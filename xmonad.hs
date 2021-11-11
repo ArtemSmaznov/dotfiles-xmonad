@@ -22,7 +22,31 @@ myClickJustFocuses = False
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
-myTerminal      = "alacritty"
+myTerminal         = "alacritty"
+-- myTextEditor       = myTerminal + " -e vim"
+myWebBrowser       = "qutebrowser"
+myIncognitoBrowser = "qutebrowser --target private-window"
+myTorBrowser       = "torbrowser-launcher"
+myFileManager      = "pcmanfm"
+myMusicPlayer      = "youtubemusic-nativefier"
+-- myCliMusicPlayer   = myTerminal + " -e tmux attach -t music"
+myVideoPlayer      = "celluloid"
+myGame             = "/usr/bin/steam-runtime %U"
+myIde              = "emacsclient -c -a 'emacs'"
+myGraphicsEditor   = "gimp"
+myVectorEditor     = "inkscape"
+myVideoEditor      = "kdenlive"
+myPhotosLibrary    = "digikam"
+myTorrentClient    = "transmission-qt"
+myVpn              = "/opt/piavpn/bin/pia-client --quiet"
+myVm               = "virtualbox"
+myLauncher         = "rofi -show drun"
+myPasswordManager  = "rofi-pass"
+
+myNetworkManager   = "nm-connection-editor"
+myBluetoothManager = "blueman-manager"
+myPowerManager     = "xfce4-power-manager-settings"
+-- myAudioManager     = terminal + " -e alsamixer"
 
 -- Width of the window border in pixels.
 --
@@ -42,13 +66,27 @@ myKeys =
     , ("M-C-q", io (exitWith ExitSuccess))                    -- Quit xmonad
 
     -- Windows
-    , ("M-q", kill)                               -- close focused window
+    , ("M-q"       , kill                  ) -- close focused window
+    , ("M1-<Tab>"  , windows W.focusDown   ) -- Move focus to the next window
+    , ("M1-S-<Tab>", windows W.focusUp     ) -- Move focus to the next window
+    , ("M-h"       , windows W.focusUp     ) -- Move focus to the previous window
+    , ("M-j"       , windows W.focusDown   ) -- Move focus to the next window
+    , ("M-k"       , windows W.focusUp     ) -- Move focus to the previous window
+    , ("M-l"       , windows W.focusDown   ) -- Move focus to the next window
+    , ("M-m"       , windows W.focusMaster ) -- Move focus to the master window
+    , ("M-S-h"     , windows W.swapUp      ) -- Swap the focused window with the previous window
+    , ("M-S-j"     , windows W.swapDown    ) -- Swap the focused window with the next window
+    , ("M-S-k"     , windows W.swapUp      ) -- Swap the focused window with the previous window
+    , ("M-S-l"     , windows W.swapDown    ) -- Swap the focused window with the next window
 
     -- Screens
     , ("M-,", prevScreen) -- launch a terminal
     , ("M-.", nextScreen) -- launch a terminal
 
     -- Layouts
+    , ("M-<Space>"  , sendMessage NextLayout            ) -- Rotate through the available layout algorithms
+    -- , ("M-S-<Space>", setLayout $ XMonad.layoutHook conf) -- Reset the layouts on the current workspace to default
+    , ("M-="      , refresh                           ) -- Resize viewed windows to the correct size
 
     -- Workspaces
 
@@ -67,34 +105,24 @@ myKeys =
     -- , ("<Print>", spawn "dm-maim")
 
     -- Launching Apps
-    , ("M-<Return>", spawn (myTerminal)) -- launch a terminal
-    , ("M-S-r", spawn "dmenu_run") -- launch dmenu
+    , ("C-M1-t"    , spawn (myTerminal))         -- launch terminal
+    , ("M-<Return>", spawn (myTerminal))         -- launch terminal
+    , ("M-c"       , spawn (myIde))              -- launch IDE
+    , ("M-b"       , spawn (myWebBrowser))       -- launch web browser
+    , ("M-i"       , spawn (myIncognitoBrowser)) -- launch web browser in incognito mode
+    , ("M-r"       , spawn (myLauncher))         -- launch launcher
+    , ("M-S-r"     , spawn "dmenu_run")          -- launch dmenu
+    , ("M-p"       , spawn (myPasswordManager))  -- autofill password
 
   ]
 
 myKeys1 conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
-    [ ((modm,               xK_r     ), spawn "dmenu_run"           ) -- launch dmenu
-    , ((modm .|. shiftMask, xK_p     ), spawn "gmrun"               ) -- launch gmrun
+    [ ((modm .|. shiftMask, xK_p     ), spawn "gmrun"               ) -- launch gmrun
 
-    , ((modm,               xK_space ), sendMessage NextLayout            ) -- Rotate through the available layout algorithms
-    , ((modm .|. shiftMask, xK_space ), setLayout $ XMonad.layoutHook conf) -- Reset the layouts on the current workspace to default
-    , ((modm,               xK_n     ), refresh                           ) -- Resize viewed windows to the correct size
-    , ((modm,               xK_equal ), refresh                           ) -- Resize viewed windows to the correct size
 
-    , ((modm,               xK_Tab   ), windows W.focusDown   )             -- Move focus to the next window
-    , ((modm .|. shiftMask, xK_Tab   ), windows W.focusUp     )             -- Move focus to the next window
-    , ((modm,               xK_h     ), windows W.focusUp     )             -- Move focus to the previous window
-    , ((modm,               xK_j     ), windows W.focusDown   )             -- Move focus to the next window
-    , ((modm,               xK_k     ), windows W.focusUp     )             -- Move focus to the previous window
-    , ((modm,               xK_l     ), windows W.focusDown   )             -- Move focus to the next window
-    , ((modm,               xK_m     ), windows W.focusMaster )             -- Move focus to the master window
 
     -- , ((modm,               xK_Return), windows W.swapMaster)               -- Swap the focused window and the master window
-    , ((modm .|. shiftMask, xK_h     ), windows W.swapUp    )               -- Swap the focused window with the previous window
-    , ((modm .|. shiftMask, xK_j     ), windows W.swapDown  )               -- Swap the focused window with the next window
-    , ((modm .|. shiftMask, xK_k     ), windows W.swapUp    )               -- Swap the focused window with the previous window
-    , ((modm .|. shiftMask, xK_l     ), windows W.swapDown  )               -- Swap the focused window with the next window
 
     -- , ((modm,               xK_h     ), sendMessage Shrink            ) -- Shrink the master area
     -- , ((modm,               xK_l     ), sendMessage Expand            ) -- Expand the master area
