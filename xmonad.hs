@@ -116,7 +116,7 @@ myKeys =
 
   ]
 
-myKeys1 conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
+myLegacyKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     [ ((modm .|. shiftMask, xK_p     ), spawn "gmrun"               ) -- launch gmrun
 
@@ -278,7 +278,7 @@ defaults = def {
         focusedBorderColor = myFocusedBorderColor,
 
       -- key bindings
-        -- keys               = myKeys,
+        keys               = myLegacyKeys,
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts

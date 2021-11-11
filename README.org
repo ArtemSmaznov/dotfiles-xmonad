@@ -4,6 +4,8 @@
 #+STARTUP: overview
 #+PROPERTY: header-args :tangle xmonad.hs
 
+Work in Progress - still setting up
+
 * Table of Contents :toc:
 - [[#intro][Intro]]
 - [[#imports][Imports]]
@@ -178,7 +180,7 @@ myKeys =
 
 *** Legacy
 #+begin_src haskell
-myKeys1 conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
+myLegacyKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     [ ((modm .|. shiftMask, xK_p     ), spawn "gmrun"               ) -- launch gmrun
 
@@ -355,7 +357,7 @@ defaults = def {
         focusedBorderColor = myFocusedBorderColor,
 
       -- key bindings
-        -- keys               = myKeys,
+        keys               = myLegacyKeys,
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
