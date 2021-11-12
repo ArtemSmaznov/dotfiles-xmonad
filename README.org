@@ -218,12 +218,22 @@ myKeys =
 
     -- Workspaces
 
+    -- dm-scripts
+    , ("M-s M-s"        , spawn "$HOME/.local/bin/dmscripts/dm-master"     ) 
+    , ("M-s w"          , spawn "$HOME/.local/bin/dmscripts/dm-wallpaper"  ) 
+    , ("M-s r"          , spawn "$HOME/.local/bin/dmscripts/dm-record"     ) 
+    , ("M-s p"          , spawn "$HOME/.local/bin/dmscripts/dm-power"      ) 
+    , ("M-s s"          , spawn "$HOME/.local/bin/dmscripts/dm-screenshot" ) 
+    , ("M-s b"          , spawn "$HOME/.local/bin/dmscripts/dm-bookman"    ) 
+    , ("M-s n"          , spawn "$HOME/.local/bin/dmscripts/dm-notify"     ) 
+    , ("M-s <Backslash>", spawn "$HOME/.local/bin/dmscripts/dm-notify"     ) 
+      
     -- Power Control
     , ("M-z z", spawn "$HOME/.local/bin/dmscripts/dm-power"         ) -- dm-power
     , ("M-z l", spawn "$HOME/.local/bin/dmscripts/dm-power lock"    ) -- Lock Screen
     , ("M-z s", spawn "$HOME/.local/bin/dmscripts/dm-power suspend" ) -- Suspend System
     , ("M-z p", spawn "$HOME/.local/bin/dmscripts/dm-power poweroff") -- Shutdown System
-    , ("M-z r", spawn "$HOME/.local/bin/dmscripts/dm-power reboot"  ) -- Reboot
+    , ("M-z r", spawn "$HOME/.local/bin/dmscripts/dm-power reboot"  ) -- Reboot System
     , ("M-z w", spawn "$HOME/.local/bin/dmscripts/dm-power windows" ) -- Reboot to Windows
 
     -- Screenshot
@@ -247,14 +257,15 @@ myKeys =
     -- , ("<Print>", spawn "dm-maim")
 
     -- Launching Apps
-    , ("C-M1-t"    , spawn (myTerminal))         -- launch terminal
-    , ("M-<Return>", spawn (myTerminal))         -- launch terminal
-    , ("M-c"       , spawn (myIde))              -- launch IDE
-    , ("M-b"       , spawn (myWebBrowser))       -- launch web browser
-    , ("M-i"       , spawn (myIncognitoBrowser)) -- launch web browser in incognito mode
-    , ("M-r"       , spawn (myLauncher))         -- launch launcher
-    , ("M-S-r"     , spawn "dmenu_run")          -- launch dmenu
-    , ("M-p"       , spawn (myPasswordManager))  -- autofill password
+    , ("C-M1-t"    , spawn (myTerminal))         -- Launch Terminal
+    , ("M-<Return>", spawn (myTerminal))         -- Launch Terminal
+    , ("M-c"       , spawn (myIde))              -- Launch IDE
+    , ("M-e"       , spawn (myFileManager))      -- Launch File Manager
+    , ("M-b"       , spawn (myWebBrowser))       -- Launch Web Browser
+    , ("M-i"       , spawn (myIncognitoBrowser)) -- Launch Web Browser in Incognito Mode
+    , ("M-r"       , spawn (myLauncher))         -- Launch Launcher
+    , ("M-S-r"     , spawn "dmenu_run")          -- Launch dmenu
+    , ("M-p"       , spawn (myPasswordManager))  -- Autofill Passwords
 
   ]
 #+end_src
