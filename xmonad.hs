@@ -49,7 +49,7 @@ myClickJustFocuses :: Bool
 myClickJustFocuses = False
 
 myTerminal         = "alacritty"
--- myTextEditor       = myTerminal + " -e vim"
+myTextEditor       = "alacritty -e vim"
 myWebBrowser       = "qutebrowser"
 myIncognitoBrowser = "qutebrowser --target private-window"
 myTorBrowser       = "torbrowser-launcher"
@@ -59,10 +59,10 @@ myMusicPlayer      = "youtubemusic-nativefier"
 myVideoPlayer      = "celluloid"
 myGame             = "/usr/bin/steam-runtime %U"
 myIde              = "emacsclient -c -a 'emacs'"
-myGraphicsEditor   = "gimp"
+myImageEditor      = "gimp"
 myVectorEditor     = "inkscape"
 myVideoEditor      = "kdenlive"
-myPhotosLibrary    = "digikam"
+myPhotoLibrary    = "digikam"
 myTorrentClient    = "transmission-qt"
 myVpn              = "/opt/piavpn/bin/pia-client --quiet"
 myVm               = "virtualbox"
@@ -84,51 +84,96 @@ myModMask       = mod4Mask
 myKeys :: [(String, X ())]
 myKeys =
     -- System
-    [ ("M-C-r", spawn "xmonad --recompile; xmonad --restart") -- Restart xmonad
-    , ("M-C-q", io (exitWith ExitSuccess))                    -- Quit xmonad
+    [ ("M-C-r", spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
+    , ("M-C-q", io (exitWith ExitSuccess)                   ) -- Quit XMonad
+      -- "M-d" Debug
+      -- "M1-S" Language Switching
+      -- "M-t z" Changing UI
 
     -- Windows
-    , ("M-q"       , kill                  ) -- close focused window
-    , ("M1-<Tab>"  , windows W.focusDown   ) -- Move focus to the next window
-    , ("M1-S-<Tab>", windows W.focusUp     ) -- Move focus to the next window
-    , ("M-h"       , windows W.focusUp     ) -- Move focus to the previous window
-    , ("M-j"       , windows W.focusDown   ) -- Move focus to the next window
-    , ("M-k"       , windows W.focusUp     ) -- Move focus to the previous window
-    , ("M-l"       , windows W.focusDown   ) -- Move focus to the next window
-    , ("M-m"       , windows W.focusMaster ) -- Move focus to the master window
-    , ("M-S-h"     , windows W.swapUp      ) -- Swap the focused window with the previous window
-    , ("M-S-j"     , windows W.swapDown    ) -- Swap the focused window with the next window
-    , ("M-S-k"     , windows W.swapUp      ) -- Swap the focused window with the previous window
-    , ("M-S-l"     , windows W.swapDown    ) -- Swap the focused window with the next window
+    , ("M-q"       , kill                  ) -- Close focused Window
+    -- , ("M-<F11>"   , windows W.            ) -- Toggle Fullscreen
+    -- , ("M-f"       , windows W.            ) -- Toggle Floating
+    -- , ("M-m"       , windows W.            ) -- Toggle Maximize
+    -- , ("M-d"       , windows W.            ) -- Toggle Minimize
+    , ("M1-<Tab>"  , windows W.focusDown   ) -- Move focus to next Window
+    , ("M1-S-<Tab>", windows W.focusUp     ) -- Move focus to prev Window
+    , ("M-h"       , windows W.focusUp     ) -- Move focus to prev Window
+    , ("M-j"       , windows W.focusDown   ) -- Move focus to next Window
+    , ("M-k"       , windows W.focusUp     ) -- Move focus to prev Window
+    , ("M-l"       , windows W.focusDown   ) -- Move focus to next Window
+    , ("M-m"       , windows W.focusMaster ) -- Move focus to Master Window
+    , ("M-S-h"     , windows W.swapUp      ) -- Swap focused Window with prev Window
+    , ("M-S-j"     , windows W.swapDown    ) -- Swap focused Window with next Window
+    , ("M-S-k"     , windows W.swapUp      ) -- Swap focused Window with prev Window
+    , ("M-S-l"     , windows W.swapDown    ) -- Swap focused Window with next Window
+    -- , ("M-C-h"     , windows W.            ) -- Grow focused Window left
+    -- , ("M-C-l"     , windows W.            ) -- Grow focused Window right
+    -- , ("M-C-j"     , windows W.            ) -- Grow focused Window down
+    -- , ("M-C-k"     , windows W.            ) -- Grow focused Window up
 
-    -- Screens
-    , ("M-,", prevScreen) -- launch a terminal
-    , ("M-.", nextScreen) -- launch a terminal
+    -- Monitors
+    , ("M-,", prevScreen) -- Move focus to prev Screen
+    , ("M-.", nextScreen) -- Move focus to next Screen
 
     -- Layouts
-    , ("M-<Space>"  , sendMessage NextLayout            ) -- Rotate through the available layout algorithms
-    -- , ("M-S-<Space>", setLayout $ XMonad.layoutHook conf) -- Reset the layouts on the current workspace to default
-    , ("M-="      , refresh                           ) -- Resize viewed windows to the correct size
+    , ("M-<Space>"   , sendMessage NextLayout            ) -- Switch Layouts
+    -- , ("M-S-<Space>" , setLayout $ XMonad.layoutHook conf) -- Switch Layouts
+    -- , ("M-M1-<Space>", setLayout $ XMonad.layoutHook conf) -- Switch to default Layout
+    , ("M-="         , refresh                           ) -- Resize viewed windows to the correct size
 
     -- Workspaces
+    -- , ("M-<Tab>" ,                    ) -- Toggle Workspace
+    -- , ("M-`"     ,                    ) -- Toggle Scratchpad
+
+    -- Media Keys
+    , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute" )
+    , ("<XF86AudioRaiseVolume>", spawn "amixer set Master 3%+ unmute" )
+    , ("<XF86AudioMute>"       , spawn "amixer set Master toggle"     )
+    -- , ("<XF86AudioPlay>"       , spawn "mocp --play"                  )
+    -- , ("<XF86AudioPrev>"       , spawn "mocp --previous"              )
+    -- , ("<XF86AudioNext>"       , spawn "mocp --next"                  )
+
+    -- Launching Apps
+    , ("C-M1-t"    , spawn (myTerminal)        ) -- Launch Terminal
+    , ("M-<Return>", spawn (myTerminal)        ) -- Launch Terminal
+    , ("M-c"       , spawn (myIde)             ) -- Launch IDE
+    , ("M-e"       , spawn (myFileManager)     ) -- Launch File Manager
+    , ("M-b"       , spawn (myWebBrowser)      ) -- Launch Web Browser
+    , ("M-i"       , spawn (myIncognitoBrowser)) -- Launch Web Browser in Incognito Mode
+    , ("M-p"       , spawn (myPasswordManager) ) -- Autofill Passwords
+    , ("M-r"       , spawn (myLauncher)        ) -- Launch Launcher
+    , ("M-S-r"     , spawn "dmenu_run"         ) -- Launch dmenu
+    -- Primary
+    , ("M-o t"     , spawn (myTorBrowser)      ) -- Launch Tor Browser
+    , ("M-o m"     , spawn (myMusicPlayer)     ) -- Launch Music Player
+    , ("M-o v"     , spawn (myVideoPlayer)     ) -- Launch Video Player
+    , ("M-o s"     , spawn (myGame)            ) -- Launch Steam
+    -- Secondary
+    , ("C-M1-o t"  , spawn (myTextEditor)      ) -- Launch Text Editor
+    , ("C-M1-o p"  , spawn (myPhotoLibrary)    ) -- Launch Photo Library
+    , ("C-M1-o g"  , spawn (myImageEditor)     ) -- Launch Image Editor
+    , ("C-M1-o r"  , spawn (myVectorEditor)    ) -- Launch Vector Editor
+    , ("C-M1-o v"  , spawn (myVideoEditor)     ) -- Launch Video Editor
 
     -- dm-scripts
-    , ("M-s M-s"        , spawn "$HOME/.local/bin/dmscripts/dm-master"     ) 
-    , ("M-s w"          , spawn "$HOME/.local/bin/dmscripts/dm-wallpaper"  ) 
-    , ("M-s r"          , spawn "$HOME/.local/bin/dmscripts/dm-record"     ) 
-    , ("M-s p"          , spawn "$HOME/.local/bin/dmscripts/dm-power"      ) 
-    , ("M-s s"          , spawn "$HOME/.local/bin/dmscripts/dm-screenshot" ) 
-    , ("M-s b"          , spawn "$HOME/.local/bin/dmscripts/dm-bookman"    ) 
-    , ("M-s n"          , spawn "$HOME/.local/bin/dmscripts/dm-notify"     ) 
-    , ("M-s <Backslash>", spawn "$HOME/.local/bin/dmscripts/dm-notify"     ) 
-      
+    , ("M-s M-s" , spawn "$HOME/.local/bin/dmscripts/dm-master"     )
+    , ("M-s w"   , spawn "$HOME/.local/bin/dmscripts/dm-wallpaper"  )
+    , ("M-s r"   , spawn "$HOME/.local/bin/dmscripts/dm-record"     )
+    , ("M-s p"   , spawn "$HOME/.local/bin/dmscripts/dm-power"      )
+    , ("M-s s"   , spawn "$HOME/.local/bin/dmscripts/dm-screenshot" )
+    , ("M-s b"   , spawn "$HOME/.local/bin/dmscripts/dm-bookman"    )
+    , ("M-s n"   , spawn "$HOME/.local/bin/dmscripts/dm-notify"     )
+    , ("M-s \\"  , spawn "$HOME/.local/bin/dmscripts/dm-notify"     )
+
     -- Power Control
-    , ("M-z z", spawn "$HOME/.local/bin/dmscripts/dm-power"         ) -- dm-power
-    , ("M-z l", spawn "$HOME/.local/bin/dmscripts/dm-power lock"    ) -- Lock Screen
-    , ("M-z s", spawn "$HOME/.local/bin/dmscripts/dm-power suspend" ) -- Suspend System
-    , ("M-z p", spawn "$HOME/.local/bin/dmscripts/dm-power poweroff") -- Shutdown System
-    , ("M-z r", spawn "$HOME/.local/bin/dmscripts/dm-power reboot"  ) -- Reboot System
-    , ("M-z w", spawn "$HOME/.local/bin/dmscripts/dm-power windows" ) -- Reboot to Windows
+    , ("M1-<F4>", spawn "$HOME/.local/bin/dmscripts/dm-power"         ) -- Logout Menu
+    , ("M-z z"  , spawn "$HOME/.local/bin/dmscripts/dm-power"         ) -- Logout Menu
+    , ("M-z l"  , spawn "$HOME/.local/bin/dmscripts/dm-power lock"    ) -- Lock Screen
+    , ("M-z s"  , spawn "$HOME/.local/bin/dmscripts/dm-power suspend" ) -- Suspend System
+    , ("M-z p"  , spawn "$HOME/.local/bin/dmscripts/dm-power poweroff") -- Shutdown System
+    , ("M-z r"  , spawn "$HOME/.local/bin/dmscripts/dm-power reboot"  ) -- Reboot System
+    , ("M-z w"  , spawn "$HOME/.local/bin/dmscripts/dm-power windows" ) -- Reboot to Windows
 
     -- Screenshot
     , ("M-<Print>"  , spawn "$HOME/.local/bin/dmscripts/dm-screenshot full"   ) -- Full Desktop Screenshot
@@ -136,31 +181,7 @@ myKeys =
     , ("M-S-<Print>", spawn "$HOME/.local/bin/dmscripts/dm-screenshot area"   ) -- Selection Area Screenshot
     , ("M1-<Print>" , spawn "$HOME/.local/bin/dmscripts/dm-screenshot window" ) -- Active Window Screenshot
 
-    -- Media Keys
-    , ("<XF86AudioMute>", spawn "amixer set Master toggle")
-    , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute")
-    , ("<XF86AudioRaiseVolume>", spawn "amixer set Master 3%+ unmute")
-    -- , ("<XF86AudioPlay>", spawn "mocp --play")
-    -- , ("<XF86AudioPrev>", spawn "mocp --previous")
-    -- , ("<XF86AudioNext>", spawn "mocp --next")
-    -- , ("<XF86HomePage>", spawn "qutebrowser https://www.youtube.com/c/DistroTube")
-    -- , ("<XF86Search>", spawn "dm-websearch")
-    -- , ("<XF86Mail>", runOrRaise "thunderbird" (resource =? "thunderbird"))
-    -- , ("<XF86Calculator>", runOrRaise "qalculate-gtk" (resource =? "qalculate-gtk"))
-    -- , ("<XF86Eject>", spawn "toggleeject")
-    -- , ("<Print>", spawn "dm-maim")
-
-    -- Launching Apps
-    , ("C-M1-t"    , spawn (myTerminal))         -- Launch Terminal
-    , ("M-<Return>", spawn (myTerminal))         -- Launch Terminal
-    , ("M-c"       , spawn (myIde))              -- Launch IDE
-    , ("M-e"       , spawn (myFileManager))      -- Launch File Manager
-    , ("M-b"       , spawn (myWebBrowser))       -- Launch Web Browser
-    , ("M-i"       , spawn (myIncognitoBrowser)) -- Launch Web Browser in Incognito Mode
-    , ("M-r"       , spawn (myLauncher))         -- Launch Launcher
-    , ("M-S-r"     , spawn "dmenu_run")          -- Launch dmenu
-    , ("M-p"       , spawn (myPasswordManager))  -- Autofill Passwords
-
+    -- Notifications
   ]
 
 myLegacyKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
