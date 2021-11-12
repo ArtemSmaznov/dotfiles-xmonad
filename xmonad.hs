@@ -111,6 +111,14 @@ myKeys =
     , ("M-="      , refresh                           ) -- Resize viewed windows to the correct size
 
     -- Workspaces
+    
+    -- Power Control
+    , ("M-z z", spawn "$HOME/.local/bin/dmscripts/dm-power") -- dm-power
+    , ("M-z l", spawn "$HOME/.local/bin/dmscripts/dm-power lock") -- Lock Screen
+    , ("M-z s", spawn "$HOME/.local/bin/dmscripts/dm-power suspend") -- Suspend System
+    , ("M-z p", spawn "$HOME/.local/bin/dmscripts/dm-power poweroff") -- Shutdown System
+    , ("M-z r", spawn "$HOME/.local/bin/dmscripts/dm-power reboot") -- Reboot
+    , ("M-z w", spawn "$HOME/.local/bin/dmscripts/dm-power windows") -- Reboot to Windows
 
     -- Media Keys
     , ("<XF86AudioMute>", spawn "amixer set Master toggle")
