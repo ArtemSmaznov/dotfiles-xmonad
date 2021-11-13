@@ -26,6 +26,19 @@ Work in Progress - still setting up
 - [[#rules][Rules]]
 - [[#help][Help]]
 
+* Dependencies
+|----------------+----------------------|
+| Name           | Description          |
+|----------------+----------------------|
+| [[https://archlinux.org/packages/?name=xmonad][xmonad]]         | Window Manager       |
+| [[https://archlinux.org/packages/?name=xmonad-contrib][xmonad-contrib]] | Additional Libraries |
+| [[https://archlinux.org/packages/?name=xmobar][xmobar]]         | Status Bar           |
+|----------------+----------------------|
+
+#+begin_example shell
+sudo pacman -S xmonad xmonad-contrib xmobar
+#+end_example
+
 * Imports
 Base
 #+begin_src haskell
@@ -420,7 +433,7 @@ workspace.
 
 To find the property name associated with a program, use
 
-#+begin_example bash
+#+begin_example shell
 xprop | grep WM_CLASS
 #+end_example
 
