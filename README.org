@@ -40,6 +40,7 @@ import qualified Data.Map        as M
 Actions
 #+begin_src haskell
 import XMonad.Actions.CycleWS (Direction1D(..), moveTo, shiftTo, WSType(..), nextScreen, prevScreen)
+import XMonad.Actions.Navigation2D
 #+end_src
 
 Layouts
@@ -208,29 +209,34 @@ myKeys =
 
     -- Windows
     , ("M-q"       , kill                  ) -- Close focused Window
-    -- , ("M-<F11>"   , windows W.            ) -- Toggle Fullscreen
-    -- , ("M-f"       , windows W.            ) -- Toggle Floating
-    -- , ("M-m"       , windows W.            ) -- Toggle Maximize
-    -- , ("M-d"       , windows W.            ) -- Toggle Minimize
+    -- , ("M-<F11>"   , windows W.         ) -- Toggle Fullscreen
+    -- , ("M-f"       , windows W.         ) -- Toggle Floating
+    -- , ("M-m"       , windows W.         ) -- Toggle Maximize
+    -- , ("M-d"       , windows W.         ) -- Toggle Minimize
     , ("M1-<Tab>"  , windows W.focusDown   ) -- Move focus to next Window
     , ("M1-S-<Tab>", windows W.focusUp     ) -- Move focus to prev Window
-    , ("M-h"       , windows W.focusUp     ) -- Move focus to prev Window
-    , ("M-j"       , windows W.focusDown   ) -- Move focus to next Window
-    , ("M-k"       , windows W.focusUp     ) -- Move focus to prev Window
-    , ("M-l"       , windows W.focusDown   ) -- Move focus to next Window
+    , ("M-/"       , switchLayer           ) -- Switch navigation layer (Tiled vs Floating screens)
+    , ("M-h"       , windowGo L False      ) -- Move focus to left Window
+    , ("M-j"       , windowGo D False      ) -- Move focus to below Window
+    , ("M-k"       , windowGo U False      ) -- Move focus to above Window
+    , ("M-l"       , windowGo R False      ) -- Move focus to right Window
     , ("M-m"       , windows W.focusMaster ) -- Move focus to Master Window
-    , ("M-S-h"     , windows W.swapUp      ) -- Swap focused Window with prev Window
-    , ("M-S-j"     , windows W.swapDown    ) -- Swap focused Window with next Window
-    , ("M-S-k"     , windows W.swapUp      ) -- Swap focused Window with prev Window
-    , ("M-S-l"     , windows W.swapDown    ) -- Swap focused Window with next Window
+    , ("M-S-h"     , windowSwap L False    ) -- Swap focused Window with left Window
+    , ("M-S-j"     , windowSwap D False    ) -- Swap focused Window with below Window
+    , ("M-S-k"     , windowSwap U False    ) -- Swap focused Window with above Window
+    , ("M-S-l"     , windowSwap R False    ) -- Swap focused Window with right Window
     , ("M-C-h"     , sendMessage Shrink    ) -- Grow focused Window left
     , ("M-C-l"     , sendMessage Expand    ) -- Grow focused Window right
     , ("M-C-j"     , sendMessage Shrink    ) -- Grow focused Window down
     , ("M-C-k"     , sendMessage Expand    ) -- Grow focused Window up
 
     -- Monitors
-    , ("M-,", prevScreen) -- Move focus to prev Screen
-    , ("M-.", nextScreen) -- Move focus to next Screen
+    , ("M-,"  , screenGo L False      ) -- Move focus to left Screen
+    , ("M-."  , screenGo R False      ) -- Move focus to right Screen
+    , ("M-S-,", windowToScreen L False) -- Move focused Window to the left Screen
+    , ("M-S-.", windowToScreen R False) -- Move focused Window to the right Screen
+    , ("M-C-,", screenSwap L False    ) -- Swap active Screen with the left Screen
+    , ("M-C-.", screenSwap R False    ) -- Swap active Screen with the right Screen
 
     -- Layouts
     , ("M-<Space>"   , sendMessage NextLayout            ) -- Switch Layouts
