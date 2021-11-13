@@ -7,6 +7,7 @@
 Work in Progress - still setting up
 
 * Table of Contents :toc:
+- [[#dependencies][Dependencies]]
 - [[#imports][Imports]]
 - [[#main][Main]]
 - [[#hooks][Hooks]]
@@ -24,6 +25,8 @@ Work in Progress - still setting up
 - [[#workspaces][Workspaces]]
 - [[#layouts][Layouts]]
 - [[#rules][Rules]]
+- [[#xmobar][XMobar]]
+  - [[#main-monitor][Main Monitor]]
 - [[#help][Help]]
 
 * Dependencies
@@ -61,10 +64,16 @@ Layouts
 import XMonad.Layout.Spacing
 #+end_src
 
+Hooks
+#+begin_src haskell
+import XMonad.Hooks.ManageDocks
+#+end_src
+
 Util
 #+begin_src haskell
 import XMonad.Util.EZConfig (additionalKeysP)
 import XMonad.Util.SpawnOnce
+import XMonad.Util.Run (runProcessWithInput, safeSpawn, spawnPipe)
 #+end_src
 
 * Main
@@ -111,6 +120,7 @@ per-workspace layout choices.
 By default, do nothing.
 #+begin_src haskell
 myStartupHook = do
+    spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
     spawnOnce "$HOME/.config/autostart-scripts/testing.sh"
 #+end_src
 
@@ -121,7 +131,7 @@ Defines a custom handler function for X Events. The function should
 return (All True) if the default handler is to be run afterwards. To
 combine event hooks use =mappend= or =mconcat= from =Data.Monoid=.
 #+begin_src haskell
-myEventHook = mempty
+myEventHook = docksEventHook
 #+end_src
 
 ** Status bars and logging
@@ -129,6 +139,31 @@ Perform an arbitrary action on each internal state change or X event.
 See the =XMonad.Hooks.DynamicLog= extension for examples.
 #+begin_src haskell
 myLogHook = return ()
+#+end_src
+
+** Rules
+Execute arbitrary actions and =WindowSet= manipulations when managing
+a new window. You can use this to, for example, always float a
+particular program, or have a client always appear on a particular
+workspace.
+
+To find the property name associated with a program, use
+
+#+begin_example shell
+xprop | grep WM_CLASS
+#+end_example
+
+and click on the client you're interested in.
+
+To match on the WM_NAME, you can use =title= in the same way that
+=className= and =resource= are used below.
+
+#+begin_src haskell
+myManageHook = composeAll
+    [ className =? "MPlayer"        --> doFloat
+    , className =? "Gimp"           --> doFloat
+    , resource  =? "desktop_window" --> doIgnore
+    , resource  =? "kdesktop"       --> doIgnore ]
 #+end_src
 
 * General Settings
@@ -174,14 +209,10 @@ myPowerManager     = "xfce4-power-manager-settings"
 #+end_src
 
 * Theme
-Width of the window border in pixels
 #+begin_src haskell
-myBorderWidth = 3
-#+end_src
-
-Size of the gap between windows
-#+begin_src haskell
+myBarSize = 24
 myGapSize = 5
+myBorderWidth = 3
 #+end_src
 
 Border colors for unfocused and focused windows, respectively
@@ -410,7 +441,7 @@ defaults, as xmonad preserves your old layout settings by default.
 The available layouts.  Note that each layout is separated by =|||=,
 which denotes layout choice.
 #+begin_src haskell
-myLayoutHook = tiled ||| Mirror tiled ||| Full
+myLayoutHook = avoidStruts (tiled ||| Mirror tiled ||| Full)
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -425,30 +456,117 @@ myLayoutHook = tiled ||| Mirror tiled ||| Full
      delta   = 3/100
 #+end_src
 
-* Rules
-Execute arbitrary actions and =WindowSet= manipulations when managing
-a new window. You can use this to, for example, always float a
-particular program, or have a client always appear on a particular
-workspace.
+* XMobar
+** Main Monitor
+#+begin_src haskell :tangle xmobar/mainScreen.hs
+Config { 
+   -- appearance
+     -- font =         "xft:Bitstream Vera Sans Mono:size=9:bold:antialias=true"
+     font =         "xft:SF Pro Text Regular:size=9:bold:antialias=true"
+     -- font =         "xft:Font Awesome 5 Free Regular:size=9:bold:antialias=true"
+   , bgColor =      "#282828"
+   , fgColor =      "#ebdbb2"
+   , position =     TopH 24
 
-To find the property name associated with a program, use
+   -- layout
+   , sepChar =  "%"   -- delineator between plugin names and straight text
+   , alignSep = "}{"  -- separator between left-right alignment
+   , template = "%battery% | %multicpu% | %coretemp% | %memory% | %dynnetwork% }{ %RJTT% | %date% || %kbd% "
 
-#+begin_example shell
-xprop | grep WM_CLASS
-#+end_example
+   -- general behavior
+   , lowerOnStart =     True    -- send to bottom of window stack on start
+   , hideOnStart =      False   -- start with window unmapped (hidden)
+   , allDesktops =      True    -- show on all desktops
+   , overrideRedirect = True    -- set the Override Redirect flag (Xlib)
+   , pickBroadest =     False   -- choose widest display (multi-monitor)
+   , persistent =       True    -- enable/disable hiding (True = disabled)
 
-and click on the client you're interested in.
+   -- plugins
+   --   Numbers can be automatically colored according to their value. xmobar
+   --   decides color based on a three-tier/two-cutoff system, controlled by
+   --   command options:
+   --     --Low sets the low cutoff
+   --     --High sets the high cutoff
+   --
+   --     --low sets the color below --Low cutoff
+   --     --normal sets the color between --Low and --High cutoffs
+   --     --High sets the color above --High cutoff
+   --
+   --   The --template option controls how the plugin is displayed. Text
+   --   color can be set by enclosing in <fc></fc> tags. For more details
+   --   see http://projects.haskell.org/xmobar/#system-monitor-plugins.
+   , commands = 
 
-To match on the WM_NAME, you can use =title= in the same way that
-=className= and =resource= are used below.
+        -- weather monitor
+        [ Run Weather "RJTT" [ "--template", "<skyCondition> | <fc=#4682B4><tempC></fc>°C | <fc=#4682B4><rh></fc>% | <fc=#4682B4><pressure></fc>hPa"
+                             ] 36000
 
-#+begin_src haskell
-myManageHook = composeAll
-    [ className =? "MPlayer"        --> doFloat
-    , className =? "Gimp"           --> doFloat
-    , resource  =? "desktop_window" --> doIgnore
-    , resource  =? "kdesktop"       --> doIgnore ]
+        -- network activity monitor (dynamic interface resolution)
+        , Run DynNetwork     [ "--template" , "<dev>: <tx>kB/s|<rx>kB/s"
+                             , "--Low"      , "1000"       -- units: B/s
+                             , "--High"     , "5000"       -- units: B/s
+                             , "--low"      , "darkgreen"
+                             , "--normal"   , "darkorange"
+                             , "--high"     , "darkred"
+                             ] 10
+
+        -- cpu activity monitor
+        , Run MultiCpu       [ "--template" , "Cpu: <total0>%|<total1>%"
+                             , "--Low"      , "50"         -- units: %
+                             , "--High"     , "85"         -- units: %
+                             , "--low"      , "darkgreen"
+                             , "--normal"   , "darkorange"
+                             , "--high"     , "darkred"
+                             ] 10
+
+        -- cpu core temperature monitor
+        , Run CoreTemp       [ "--template" , "Temp: <core0>°C|<core1>°C"
+                             , "--Low"      , "70"        -- units: °C
+                             , "--High"     , "80"        -- units: °C
+                             , "--low"      , "darkgreen"
+                             , "--normal"   , "darkorange"
+                             , "--high"     , "darkred"
+                             ] 50
+                          
+        -- memory usage monitor
+        , Run Memory         [ "--template" ,"Mem: <usedratio>%"
+                             , "--Low"      , "20"        -- units: %
+                             , "--High"     , "90"        -- units: %
+                             , "--low"      , "darkgreen"
+                             , "--normal"   , "darkorange"
+                             , "--high"     , "darkred"
+                             ] 10
+
+        -- battery monitor
+        , Run Battery        [ "--template" , "Batt: <acstatus>"
+                             , "--Low"      , "10"        -- units: %
+                             , "--High"     , "80"        -- units: %
+                             , "--low"      , "darkred"
+                             , "--normal"   , "darkorange"
+                             , "--high"     , "darkgreen"
+
+                             , "--" -- battery specific options
+                                       -- discharging status
+                                       , "-o"	, "<left>% (<timeleft>)"
+                                       -- AC "on" status
+                                       , "-O"	, "<fc=#dAA520>Charging</fc>"
+                                       -- charged status
+                                       , "-i"	, "<fc=#006000>Charged</fc>"
+                             ] 50
+
+        -- time and date indicator 
+        --   (%F = y-m-d date, %a = day of week, %T = h:m:s time)
+        , Run Date           "<fc=#ABABAB>%F (%a) %T</fc>" "date" 10
+
+        -- keyboard layout indicator
+        , Run Kbd            [ ("us" , "<fc=#00008B>US</fc>")
+                             , ("ru" , "<fc=#8B0000>RU</fc>")
+                             ]
+        ]
+   }
 #+end_src
+
+** Secondary Monitor
 
 * TODO Help
 - Not updated yet

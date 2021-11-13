@@ -10,8 +10,11 @@ import XMonad.Actions.Navigation2D
 
 import XMonad.Layout.Spacing
 
+import XMonad.Hooks.ManageDocks
+
 import XMonad.Util.EZConfig (additionalKeysP)
 import XMonad.Util.SpawnOnce
+import XMonad.Util.Run (runProcessWithInput, safeSpawn, spawnPipe)
 
 main = xmonad defaults
 
@@ -39,11 +42,18 @@ defaults = def {
     } `additionalKeysP` myKeys
 
 myStartupHook = do
+    spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
     spawnOnce "$HOME/.config/autostart-scripts/testing.sh"
 
-myEventHook = mempty
+myEventHook = docksEventHook
 
 myLogHook = return ()
+
+myManageHook = composeAll
+    [ className =? "MPlayer"        --> doFloat
+    , className =? "Gimp"           --> doFloat
+    , resource  =? "desktop_window" --> doIgnore
+    , resource  =? "kdesktop"       --> doIgnore ]
 
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse = False
@@ -77,9 +87,9 @@ myBluetoothManager = "blueman-manager"
 myPowerManager     = "xfce4-power-manager-settings"
 -- myAudioManager     = terminal + " -e alsamixer"
 
-myBorderWidth = 3
-
+myBarSize = 24
 myGapSize = 5
+myBorderWidth = 3
 
 myNormalBorderColor  = "#928374"
 myFocusedBorderColor = "#fb4934"
@@ -255,7 +265,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 -- myWorkspaces    = ["","","","","","","","",""]
 
-myLayoutHook = tiled ||| Mirror tiled ||| Full
+myLayoutHook = avoidStruts (tiled ||| Mirror tiled ||| Full)
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -268,12 +278,6 @@ myLayoutHook = tiled ||| Mirror tiled ||| Full
 
      -- Percent of screen to increment by when resizing panes
      delta   = 3/100
-
-myManageHook = composeAll
-    [ className =? "MPlayer"        --> doFloat
-    , className =? "Gimp"           --> doFloat
-    , resource  =? "desktop_window" --> doIgnore
-    , resource  =? "kdesktop"       --> doIgnore ]
 
 help :: String
 help = unlines ["The default modifier key is 'alt'. Default keybindings:",
