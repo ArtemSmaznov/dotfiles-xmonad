@@ -317,11 +317,11 @@ myKeys =
     , ("M1-<Print>" , spawn "$HOME/.local/bin/dmscripts/dm-screenshot window" ) -- Active Window Screenshot
 
     -- Notifications
-    , ("M-\\"  , spawn "$HOME/.local/bin/dmscripts/dm-notify recents" ) -- Show recent Notifications
-    , ("M-r"   , spawn "$HOME/.local/bin/dmscripts/dm-notify recents" ) -- Show recent Notifications
-    , ("M-S-c" , spawn "$HOME/.local/bin/dmscripts/dm-notify clear"   ) -- Clear all Notifications
-    , ("M-c"   , spawn "$HOME/.local/bin/dmscripts/dm-notify close"   ) -- Clear last Notification
-    , ("M-a"   , spawn "$HOME/.local/bin/dmscripts/dm-notify context" ) -- Open last Notification
+    , ("M-\\ \\"  , spawn "$HOME/.local/bin/dmscripts/dm-notify recents" ) -- Show recent Notifications
+    , ("M-\\ r"   , spawn "$HOME/.local/bin/dmscripts/dm-notify recents" ) -- Show recent Notifications
+    , ("M-\\ S-c" , spawn "$HOME/.local/bin/dmscripts/dm-notify clear"   ) -- Clear all Notifications
+    , ("M-\\ c"   , spawn "$HOME/.local/bin/dmscripts/dm-notify close"   ) -- Clear last Notification
+    , ("M-\\ a"   , spawn "$HOME/.local/bin/dmscripts/dm-notify context" ) -- Open last Notification
   ]
 #+end_src
 
