@@ -7,6 +7,8 @@ import qualified Data.Map        as M
 
 import XMonad.Actions.CycleWS (Direction1D(..), moveTo, shiftTo, WSType(..), nextScreen, prevScreen)
 
+import XMonad.Layout.Spacing
+
 import XMonad.Util.EZConfig (additionalKeysP)
 import XMonad.Util.SpawnOnce
 
@@ -28,7 +30,7 @@ defaults = def {
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
-        layoutHook         = myLayout,
+        layoutHook         = spacingWithEdge myGapSize $ myLayoutHook,
         manageHook         = myManageHook,
         handleEventHook    = myEventHook,
         logHook            = myLogHook,
@@ -76,6 +78,8 @@ myPowerManager     = "xfce4-power-manager-settings"
 
 myBorderWidth = 3
 
+myGapSize = 5
+
 myNormalBorderColor  = "#928374"
 myFocusedBorderColor = "#fb4934"
 
@@ -107,10 +111,10 @@ myKeys =
     , ("M-S-j"     , windows W.swapDown    ) -- Swap focused Window with next Window
     , ("M-S-k"     , windows W.swapUp      ) -- Swap focused Window with prev Window
     , ("M-S-l"     , windows W.swapDown    ) -- Swap focused Window with next Window
-    -- , ("M-C-h"     , windows W.            ) -- Grow focused Window left
-    -- , ("M-C-l"     , windows W.            ) -- Grow focused Window right
-    -- , ("M-C-j"     , windows W.            ) -- Grow focused Window down
-    -- , ("M-C-k"     , windows W.            ) -- Grow focused Window up
+    , ("M-C-h"     , sendMessage Shrink    ) -- Grow focused Window left
+    , ("M-C-l"     , sendMessage Expand    ) -- Grow focused Window right
+    , ("M-C-j"     , sendMessage Shrink    ) -- Grow focused Window down
+    , ("M-C-k"     , sendMessage Expand    ) -- Grow focused Window up
 
     -- Monitors
     , ("M-,", prevScreen) -- Move focus to prev Screen
@@ -245,7 +249,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 -- myWorkspaces    = ["","","","","","","","",""]
 
-myLayout = tiled ||| Mirror tiled ||| Full
+myLayoutHook = tiled ||| Mirror tiled ||| Full
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio

@@ -42,6 +42,11 @@ Actions
 import XMonad.Actions.CycleWS (Direction1D(..), moveTo, shiftTo, WSType(..), nextScreen, prevScreen)
 #+end_src
 
+Layouts
+#+begin_src haskell
+import XMonad.Layout.Spacing
+#+end_src
+
 Util
 #+begin_src haskell
 import XMonad.Util.EZConfig (additionalKeysP)
@@ -75,7 +80,7 @@ defaults = def {
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
-        layoutHook         = myLayout,
+        layoutHook         = spacingWithEdge myGapSize $ myLayoutHook,
         manageHook         = myManageHook,
         handleEventHook    = myEventHook,
         logHook            = myLogHook,
@@ -155,12 +160,17 @@ myPowerManager     = "xfce4-power-manager-settings"
 #+end_src
 
 * Theme
-Width of the window border in pixels.
+Width of the window border in pixels
 #+begin_src haskell
 myBorderWidth = 3
 #+end_src
 
-Border colors for unfocused and focused windows, respectively.
+Size of the gap between windows
+#+begin_src haskell
+myGapSize = 5
+#+end_src
+
+Border colors for unfocused and focused windows, respectively
 #+begin_src haskell
 myNormalBorderColor  = "#928374"
 myFocusedBorderColor = "#fb4934"
@@ -213,10 +223,10 @@ myKeys =
     , ("M-S-j"     , windows W.swapDown    ) -- Swap focused Window with next Window
     , ("M-S-k"     , windows W.swapUp      ) -- Swap focused Window with prev Window
     , ("M-S-l"     , windows W.swapDown    ) -- Swap focused Window with next Window
-    -- , ("M-C-h"     , windows W.            ) -- Grow focused Window left
-    -- , ("M-C-l"     , windows W.            ) -- Grow focused Window right
-    -- , ("M-C-j"     , windows W.            ) -- Grow focused Window down
-    -- , ("M-C-k"     , windows W.            ) -- Grow focused Window up
+    , ("M-C-h"     , sendMessage Shrink    ) -- Grow focused Window left
+    , ("M-C-l"     , sendMessage Expand    ) -- Grow focused Window right
+    , ("M-C-j"     , sendMessage Shrink    ) -- Grow focused Window down
+    , ("M-C-k"     , sendMessage Expand    ) -- Grow focused Window up
 
     -- Monitors
     , ("M-,", prevScreen) -- Move focus to prev Screen
@@ -381,7 +391,7 @@ defaults, as xmonad preserves your old layout settings by default.
 The available layouts.  Note that each layout is separated by =|||=,
 which denotes layout choice.
 #+begin_src haskell
-myLayout = tiled ||| Mirror tiled ||| Full
+myLayoutHook = tiled ||| Mirror tiled ||| Full
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
