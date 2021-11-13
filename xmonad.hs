@@ -1,59 +1,95 @@
 import XMonad
-import Data.Monoid
+import System.Directory
+import System.IO (hPutStrLn)
 import System.Exit
-
 import qualified XMonad.StackSet as W
-import qualified Data.Map        as M
 
 import XMonad.Actions.CycleWS (Direction1D(..), moveTo, shiftTo, WSType(..), nextScreen, prevScreen)
 import XMonad.Actions.Navigation2D
 
+import Data.Monoid
+import qualified Data.Map        as M
+
+import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, xmobarPP, xmobarColor, shorten, PP(..))
+import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, ToggleStruts(..))
+import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat, doCenterFloat)
+import XMonad.Hooks.ServerMode
+
 import XMonad.Layout.Spacing
 
-import XMonad.Hooks.ManageDocks
-
+import XMonad.Util.Dmenu
 import XMonad.Util.EZConfig (additionalKeysP)
-import XMonad.Util.SpawnOnce
+import XMonad.Util.NamedScratchpad
 import XMonad.Util.Run (runProcessWithInput, safeSpawn, spawnPipe)
+import XMonad.Util.SpawnOnce
 
-main = xmonad defaults
+main :: IO ()
+main = do
+    xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
+    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.xmonad/xmobar/secondaryScreen.hs"
+  
+    xmonad $ def 
+        -- simple stuff
+        { terminal           = myTerminal
+        , focusFollowsMouse  = myFocusFollowsMouse
+        , clickJustFocuses   = myClickJustFocuses
+        , borderWidth        = myBorderWidth
+        , modMask            = myModMask
+        , workspaces         = myWorkspaces
+        , normalBorderColor  = myNormalBorderColor
+        , focusedBorderColor = myFocusedBorderColor
 
-defaults = def {
-      -- simple stuff
-        terminal           = myTerminal,
-        focusFollowsMouse  = myFocusFollowsMouse,
-        clickJustFocuses   = myClickJustFocuses,
-        borderWidth        = myBorderWidth,
-        modMask            = myModMask,
-        workspaces         = myWorkspaces,
-        normalBorderColor  = myNormalBorderColor,
-        focusedBorderColor = myFocusedBorderColor,
+        -- key bindings
+        , keys               = myLegacyKeys
+        , mouseBindings      = myMouseBindings
 
-      -- key bindings
-        keys               = myLegacyKeys,
-        mouseBindings      = myMouseBindings,
+        -- hooks, layouts
+        , manageHook         = myManageHook <+> manageDocks
+        , handleEventHook    = myEventHook
+        , layoutHook         = spacingWithEdge myGapSize $ myLayoutHook
+        , startupHook        = myStartupHook
+        , logHook            = dynamicLogWithPP $ xmobarPP
+            { ppOutput = \x -> hPutStrLn xmproc0 x -- xmobar on Monitor 1
+                            >> hPutStrLn xmproc1 x -- xmobar on Monitor 2
 
-      -- hooks, layouts
-        layoutHook         = spacingWithEdge myGapSize $ myLayoutHook,
-        manageHook         = myManageHook,
-        handleEventHook    = myEventHook,
-        logHook            = myLogHook,
-        startupHook        = myStartupHook
+            , ppCurrent = xmobarColor "#c792ea" "" . wrap "<box type=Bottom width=2 mb=2 color=#c792ea>" "</box>"         -- Current workspace
+            , ppVisible = xmobarColor "#c792ea" ""                                                                        -- Visible but not current workspace
+            , ppHidden = xmobarColor "#82AAFF" "" . wrap "<box type=Top width=2 mt=2 color=#82AAFF>" "</box>"             -- Hidden workspaces
+            , ppHiddenNoWindows = xmobarColor "#82AAFF" ""                                                                -- Hidden workspaces (no windows)
+            , ppTitle = xmobarColor "#b3afc2" "" . shorten 60                                                             -- Title of active window
+            , ppSep =  "<fc=#666666> <fn=1>|</fn> </fc>"                                                                  -- Separator character
+            , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"                                                          -- Urgent workspace
+            -- , ppOrder  = \(ws:l:t) -> [ws,l,t]                                                                  -- order of things in xmobar
+            }
+
     } `additionalKeysP` myKeys
 
 myStartupHook = do
-    spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
     spawnOnce "$HOME/.config/autostart-scripts/testing.sh"
 
 myEventHook = docksEventHook
 
-myLogHook = return ()
-
 myManageHook = composeAll
-    [ className =? "MPlayer"        --> doFloat
-    , className =? "Gimp"           --> doFloat
-    , resource  =? "desktop_window" --> doIgnore
-    , resource  =? "kdesktop"       --> doIgnore ]
+    [ className =? "confirm"            --> doFloat
+    , className =? "file_progress"      --> doFloat
+    , className =? "dialog"             --> doFloat
+    , className =? "download"           --> doFloat
+    , className =? "error"              --> doFloat
+    , className =? "Gimp"               --> doFloat
+    , className =? "MPlayer"            --> doFloat
+    , className =? "notification"       --> doFloat
+    , className =? "splash"             --> doFloat
+    , className =? "toolbar"            --> doFloat
+    , resource  =? "desktop_window"     --> doIgnore
+    , resource  =? "kdesktop"           --> doIgnore 
+    , isFullscreen                      --> doFullFloat
+      
+    , className =? "Brave-browser"      --> doShift ( myWorkspaces !! 0 )
+    , className =? "qutebrowser"        --> doShift ( myWorkspaces !! 0 )
+    , className =? "Emacs"              --> doShift ( myWorkspaces !! 2 )
+    , className =? "Gimp"               --> doShift ( myWorkspaces !! 5 )
+    , className =? "VirtualBox Manager" --> doShift  ( myWorkspaces !! 8 )
+    ]
 
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse = False
