@@ -279,8 +279,8 @@ myKeys =
     -- System
     [ ("M-C-r", spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
     , ("M-C-q", io (exitWith ExitSuccess)                   ) -- Quit XMonad
+    -- , ("M1-<Alt_R>" , spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
       -- "M-d" Debug
-      -- "M1-S" Language Switching
       -- "M-t z" Changing UI
 
     -- Windows
@@ -393,16 +393,10 @@ myKeys =
 myLegacyKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     [ ((modm .|. shiftMask, xK_p     ), spawn "gmrun"               ) -- launch gmrun
+    
+    , ((shiftMask, xK_Alt_L), spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
 
-
-
-    -- , ((modm,               xK_Return), windows W.swapMaster)               -- Swap the focused window and the master window
-
-    -- , ((modm,               xK_h     ), sendMessage Shrink            ) -- Shrink the master area
-    -- , ((modm,               xK_l     ), sendMessage Expand            ) -- Expand the master area
     , ((modm,               xK_t     ), withFocused $ windows . W.sink) -- Push window back into tiling
-    -- , ((modm              , xK_comma ), sendMessage (IncMasterN 1)    ) -- Increment the number of windows in the master area
-    -- , ((modm              , xK_period), sendMessage (IncMasterN (-1)) ) -- Deincrement the number of windows in the master area
 
     -- Toggle the status bar gap
     -- Use this binding with avoidStruts from Hooks.ManageDocks.
