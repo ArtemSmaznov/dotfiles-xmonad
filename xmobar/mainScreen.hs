@@ -1,9 +1,9 @@
 Config {
    -- appearance
      font            = "xft:SF Pro Text Regular:size=9:bold:antialias=true"
-   , additionalFonts = [ "xft:Mononoki:pixelsize=11:antialias=true:hinting=true"
-                       , "xft:Font Awesome 5 Free Solid:pixelsize=12"
-                       , "xft:Font Awesome 5 Brands:pixelsize=12"
+   , additionalFonts = [ "xft:Font Awesome 5 Free Solid:pixelsize=16"
+                       , "xft:Font Awesome 5 Brands:pixelsize=16"
+                       , "xft:Mononoki:pixelsize=11:antialias=true:hinting=true"
                        ]
    , bgColor         = "#282828"
    , fgColor         = "#ebdbb2"
@@ -20,10 +20,10 @@ Config {
    -- layout
    , sepChar =  "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
-   , template = "%time% %UnsafeStdinReader% }{ %kbd% %date% "
+   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %date% "
    , commands =
         -- time and date indicators
-        [ Run Date "<box type=Bottom width=2 mb=2> %l:%M %p  </box>" "time" 10
+        [ Run Date " %l:%M %p " "time" 10
         , Run Date "<box type=Bottom width=2 mb=2> %a, %d %b %Y </box>" "date" 3600
 
         -- keyboard layout indicator

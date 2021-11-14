@@ -52,14 +52,14 @@ main = do
             { ppOutput = \x -> hPutStrLn xmproc0 x -- xmobar on Monitor 1
                             >> hPutStrLn xmproc1 x -- xmobar on Monitor 2
 
-            , ppCurrent = xmobarColor "#c792ea" "" . wrap "<box type=Bottom width=2 mb=2 color=#c792ea>" "</box>"         -- Current workspace
-            , ppVisible = xmobarColor "#c792ea" ""                                                                        -- Visible but not current workspace
-            , ppHidden = xmobarColor "#82AAFF" "" . wrap "<box type=Top width=2 mt=2 color=#82AAFF>" "</box>"             -- Hidden workspaces
-            , ppHiddenNoWindows = xmobarColor "#82AAFF" ""                                                                -- Hidden workspaces (no windows)
-            , ppTitle = xmobarColor "#b3afc2" "" . shorten 60                                                             -- Title of active window
-            , ppSep =  "<fc=#666666> <fn=1>|</fn> </fc>"                                                                  -- Separator character
-            , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"                                                          -- Urgent workspace
-            -- , ppOrder  = \(ws:l:t) -> [ws,l,t]                                                                  -- order of things in xmobar
+            , ppCurrent         = xmobarColor "#ebdbb2" "#665c54" . wrap "<box type=Bottom width=2 mb=2 color=#fabd2f> " " </box>" -- Current workspace
+            , ppVisible         = xmobarColor "#ebdbb2" ""        . wrap "<box type=Bottom width=2 mb=2 color=#665c54> " " </box>" -- Visible but not current workspace
+            , ppHidden          = xmobarColor "#ebdbb2" ""        . wrap " " " "                                                   -- Hidden workspaces
+            , ppHiddenNoWindows = xmobarColor "#504945" ""        . wrap " " " "                                                   -- Hidden workspaces (no windows)
+            , ppUrgent          = xmobarColor "#FF5252" ""        . wrap " " " "                                                   -- Urgent workspace
+            , ppTitle           = xmobarColor "#ebdbb2" ""        . shorten 60                                                     -- Title of active window
+            , ppSep             = "<fc=#7c6f64> | </fc>"                                                                           -- Separator between widgets
+            , ppOrder           = \(ws:l:t:_) -> [l,ws,t]                                                                          -- order of things in xmobar
             }
 
     } `additionalKeysP` myKeys
@@ -298,8 +298,16 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
     ]
 
-myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
--- myWorkspaces    = ["","","","","","","","",""]
+myWorkspaces  = [ "<fn=2>\xf268</fn>"
+                , "<fn=2>\xf3f6</fn>"
+                , "<fn=1>\xf11c</fn>"
+                , "<fn=1>\xf07b</fn>"
+                , "<fn=1>\xf025</fn>"
+                , "<fn=1>\xf030</fn>"
+                , "<fn=1>\xf03d</fn>"
+                , "<fn=1>\xf7cd</fn>"
+                , "<fn=2>\xf395</fn>"
+                ]
 
 myLayoutHook = avoidStruts (tiled ||| Mirror tiled ||| Full)
   where
