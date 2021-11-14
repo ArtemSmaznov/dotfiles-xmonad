@@ -78,6 +78,9 @@ Layout Modifiers
 #+begin_src haskell
 import XMonad.Layout.Spacing
 import XMonad.Layout.Renamed
+import XMonad.Layout.MultiToggle
+import XMonad.Layout.MultiToggle.Instances
+import XMonad.Layout.NoBorders
 #+end_src
 
 Util
@@ -116,7 +119,7 @@ main = do
         -- hooks, layouts
         , manageHook         = myManageHook <+> manageDocks
         , handleEventHook    = myEventHook
-        , layoutHook         = spacingWithEdge myGapSize $ myLayoutHook
+        , layoutHook         = spacing myGapSize $ myLayoutHook
         , startupHook        = myStartupHook
         , logHook            = dynamicLogWithPP $ xmobarPP
             { ppOutput = \x -> hPutStrLn xmproc0 x -- xmobar on Monitor 1
@@ -283,27 +286,27 @@ myKeysP =
       -- "M-t z" Changing UI
 
     -- Windows
-    , ("M-q"       , kill                  ) -- Close focused Window
-    -- , ("M-<F11>"   , windows W.         ) -- Toggle Fullscreen
-    -- , ("M-f"       , withFocused $ windows . W.sink         ) -- Toggle Floating
-    -- , ("M-m"       , windows W.         ) -- Toggle Maximize
-    -- , ("M-d"       , windows W.         ) -- Toggle Minimize
-    , ("M1-<Tab>"  , windows W.focusDown   ) -- Move focus to next Window
-    , ("M1-S-<Tab>", windows W.focusUp     ) -- Move focus to prev Window
-    , ("M-/"       , switchLayer           ) -- Switch navigation layer (Tiled vs Floating screens)
-    , ("M-h"       , windowGo L False      ) -- Move focus to left Window
-    , ("M-j"       , windowGo D False      ) -- Move focus to below Window
-    , ("M-k"       , windowGo U False      ) -- Move focus to above Window
-    , ("M-l"       , windowGo R False      ) -- Move focus to right Window
-    , ("M-m"       , windows W.focusMaster ) -- Move focus to Master Window
-    , ("M-S-h"     , windowSwap L False    ) -- Swap focused Window with left Window
-    , ("M-S-j"     , windowSwap D False    ) -- Swap focused Window with below Window
-    , ("M-S-k"     , windowSwap U False    ) -- Swap focused Window with above Window
-    , ("M-S-l"     , windowSwap R False    ) -- Swap focused Window with right Window
-    , ("M-C-h"     , sendMessage Shrink    ) -- Grow focused Window left
-    , ("M-C-l"     , sendMessage Expand    ) -- Grow focused Window right
-    , ("M-C-j"     , sendMessage Shrink    ) -- Grow focused Window down
-    , ("M-C-k"     , sendMessage Expand    ) -- Grow focused Window up
+    , ("M-q"       , kill                                                                          ) -- Close focused Window
+    , ("M-<F11>"   , toggleSmartSpacing >> sendMessage (Toggle NBFULL) >> sendMessage ToggleStruts ) -- Toggles Fullscreen
+    , ("M-m"       , toggleSmartSpacing >> sendMessage (Toggle NBFULL)                             ) -- Toggle Maximize
+    -- , ("M-f"       , withFocused $ windows . W.sink                                             ) -- Toggle Floating
+    -- , ("M-d"       , windows W.                                                                 ) -- Toggle Minimize
+    , ("M1-<Tab>"  , windows W.focusDown                                                           ) -- Move focus to next Window
+    , ("M1-S-<Tab>", windows W.focusUp                                                             ) -- Move focus to prev Window
+    , ("M-/"       , switchLayer                                                                   ) -- Switch navigation layer (Tiled vs Floating screens)
+    , ("M-h"       , windowGo L False                                                              ) -- Move focus to left Window
+    , ("M-j"       , windowGo D False                                                              ) -- Move focus to below Window
+    , ("M-k"       , windowGo U False                                                              ) -- Move focus to above Window
+    , ("M-l"       , windowGo R False                                                              ) -- Move focus to right Window
+    -- , ("M-m"       , windows W.focusMaster                                                      ) -- Move focus to Master Window
+    , ("M-S-h"     , windowSwap L False                                                            ) -- Swap focused Window with left Window
+    , ("M-S-j"     , windowSwap D False                                                            ) -- Swap focused Window with below Window
+    , ("M-S-k"     , windowSwap U False                                                            ) -- Swap focused Window with above Window
+    , ("M-S-l"     , windowSwap R False                                                            ) -- Swap focused Window with right Window
+    , ("M-C-h"     , sendMessage Shrink                                                            ) -- Grow focused Window left
+    , ("M-C-l"     , sendMessage Expand                                                            ) -- Grow focused Window right
+    , ("M-C-j"     , sendMessage Shrink                                                            ) -- Grow focused Window down
+    , ("M-C-k"     , sendMessage Expand                                                            ) -- Grow focused Window up
 
     -- Monitors
     , ("M-,"  , screenGo L False      ) -- Move focus to left Screen
@@ -318,6 +321,7 @@ myKeysP =
     -- , ("M-S-<Space>" , setLayout $ XMonad.layoutHook conf) -- Switch Layouts
     , ("M-M1-<Space>", sendMessage FirstLayout           ) -- Switch to default Layout
     , ("M-="         , refresh                           ) -- Resize viewed windows to the correct size
+    , ("M-t w b"     , sendMessage (Toggle NOBORDERS) ) -- Toggle Window Borders
 
     -- Workspaces
     , ("M-<Tab>" , toggleWS           ) -- Toggle Workspace
@@ -474,7 +478,7 @@ defaults, as xmonad preserves your old layout settings by default.
 The available layouts.  Note that each layout is separated by =|||=,
 which denotes layout choice.
 #+begin_src haskell
-myLayoutHook = avoidStruts (tiled ||| Mirror tiled ||| Full)
+myLayoutHook = avoidStruts $ mkToggle (NBFULL ?? NOBORDERS ?? EOT) (tiled ||| Mirror tiled ||| Full)
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
