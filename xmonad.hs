@@ -4,7 +4,7 @@ import System.IO (hPutStrLn)
 import System.Exit
 import qualified XMonad.StackSet as W
 
-import XMonad.Actions.CycleWS (Direction1D(..), moveTo, shiftTo, WSType(..), nextScreen, prevScreen)
+import XMonad.Actions.CycleWS
 import XMonad.Actions.Navigation2D
 
 import Data.Monoid
@@ -12,13 +12,14 @@ import qualified Data.Map        as M
 
 import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, xmobarPP, xmobarColor, shorten, PP(..))
 import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, ToggleStruts(..))
-import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat, doCenterFloat)
+import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ServerMode
 
 import XMonad.Layout.Spacing
+import XMonad.Layout.Renamed
 
 import XMonad.Util.Dmenu
-import XMonad.Util.EZConfig (additionalKeysP)
+import XMonad.Util.EZConfig
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.Run (runProcessWithInput, safeSpawn, spawnPipe)
 import XMonad.Util.SpawnOnce
@@ -27,8 +28,8 @@ main :: IO ()
 main = do
     xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
     xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.xmonad/xmobar/secondaryScreen.hs"
-  
-    xmonad $ def 
+
+    xmonad $ def
         -- simple stuff
         { terminal           = myTerminal
         , focusFollowsMouse  = myFocusFollowsMouse
@@ -62,7 +63,7 @@ main = do
             , ppOrder           = \(ws:l:t:_) -> [l,ws,t]                                                                          -- order of things in xmobar
             }
 
-    } `additionalKeysP` myKeys
+    } `additionalKeysP` myKeysP `additionalKeys` myKeys
 
 myStartupHook = do
     spawnOnce "$HOME/.config/autostart-scripts/testing.sh"
@@ -88,7 +89,7 @@ myManageHook = composeAll
     , className =? "qutebrowser"        --> doShift ( myWorkspaces !! 0 )
     , className =? "Emacs"              --> doShift ( myWorkspaces !! 2 )
     , className =? "Gimp"               --> doShift ( myWorkspaces !! 5 )
-    , className =? "VirtualBox Manager" --> doShift  ( myWorkspaces !! 8 )
+    , className =? "VirtualBox Manager" --> doShift ( myWorkspaces !! 8 )
     ]
 
 myFocusFollowsMouse :: Bool
@@ -132,19 +133,18 @@ myFocusedBorderColor = "#fb4934"
 
 myModMask       = mod4Mask
 
-myKeys :: [(String, X ())]
-myKeys =
+myKeysP :: [(String, X ())]
+myKeysP =
     -- System
     [ ("M-C-r", spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
     , ("M-C-q", io (exitWith ExitSuccess)                   ) -- Quit XMonad
-    -- , ("M1-<Alt_R>" , spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
       -- "M-d" Debug
       -- "M-t z" Changing UI
 
     -- Windows
     , ("M-q"       , kill                  ) -- Close focused Window
     -- , ("M-<F11>"   , windows W.         ) -- Toggle Fullscreen
-    -- , ("M-f"       , windows W.         ) -- Toggle Floating
+    -- , ("M-f"       , withFocused $ windows . W.sink         ) -- Toggle Floating
     -- , ("M-m"       , windows W.         ) -- Toggle Maximize
     -- , ("M-d"       , windows W.         ) -- Toggle Minimize
     , ("M1-<Tab>"  , windows W.focusDown   ) -- Move focus to next Window
@@ -175,11 +175,11 @@ myKeys =
     -- Layouts
     , ("M-<Space>"   , sendMessage NextLayout            ) -- Switch Layouts
     -- , ("M-S-<Space>" , setLayout $ XMonad.layoutHook conf) -- Switch Layouts
-    -- , ("M-M1-<Space>", setLayout $ XMonad.layoutHook conf) -- Switch to default Layout
+    , ("M-M1-<Space>", sendMessage FirstLayout           ) -- Switch to default Layout
     , ("M-="         , refresh                           ) -- Resize viewed windows to the correct size
 
     -- Workspaces
-    -- , ("M-<Tab>" ,                    ) -- Toggle Workspace
+    , ("M-<Tab>" , toggleWS           ) -- Toggle Workspace
     -- , ("M-`"     ,                    ) -- Toggle Scratchpad
 
     -- Media Keys
@@ -245,23 +245,23 @@ myKeys =
     , ("M-\\ a"   , spawn "$HOME/.local/bin/dmscripts/dm-notify context" ) -- Open last Notification
   ]
 
-myLegacyKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
+myKeys :: [((KeyMask, KeySym), X ())]
+myKeys =
+    [ ((shiftMask, xK_Alt_L), spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
 
-    [ ((modm .|. shiftMask, xK_p     ), spawn "gmrun"               ) -- launch gmrun
-    
-    , ((shiftMask, xK_Alt_L), spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
+    -- Push window back into tiling
+    -- , ((mod4Mask,               xK_t     ), withFocused $ windows . W.sink)
 
-    , ((modm,               xK_t     ), withFocused $ windows . W.sink) -- Push window back into tiling
+    -- Run xmessage with a summary of the default keybindings (useful for beginners)
+    -- , ((mod4Mask .|. shiftMask, xK_slash ), spawn ("echo \"" ++ help ++ "\" | xmessage -file -"))
 
     -- Toggle the status bar gap
     -- Use this binding with avoidStruts from Hooks.ManageDocks.
     -- See also the statusBar function from Hooks.DynamicLog.
-    -- , ((modm              , xK_b     ), sendMessage ToggleStruts)
-
-    -- Run xmessage with a summary of the default keybindings (useful for beginners)
-    , ((modm .|. shiftMask, xK_slash ), spawn ("echo \"" ++ help ++ "\" | xmessage -file -"))
+    -- , ((mod4Mask          , xK_b     ), sendMessage ToggleStruts)
     ]
-    ++
+
+myLegacyKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- mod-[1..9], Switch to workspace N
     -- mod-shift-[1..9], Move client to workspace N
