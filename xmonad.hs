@@ -1,12 +1,13 @@
 import XMonad
 import System.Directory
-import System.IO (hPutStrLn)
 import System.Exit
+import System.IO (hPutStrLn)
 import qualified XMonad.StackSet as W
 
 import XMonad.Actions.CycleWS
 import XMonad.Actions.Navigation2D
 
+import Data.Maybe
 import Data.Monoid
 import qualified Data.Map        as M
 
@@ -15,11 +16,11 @@ import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, Toggl
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ServerMode
 
-import XMonad.Layout.Spacing
-import XMonad.Layout.Renamed
 import XMonad.Layout.MultiToggle
 import XMonad.Layout.MultiToggle.Instances
 import XMonad.Layout.NoBorders
+import XMonad.Layout.Renamed
+import XMonad.Layout.Spacing
 
 import XMonad.Util.Dmenu
 import XMonad.Util.EZConfig
@@ -56,14 +57,38 @@ main = do
             { ppOutput = \x -> hPutStrLn xmproc0 x -- xmobar on Monitor 1
                             >> hPutStrLn xmproc1 x -- xmobar on Monitor 2
 
-            , ppCurrent          = xmobarColor "#ebdbb2" "#665c54" . wrap "<box type=Bottom width=2 mb=2 color=#fabd2f> " " </box>" -- Current workspace
-            , ppVisible          = xmobarColor "#ebdbb2" ""        . wrap "<box type=Bottom width=2 mb=2 color=#665c54> " " </box>" -- Visible but not current workspace
-            , ppHidden           = xmobarColor "#ebdbb2" ""        . wrap " " " "                                                   -- Hidden workspaces
-            , ppHiddenNoWindows  = xmobarColor "#504945" ""        . wrap " " " "                                                   -- Hidden workspaces (no windows)
-            , ppUrgent           = xmobarColor "#FF5252" ""        . wrap " " " "                                                   -- Urgent workspace
-            , ppTitle            = xmobarColor "#ebdbb2" ""        . shorten 60                                                     -- Title of active window
-            , ppSep              = "<fc=#7c6f64> | </fc>"                                                                           -- Separator between widgets
-            , ppOrder            = \(ws:l:t:_) -> [l,ws,t]                                                                          -- order of things in xmobar
+            -- Current workspace
+            , ppCurrent          = xmobarColor "#ebdbb2" "#665c54"
+                                   . wrap "<box type=Bottom width=2 mb=2 color=#fabd2f> " " </box>" 
+            
+            -- Visible but not current workspace
+            , ppVisible          = xmobarColor "#ebdbb2" ""
+                                   . wrap "<box type=Bottom width=2 mb=2 color=#665c54> " " </box>"
+                                   . clickable 
+            -- Hidden workspaces           
+            , ppHidden           = xmobarColor "#ebdbb2" ""
+                                   . wrap " " " "
+                                   . clickable                                                   
+            
+            -- Hidden workspaces (no windows)           
+            , ppHiddenNoWindows  = xmobarColor "#504945" ""
+                                   . wrap " " " "
+                                   . clickable                                                   
+            
+            -- Urgent workspace           
+            , ppUrgent           = xmobarColor "#FF5252" ""
+                                   . wrap " " " "                                                   
+                                   . clickable                                                   
+            
+            -- Title of active window             
+            , ppTitle            = xmobarColor "#ebdbb2" ""
+                                   . shorten 60                                                     
+            
+            -- Separator between widgets             
+            , ppSep              = "<fc=#7c6f64> | </fc>"                                                                           
+              
+            -- order of things in xmobar
+            , ppOrder            = \(ws:l:t:_) -> [l,ws,t]                                                                          
             }
 
     } `additionalKeysP` myKeysP `additionalKeys` myKeys
@@ -373,6 +398,11 @@ myWorkspaces  = [ "<fn=2>\xf268</fn>"
                 , "<fn=1>\xf7cd</fn>"
                 , "<fn=2>\xf395</fn>"
                 ]
+  
+myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
+
+clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
+    where i = fromJust $ M.lookup ws myWorkspaceIndices
 
 myLayoutHook = avoidStruts $ mkToggle (NBFULL ?? NOBORDERS ?? EOT) (tiled ||| Mirror tiled ||| Full)
   where
