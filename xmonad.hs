@@ -56,14 +56,14 @@ main = do
             { ppOutput = \x -> hPutStrLn xmproc0 x -- xmobar on Monitor 1
                             >> hPutStrLn xmproc1 x -- xmobar on Monitor 2
 
-            , ppCurrent         = xmobarColor "#ebdbb2" "#665c54" . wrap "<box type=Bottom width=2 mb=2 color=#fabd2f> " " </box>" -- Current workspace
-            , ppVisible         = xmobarColor "#ebdbb2" ""        . wrap "<box type=Bottom width=2 mb=2 color=#665c54> " " </box>" -- Visible but not current workspace
-            , ppHidden          = xmobarColor "#ebdbb2" ""        . wrap " " " "                                                   -- Hidden workspaces
-            , ppHiddenNoWindows = xmobarColor "#504945" ""        . wrap " " " "                                                   -- Hidden workspaces (no windows)
-            , ppUrgent          = xmobarColor "#FF5252" ""        . wrap " " " "                                                   -- Urgent workspace
-            , ppTitle           = xmobarColor "#ebdbb2" ""        . shorten 60                                                     -- Title of active window
-            , ppSep             = "<fc=#7c6f64> | </fc>"                                                                           -- Separator between widgets
-            , ppOrder           = \(ws:l:t:_) -> [l,ws,t]                                                                          -- order of things in xmobar
+            , ppCurrent          = xmobarColor "#ebdbb2" "#665c54" . wrap "<box type=Bottom width=2 mb=2 color=#fabd2f> " " </box>" -- Current workspace
+            , ppVisible          = xmobarColor "#ebdbb2" ""        . wrap "<box type=Bottom width=2 mb=2 color=#665c54> " " </box>" -- Visible but not current workspace
+            , ppHidden           = xmobarColor "#ebdbb2" ""        . wrap " " " "                                                   -- Hidden workspaces
+            , ppHiddenNoWindows  = xmobarColor "#504945" ""        . wrap " " " "                                                   -- Hidden workspaces (no windows)
+            , ppUrgent           = xmobarColor "#FF5252" ""        . wrap " " " "                                                   -- Urgent workspace
+            , ppTitle            = xmobarColor "#ebdbb2" ""        . shorten 60                                                     -- Title of active window
+            , ppSep              = "<fc=#7c6f64> | </fc>"                                                                           -- Separator between widgets
+            , ppOrder            = \(ws:l:t:_) -> [l,ws,t]                                                                          -- order of things in xmobar
             }
 
     } `additionalKeysP` myKeysP `additionalKeys` myKeys
@@ -74,25 +74,92 @@ myStartupHook = do
 myEventHook = docksEventHook
 
 myManageHook = composeAll
-    [ className =? "confirm"            --> doFloat
-    , className =? "file_progress"      --> doFloat
-    , className =? "dialog"             --> doFloat
-    , className =? "download"           --> doFloat
-    , className =? "error"              --> doFloat
-    , className =? "Gimp"               --> doFloat
-    , className =? "MPlayer"            --> doFloat
-    , className =? "notification"       --> doFloat
-    , className =? "splash"             --> doFloat
-    , className =? "toolbar"            --> doFloat
-    , resource  =? "desktop_window"     --> doIgnore
-    , resource  =? "kdesktop"           --> doIgnore 
-    , isFullscreen                      --> doFullFloat
+    -- General Rules
+    [ className =? "confirm"        --> doFloat
+    , className =? "file_progress"  --> doFloat
+    , className =? "dialog"         --> doFloat
+    , className =? "download"       --> doFloat
+    , className =? "error"          --> doFloat
+    , className =? "Gimp"           --> doFloat
+    , className =? "MPlayer"        --> doFloat
+    , className =? "notification"   --> doFloat
+    , className =? "splash"         --> doFloat
+    , className =? "toolbar"        --> doFloat
+    , resource  =? "desktop_window" --> doIgnore
+    , resource  =? "kdesktop"       --> doIgnore
+    , isFullscreen                  --> doFullFloat
+
+    -- Workspace 1 - Internet
+    , className =? "firefox"                        --> doShift ( myWorkspaces !! 0 )
+    , className =? "Tor Browser"                    --> doShift ( myWorkspaces !! 0 )
+    , className =? "Chromium"                       --> doShift ( myWorkspaces !! 0 )
+    , className =? "Google-chrome"                  --> doShift ( myWorkspaces !! 0 )
+    , className =? "Brave-browser"                  --> doShift ( myWorkspaces !! 0 )
+    , className =? "vivaldi-stable"                 --> doShift ( myWorkspaces !! 0 )
+    , className =? "qutebrowser"                    --> doShift ( myWorkspaces !! 0 )
+    , className =? "nyxt"                           --> doShift ( myWorkspaces !! 0 )
+
+    -- Workspace 2 - Gaming
+    , className =? "Wine"                           --> doShift ( myWorkspaces !! 1 )
+    , className =? "dolphin-emu"                    --> doShift ( myWorkspaces !! 1 )
+    , className =? "Lutris"                         --> doShift ( myWorkspaces !! 1 )
+    , className =? "Citra"                          --> doShift ( myWorkspaces !! 1 )
+    , className =? "SuperTuxKart"                   --> doShift ( myWorkspaces !! 1 )
+    , className =? "Steam"                          --> doShift ( myWorkspaces !! 1 )
+    , className =? "battle.net.exe"                 --> doShift ( myWorkspaces !! 1 )
+    , title     =? "Steam"                          --> doShift ( myWorkspaces !! 1 )
+    , title     =? "Battle.net"                     --> doShift ( myWorkspaces !! 1 )
+
+    -- Workspace 3 - Coding
+    , className =? "Emacs"                          --> doShift ( myWorkspaces !! 2 )
+    , className =? "Geany"                          --> doShift ( myWorkspaces !! 2 )
+    , className =? "Atom"                           --> doShift ( myWorkspaces !! 2 )
+    , className =? "Subl3"                          --> doShift ( myWorkspaces !! 2 )
+    , className =? "code-oss"                       --> doShift ( myWorkspaces !! 2 )
+    , className =? "Oomox"                          --> doShift ( myWorkspaces !! 2 )
+    , className =? "Unity"                          --> doShift ( myWorkspaces !! 2 )
+    , className =? "UnityHub"                       --> doShift ( myWorkspaces !! 2 )
+    , className =? "jetbrains-studio"               --> doShift ( myWorkspaces !! 2 )
+
+    -- Workspace 4 - Computer
+    , className =? "dolphin"                        --> doShift ( myWorkspaces !! 3 )
+    , className =? "ark"                            --> doShift ( myWorkspaces !! 3 )
+    , className =? "Nemo"                           --> doShift ( myWorkspaces !! 3 )
+    , className =? "pcmanfm"                        --> doShift ( myWorkspaces !! 3 )
+    , className =? "File-roller"                    --> doShift ( myWorkspaces !! 3 )
+    , className =? "googledocs"                     --> doShift ( myWorkspaces !! 3 )
+    , className =? "keep"                           --> doShift ( myWorkspaces !! 3 )
+    , className =? "calendar"                       --> doShift ( myWorkspaces !! 3 )
+    
+    -- Workspace 5 - Music
+    , className =? "Spotify"                        --> doShift ( myWorkspaces !! 4 )
+    , className =? "youtubemusic-nativefier-040164" --> doShift ( myWorkspaces !! 4 )
+                    
+    -- Workspace 6 - Graphics
+    , className =? "Gimp"                           --> doShift ( myWorkspaces !! 5 )
+    , className =? "Gimp-2.10"                      --> doShift ( myWorkspaces !! 5 )
+    , className =? "Gimp"                           --> doShift ( myWorkspaces !! 5 )
+    , className =? "Inkscape"                       --> doShift ( myWorkspaces !! 5 )
+    , className =? "Flowblade"                      --> doShift ( myWorkspaces !! 5 )
+    , className =? "digikam"                        --> doShift ( myWorkspaces !! 5 )
+    
+    -- Workspace 7 - Video
+    , className =? "vlc"                            --> doShift ( myWorkspaces !! 6 )
+    , className =? "obs"                            --> doShift ( myWorkspaces !! 6 )
+    , className =? "kdenlive"                       --> doShift ( myWorkspaces !! 6 )
+    , title     =? "Celluloid"                      --> doShift ( myWorkspaces !! 6 )
+    
+    -- Workspace 8 - Chat
+    , title     =? "whatsapp-for-linux"             --> doShift ( myWorkspaces !! 7 )
+    , title     =? "Slack"                          --> doShift ( myWorkspaces !! 7 )
+    , title     =? "discord"                        --> doShift ( myWorkspaces !! 7 )
+    , title     =? "signal"                         --> doShift ( myWorkspaces !! 7 )
       
-    , className =? "Brave-browser"      --> doShift ( myWorkspaces !! 0 )
-    , className =? "qutebrowser"        --> doShift ( myWorkspaces !! 0 )
-    , className =? "Emacs"              --> doShift ( myWorkspaces !! 2 )
-    , className =? "Gimp"               --> doShift ( myWorkspaces !! 5 )
-    , className =? "VirtualBox Manager" --> doShift ( myWorkspaces !! 8 )
+    -- Workspace 9 - Sandbox
+    , className =? "virt-manager"                   --> doShift ( myWorkspaces !! 8 )
+    , className =? "VirtualBox Manager"             --> doShift ( myWorkspaces !! 8 )
+    , className =? "VirtualBox Machine"             --> doShift ( myWorkspaces !! 8 )
+    , className =? "Cypress"                        --> doShift ( myWorkspaces !! 8 )
     ]
 
 myFocusFollowsMouse :: Bool
@@ -115,7 +182,7 @@ myIde              = "emacsclient -c -a 'emacs'"
 myImageEditor      = "gimp"
 myVectorEditor     = "inkscape"
 myVideoEditor      = "kdenlive"
-myPhotoLibrary    = "digikam"
+myPhotoLibrary     = "digikam"
 myTorrentClient    = "transmission-qt"
 myVpn              = "/opt/piavpn/bin/pia-client --quiet"
 myVm               = "virtualbox"
