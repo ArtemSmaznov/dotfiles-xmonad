@@ -58,7 +58,8 @@ main = do
                             >> hPutStrLn xmproc1 x -- xmobar on Monitor 2
 
             -- Current workspace
-            , ppCurrent          = xmobarColor "#ebdbb2" "#665c54"
+            -- , ppCurrent          = xmobarColor "#ebdbb2" "#665c54"
+            , ppCurrent          = xmobarColor "#ebdbb2" ""
                                    . wrap "<box type=Bottom width=2 mb=2 color=#fabd2f> " " </box>"
 
             -- Visible but not current workspace
@@ -388,15 +389,15 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
     ]
 
-myWorkspaces  = [ "<fn=2>\xf268</fn>"
-                , "<fn=2>\xf3f6</fn>"
-                , "<fn=1>\xf11c</fn>"
-                , "<fn=1>\xf07b</fn>"
-                , "<fn=1>\xf025</fn>"
-                , "<fn=1>\xf030</fn>"
-                , "<fn=1>\xf03d</fn>"
-                , "<fn=1>\xf7cd</fn>"
-                , "<fn=2>\xf395</fn>"
+myWorkspaces  = [ "<fn=2>\xf268</fn>" -- Internet
+                , "<fn=2>\xf1b6</fn>" -- Gaming
+                , "<fn=1>\xf11c</fn>" -- Coding
+                , "<fn=1>\xf07b</fn>" -- Computer
+                , "<fn=1>\xf025</fn>" -- Music
+                , "<fn=1>\xf030</fn>" -- Graphics
+                , "<fn=1>\xf03d</fn>" -- Video
+                , "<fn=1>\xf7cd</fn>" -- Chat
+                , "<fn=2>\xf395</fn>" -- Sandbox
                 ]
   
 myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
