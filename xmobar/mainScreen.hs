@@ -18,18 +18,37 @@ Config {
    , persistent       = True    -- enable/disable hiding (True = disabled)
 
    -- layout
-   , sepChar =  "%"   -- delineator between plugin names and straight text
+   , sepChar  = "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
-   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %date% "
+   , iconRoot = ".xmonad/xpm/"
+   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %default:Master% %date% "
    , commands =
         -- time and date indicators
-        [ Run Date " %l:%M %p " "time" 10
-        , Run Date "<box type=Bottom width=2 mb=2> %a, %d %b %Y </box>" "date" 3600
+        [ Run Date
+          " %l:%M %p "
+          "time" 10
+          
+        , Run Date
+          "<box type=Bottom width=2 mb=2 color=#fb4934> %a, %d %b %Y </box>"
+          "date" 3600
+          
+        -- Volume Indicator
+        , Run Volume "default" "Master"
+          [ "-t", "<box type=Bottom width=2 mb=2 color=#b8bb26> <status> <volume>% </box>"
+                , "--"
+                -- ON Icon
+                , "-O", "<fn=1>\xf028</fn>"
+                , "-C", "#b8bb26"
+                -- OFF Icon
+                , "-o", "<fn=1>\xf6a9</fn>"
+                , "-c", "#fb4934"
+                ] 10
 
-        -- keyboard layout indicator
-        , Run Kbd            [ ("us" , "US")
-                             , ("ru" , "RU")
-                             ]
+        -- Keyboard Layout Indicator
+        , Run Kbd
+          [ ("us" , "US")
+          , ("ru" , "RU")
+          ]
         
         , Run UnsafeStdinReader
         ]

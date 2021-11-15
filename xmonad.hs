@@ -59,36 +59,36 @@ main = do
 
             -- Current workspace
             , ppCurrent          = xmobarColor "#ebdbb2" "#665c54"
-                                   . wrap "<box type=Bottom width=2 mb=2 color=#fabd2f> " " </box>" 
-            
+                                   . wrap "<box type=Bottom width=2 mb=2 color=#fabd2f> " " </box>"
+
             -- Visible but not current workspace
             , ppVisible          = xmobarColor "#ebdbb2" ""
                                    . wrap "<box type=Bottom width=2 mb=2 color=#665c54> " " </box>"
-                                   . clickable 
-            -- Hidden workspaces           
+                                   . clickable
+            -- Hidden workspaces
             , ppHidden           = xmobarColor "#ebdbb2" ""
                                    . wrap " " " "
-                                   . clickable                                                   
-            
-            -- Hidden workspaces (no windows)           
+                                   . clickable
+
+            -- Hidden workspaces (no windows)
             , ppHiddenNoWindows  = xmobarColor "#504945" ""
                                    . wrap " " " "
-                                   . clickable                                                   
-            
-            -- Urgent workspace           
+                                   . clickable
+
+            -- Urgent workspace
             , ppUrgent           = xmobarColor "#FF5252" ""
-                                   . wrap " " " "                                                   
-                                   . clickable                                                   
-            
-            -- Title of active window             
+                                   . wrap " " " "
+                                   . clickable
+
+            -- Title of active window
             , ppTitle            = xmobarColor "#ebdbb2" ""
-                                   . shorten 60                                                     
-            
-            -- Separator between widgets             
-            , ppSep              = "<fc=#7c6f64> | </fc>"                                                                           
-              
+                                   . shorten 60
+
+            -- Separator between widgets
+            , ppSep              = "<fc=#7c6f64> | </fc>"
+
             -- order of things in xmobar
-            , ppOrder            = \(ws:l:t:_) -> [l,ws,t]                                                                          
+            , ppOrder            = \(ws:l:t:_) -> [l,ws,t]
             }
 
     } `additionalKeysP` myKeysP `additionalKeys` myKeys

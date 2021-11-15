@@ -94,8 +94,12 @@ import XMonad.Util.SpawnOnce
 #+end_src
 
 * Main
-Run xmonad with all the defaults we set up.
-Run xmonad with the settings you specify. No need to modify this.
+
+=xmobarPP= Format
+#+begin_example haskell
+ppFormat = noIdea "foreground" "background" . commands
+#+end_example
+
 #+begin_src haskell
 main :: IO ()
 main = do
@@ -128,36 +132,36 @@ main = do
 
             -- Current workspace
             , ppCurrent          = xmobarColor "#ebdbb2" "#665c54"
-                                   . wrap "<box type=Bottom width=2 mb=2 color=#fabd2f> " " </box>" 
-            
+                                   . wrap "<box type=Bottom width=2 mb=2 color=#fabd2f> " " </box>"
+
             -- Visible but not current workspace
             , ppVisible          = xmobarColor "#ebdbb2" ""
                                    . wrap "<box type=Bottom width=2 mb=2 color=#665c54> " " </box>"
-                                   . clickable 
-            -- Hidden workspaces           
+                                   . clickable
+            -- Hidden workspaces
             , ppHidden           = xmobarColor "#ebdbb2" ""
                                    . wrap " " " "
-                                   . clickable                                                   
-            
-            -- Hidden workspaces (no windows)           
+                                   . clickable
+
+            -- Hidden workspaces (no windows)
             , ppHiddenNoWindows  = xmobarColor "#504945" ""
                                    . wrap " " " "
-                                   . clickable                                                   
-            
-            -- Urgent workspace           
+                                   . clickable
+
+            -- Urgent workspace
             , ppUrgent           = xmobarColor "#FF5252" ""
-                                   . wrap " " " "                                                   
-                                   . clickable                                                   
-            
-            -- Title of active window             
+                                   . wrap " " " "
+                                   . clickable
+
+            -- Title of active window
             , ppTitle            = xmobarColor "#ebdbb2" ""
-                                   . shorten 60                                                     
-            
-            -- Separator between widgets             
-            , ppSep              = "<fc=#7c6f64> | </fc>"                                                                           
-              
+                                   . shorten 60
+
+            -- Separator between widgets
+            , ppSep              = "<fc=#7c6f64> | </fc>"
+
             -- order of things in xmobar
-            , ppOrder            = \(ws:l:t:_) -> [l,ws,t]                                                                          
+            , ppOrder            = \(ws:l:t:_) -> [l,ws,t]
             }
 
     } `additionalKeysP` myKeysP `additionalKeys` myKeys
@@ -613,18 +617,37 @@ Config {
    , persistent       = True    -- enable/disable hiding (True = disabled)
 
    -- layout
-   , sepChar =  "%"   -- delineator between plugin names and straight text
+   , sepChar  = "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
-   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %date% "
+   , iconRoot = ".xmonad/xpm/"
+   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %default:Master% %date% "
    , commands =
         -- time and date indicators
-        [ Run Date " %l:%M %p " "time" 10
-        , Run Date "<box type=Bottom width=2 mb=2> %a, %d %b %Y </box>" "date" 3600
+        [ Run Date
+          " %l:%M %p "
+          "time" 10
+          
+        , Run Date
+          "<box type=Bottom width=2 mb=2 color=#fb4934> %a, %d %b %Y </box>"
+          "date" 3600
+          
+        -- Volume Indicator
+        , Run Volume "default" "Master"
+          [ "-t", "<box type=Bottom width=2 mb=2 color=#b8bb26> <status> <volume>% </box>"
+                , "--"
+                -- ON Icon
+                , "-O", "<fn=1>\xf028</fn>"
+                , "-C", "#b8bb26"
+                -- OFF Icon
+                , "-o", "<fn=1>\xf6a9</fn>"
+                , "-c", "#fb4934"
+                ] 10
 
-        -- keyboard layout indicator
-        , Run Kbd            [ ("us" , "US")
-                             , ("ru" , "RU")
-                             ]
+        -- Keyboard Layout Indicator
+        , Run Kbd
+          [ ("us" , "US")
+          , ("ru" , "RU")
+          ]
         
         , Run UnsafeStdinReader
         ]
@@ -653,18 +676,36 @@ Config {
    , persistent       = True    -- enable/disable hiding (True = disabled)
 
    -- layout
-   , sepChar =  "%"   -- delineator between plugin names and straight text
+   , sepChar  = "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
-   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %date% "
+   , iconRoot = ".xmonad/xpm/"
+   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %default:Master% %date% "
    , commands =
         -- time and date indicators
-        [ Run Date " %l:%M %p " "time" 10
-        , Run Date "<box type=Bottom width=2 mb=2> %a, %d %b %Y </box>" "date" 3600
+        [ Run Date
+          " %l:%M %p "
+          "time" 10
+          
+        , Run Date
+          "<box type=Bottom width=2 mb=2 color=#fb4934> %a, %d %b %Y </box>"
+          "date" 3600
+          
+        , Run Volume "default" "Master"
+          [ "-t", "<box type=Bottom width=2 mb=2 color=#b8bb26> <status> <volume>% </box>"
+                , "--"
+                -- ON Icon
+                , "-O", "<fn=1>\xf028</fn>"
+                , "-C", "#b8bb26"
+                -- OFF Icon
+                , "-o", "<fn=1>\xf6a9</fn>"
+                , "-c", "#fb4934"
+                ] 10
 
         -- keyboard layout indicator
-        , Run Kbd            [ ("us" , "US")
-                             , ("ru" , "RU")
-                             ]
+        , Run Kbd
+          [ ("us" , "US")
+          , ("ru" , "RU")
+          ]
         
         , Run UnsafeStdinReader
         ]
