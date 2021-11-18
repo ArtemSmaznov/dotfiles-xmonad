@@ -227,6 +227,10 @@ myBorderWidth = 3
 myNormalBorderColor  = "#928374"
 myFocusedBorderColor = "#fb4934"
 
+toggleFloat w = windows (\s -> if M.member w (W.floating s)
+                               then W.sink w s
+                               else (W.float w (W.RationalRect 0.15 0.15 0.7 0.7) s))
+
 myModMask       = mod4Mask
 
 myKeysP :: [(String, X ())]
@@ -241,7 +245,7 @@ myKeysP =
     , ("M-q"       , kill                                                                          ) -- Close focused Window
     , ("M-<F11>"   , toggleSmartSpacing >> sendMessage (Toggle NBFULL) >> sendMessage ToggleStruts ) -- Toggles Fullscreen
     , ("M-m"       , toggleSmartSpacing >> sendMessage (Toggle NBFULL)                             ) -- Toggle Maximize
-    -- , ("M-f"       , withFocused $ windows . W.sink                                             ) -- Toggle Floating
+    , ("M-f"       , withFocused toggleFloat                                                       ) -- Toggle Floating
     -- , ("M-d"       , windows W.                                                                 ) -- Toggle Minimize
     , ("M1-<Tab>"  , windows W.focusDown                                                           ) -- Move focus to next Window
     , ("M1-S-<Tab>", windows W.focusUp                                                             ) -- Move focus to prev Window
