@@ -230,15 +230,22 @@ myFocusedBorderColor = "#fb4934"
 -- myFloatingWindow = W.RationalRect 0.15 0.15 0.7 0.7
 myFloatingWindow   = W.RationalRect left_margin top_margin width height
     where
-        width       = 0.7 
+        width       = 0.7
         height      = 0.7
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
-  
+
 myScratchpadWindow = W.RationalRect left_margin top_margin width height
     where
-        width       = 0.8 
+        width       = 0.8
         height      = 0.8
+        left_margin = (1.0 - width)/2
+        top_margin  = (1.0 - height)/2
+
+myScratchpadChat = W.RationalRect left_margin top_margin width height
+    where
+        width       = 0.5
+        height      = 0.9
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
 
@@ -247,12 +254,22 @@ toggleFloat w = windows (\s -> if M.member w (W.floating s)
                                else (W.float w (myFloatingWindow) s))
 
 myScratchPads :: [NamedScratchpad]
-myScratchPads = [ NS "terminal" spawnTerm findTerm manageTerm
+myScratchPads = [ NS "terminal" spawnTerm findTerm (customFloating $ myScratchpadWindow)
+                , NS "music" spawnMusic findMusic (customFloating $ myScratchpadWindow)
+                , NS "whatsapp" spawnWhatsApp findWhatsApp (customFloating $ myScratchpadChat)
                 ]
   where
     spawnTerm  = myTerminal ++ " -t scratchpad"
     findTerm   = title =? "scratchpad"
-    manageTerm = customFloating $ myScratchpadWindow
+
+    -- spawnFiles = myFileManager ++ " --role qwe"
+    -- findFiles  = role =? "qwe"
+
+    spawnMusic = myMusicPlayer
+    findMusic  = className =? "youtubemusic-nativefier-040164"
+
+    spawnWhatsApp = "whatsapp-for-linux"
+    findWhatsApp  = className =? "Whatsapp-for-linux"
 
 myModMask       = mod4Mask
 
@@ -307,6 +324,9 @@ myKeysP =
         -- Toggle Scratchpads
     , ("M-`"     , namedScratchpadAction myScratchPads "terminal" )
     , ("M-s t"   , namedScratchpadAction myScratchPads "terminal" )
+    -- , ("M-s e"   , namedScratchpadAction myScratchPads "files" )
+    , ("M-s m"   , namedScratchpadAction myScratchPads "music" )
+    , ("M-s w"   , namedScratchpadAction myScratchPads "whatsapp" )
 
     -- Media Keys
     , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute" )
