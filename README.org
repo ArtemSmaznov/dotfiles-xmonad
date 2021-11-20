@@ -44,7 +44,7 @@ sudo pacman -S xmonad xmonad-contrib xmobar
 #+end_example
 
 * Imports
-Base
+** Base
 #+begin_src haskell
 import XMonad
 import System.Directory
@@ -53,20 +53,20 @@ import System.IO (hPutStrLn)
 import qualified XMonad.StackSet as W
 #+end_src
 
-Actions
+** Actions
 #+begin_src haskell
 import XMonad.Actions.CycleWS
 import XMonad.Actions.Navigation2D
 #+end_src
 
-Data
+** Data
 #+begin_src haskell
 import Data.Maybe
 import Data.Monoid
 import qualified Data.Map        as M
 #+end_src
 
-Hooks
+** Hooks
 #+begin_src haskell
 import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, xmobarPP, xmobarColor, shorten, PP(..))
 import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, ToggleStruts(..))
@@ -74,9 +74,12 @@ import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ServerMode
 #+end_src
 
-Layouts
+** Layouts
+#+begin_src haskell
+import XMonad.Layout.Grid
+#+end_src
 
-Layout Modifiers
+** Layout Modifiers
 #+begin_src haskell
 import XMonad.Layout.MultiToggle
 import XMonad.Layout.MultiToggle.Instances
@@ -85,7 +88,7 @@ import XMonad.Layout.Renamed
 import XMonad.Layout.Spacing
 #+end_src
 
-Util
+** Util
 #+begin_src haskell
 import XMonad.Util.Dmenu
 import XMonad.Util.EZConfig
@@ -125,7 +128,7 @@ main = do
         -- hooks, layouts
         , manageHook         = myManageHook <+> manageDocks
         , handleEventHook    = myEventHook
-        , layoutHook         = spacing myGapSize $ myLayoutHook
+        , layoutHook         = myLayoutHook
         , startupHook        = myStartupHook
         , logHook            = dynamicLogWithPP $ namedScratchpadFilterOutWorkspacePP $ xmobarPP
             { ppOutput = \x -> hPutStrLn xmproc0 x -- xmobar on Monitor 1
@@ -344,8 +347,10 @@ myPowerManager     = "xfce4-power-manager-settings"
 * Theme
 #+begin_src haskell
 myBarSize = 24
-myGapSize = 5
-myBorderWidth = 3
+myBorderWidth = 4
+  
+myGap i = spacingWithEdge i
+myGapSize = 7
 #+end_src
 
 Border colors for unfocused and focused windows, respectively
@@ -631,27 +636,36 @@ clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
 #+end_src
 
 * Layouts
+Layouts available for selection in the next section
+#+begin_src haskell
+tall   = renamed [Replace "tall"]   -- default tiling algorithm partitions the screen into two panes
+       $ myGap myGapSize
+       $ Tall 
+       1       --- The default number of windows in the master pane
+       (3/100) --- Percent of screen to increment by when resizing panes
+       (1/2)   --- Default proportion of screen occupied by master pane
+mirror = renamed [Replace "mirror"] -- tall layout rotated 90 degrees
+       $ Mirror tall
+grid   = renamed [Replace "grid"]   -- just a grid layout
+       $ myGap myGapSize
+       $ Grid
+full   = renamed [Replace "full"]
+       $ myGap myGapSize
+       $ Full
+#+end_src
+
 You can specify and transform your layouts by modifying these values.
 If you change layout bindings be sure to use 'mod-shift-space' after
 restarting (with =mod-ctrl-r=) to reset your layout state to the new
 defaults, as xmonad preserves your old layout settings by default.
 
-The available layouts.  Note that each layout is separated by =|||=,
-which denotes layout choice.
 #+begin_src haskell
-myLayoutHook = avoidStruts $ mkToggle (NBFULL ?? NOBORDERS ?? EOT) (tiled ||| Mirror tiled ||| Full)
+myLayoutHook = avoidStruts $ mkToggle (NBFULL ?? NOBORDERS ?? EOT) myLayouts
   where
-     -- default tiling algorithm partitions the screen into two panes
-     tiled   = Tall nmaster delta ratio
+    myLayouts = tall 
+            ||| mirror
+            ||| full
 
-     -- The default number of windows in the master pane
-     nmaster = 1
-
-     -- Default proportion of screen occupied by master pane
-     ratio   = 1/2
-
-     -- Percent of screen to increment by when resizing panes
-     delta   = 3/100
 #+end_src
 
 * XMobar

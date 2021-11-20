@@ -16,6 +16,8 @@ import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, Toggl
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ServerMode
 
+import XMonad.Layout.Grid
+
 import XMonad.Layout.MultiToggle
 import XMonad.Layout.MultiToggle.Instances
 import XMonad.Layout.NoBorders
@@ -51,7 +53,7 @@ main = do
         -- hooks, layouts
         , manageHook         = myManageHook <+> manageDocks
         , handleEventHook    = myEventHook
-        , layoutHook         = spacing myGapSize $ myLayoutHook
+        , layoutHook         = myLayoutHook
         , startupHook        = myStartupHook
         , logHook            = dynamicLogWithPP $ namedScratchpadFilterOutWorkspacePP $ xmobarPP
             { ppOutput = \x -> hPutStrLn xmproc0 x -- xmobar on Monitor 1
@@ -221,8 +223,10 @@ myPowerManager     = "xfce4-power-manager-settings"
 -- myAudioManager     = terminal + " -e alsamixer"
 
 myBarSize = 24
-myGapSize = 5
-myBorderWidth = 3
+myBorderWidth = 4
+  
+myGap i = spacingWithEdge i
+myGapSize = 7
 
 myNormalBorderColor  = "#928374"
 myFocusedBorderColor = "#fb4934"
@@ -454,19 +458,26 @@ myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y 
 clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
     where i = fromJust $ M.lookup ws myWorkspaceIndices
 
-myLayoutHook = avoidStruts $ mkToggle (NBFULL ?? NOBORDERS ?? EOT) (tiled ||| Mirror tiled ||| Full)
+tall   = renamed [Replace "tall"]   -- default tiling algorithm partitions the screen into two panes
+       $ myGap myGapSize
+       $ Tall 
+       1       --- The default number of windows in the master pane
+       (3/100) --- Percent of screen to increment by when resizing panes
+       (1/2)   --- Default proportion of screen occupied by master pane
+mirror = renamed [Replace "mirror"] -- tall layout rotated 90 degrees
+       $ Mirror tall
+grid   = renamed [Replace "grid"]   -- just a grid layout
+       $ myGap myGapSize
+       $ Grid
+full   = renamed [Replace "full"]
+       $ myGap myGapSize
+       $ Full
+
+myLayoutHook = avoidStruts $ mkToggle (NBFULL ?? NOBORDERS ?? EOT) myLayouts
   where
-     -- default tiling algorithm partitions the screen into two panes
-     tiled   = Tall nmaster delta ratio
-
-     -- The default number of windows in the master pane
-     nmaster = 1
-
-     -- Default proportion of screen occupied by master pane
-     ratio   = 1/2
-
-     -- Percent of screen to increment by when resizing panes
-     delta   = 3/100
+    myLayouts = tall 
+            ||| mirror
+            ||| full
 
 help :: String
 help = unlines ["The default modifier key is 'alt'. Default keybindings:",
