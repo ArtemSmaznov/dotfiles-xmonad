@@ -12,6 +12,7 @@ import Data.Monoid
 import qualified Data.Map        as M
 
 import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, xmobarPP, xmobarColor, shorten, PP(..))
+import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, also for xcomposite in obs.
 import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ServerMode
@@ -52,8 +53,10 @@ main = do
 
         -- hooks, layouts
         , manageHook         = myManageHook <+> manageDocks
-        , handleEventHook    = myEventHook
-        , layoutHook         = myLayoutHook
+        , handleEventHook    = myEventHook 
+                             <+> fullscreenEventHook -- Enables fullscreen for some apps like browsers
+        , layoutHook         = lessBorders OnlyScreenFloat
+                             $ myLayoutHook
         , startupHook        = myStartupHook
         , logHook            = dynamicLogWithPP $ namedScratchpadFilterOutWorkspacePP $ xmobarPP
             { ppOutput = \x -> hPutStrLn xmproc0 x -- xmobar on Monitor 1
@@ -231,37 +234,46 @@ myGapSize = 7
 myNormalBorderColor  = "#928374"
 myFocusedBorderColor = "#fb4934"
 
--- myFloatingWindow = W.RationalRect 0.15 0.15 0.7 0.7
-myFloatingWindow   = W.RationalRect left_margin top_margin width height
+myFloatingWindow    = W.RationalRect left_margin top_margin width height
     where
         width       = 0.7
         height      = 0.7
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
 
-myScratchpadWindow = W.RationalRect left_margin top_margin width height
+myScratchpadWindow  = W.RationalRect left_margin top_margin width height
     where
         width       = 0.8
         height      = 0.8
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
 
-myScratchpadChat = W.RationalRect left_margin top_margin width height
+myScratchpadChat    = W.RationalRect left_margin top_margin width height
     where
         width       = 0.5
         height      = 0.9
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
 
-toggleFloat w = windows (\s -> if M.member w (W.floating s)
-                               then W.sink w s
-                               else (W.float w (myFloatingWindow) s))
+setFloating   w = W.float w myFloatingWindow 
+unsetFloating w = W.sink w 
+toggleFloating  = withFocused $ \w -> do 
+                       windows (\s -> if M.member w (W.floating s)
+                                      then unsetFloating w s
+                                      else setFloating w s)
+  
+toggleMaximize   = sendMessage (Toggle NBFULL)
+toggleFullScreen = sendMessage (Toggle NBFULL)    >> sendMessage ToggleStruts
+toggleZen        = sendMessage (Toggle NOBORDERS) >> sendMessage ToggleStruts >> toggleScreenSpacingEnabled >> toggleWindowSpacingEnabled 
+toggleBorders    = sendMessage (Toggle NOBORDERS)
+toggleStatusBar  = sendMessage ToggleStruts
+toggleGaps       = toggleScreenSpacingEnabled     >> toggleWindowSpacingEnabled
 
 myScratchPads :: [NamedScratchpad]
-myScratchPads = [ NS "terminal" spawnTerm findTerm (customFloating $ myScratchpadWindow)
-                , NS "music" spawnMusic findMusic (customFloating $ myScratchpadWindow)
-                , NS "whatsapp" spawnWhatsApp findWhatsApp (customFloating $ myScratchpadChat)
-                ]
+myScratchPads  = [ NS "terminal" spawnTerm findTerm (customFloating $ myScratchpadWindow)
+                 , NS "music" spawnMusic findMusic (customFloating $ myScratchpadWindow)
+                 , NS "whatsapp" spawnWhatsApp findWhatsApp (customFloating $ myScratchpadChat)
+                 ]
   where
     spawnTerm  = myTerminal ++ " -t scratchpad"
     findTerm   = title =? "scratchpad"
@@ -280,33 +292,37 @@ myModMask       = mod4Mask
 myKeysP :: [(String, X ())]
 myKeysP =
     -- System
-    [ ("M-C-r", spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
-    , ("M-C-q", io (exitWith ExitSuccess)                   ) -- Quit XMonad
-      -- "M-d" Debug
-      -- "M-t z" Changing UI
+    [ ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
+    , ("M-C-q"     , io (exitWith ExitSuccess)                   ) -- Quit XMonad
+    -- , ("M-d"       ,                                             ) -- Debug
+    , ("M-t z"     , toggleZen                                   ) -- Toggle Zen Mode
+    , ("M-t g"     , toggleGaps                                  ) -- Toggle Gaps
+    , ("M-t b"     , toggleBorders                               ) -- Toggle Window Borders
+    , ("M-t s"     , toggleStatusBar                             ) -- Ignore the statusbar
 
     -- Windows
-    , ("M-q"       , kill                                                                          ) -- Close focused Window
-    , ("M-<F11>"   , toggleSmartSpacing >> sendMessage (Toggle NBFULL) >> sendMessage ToggleStruts ) -- Toggles Fullscreen
-    , ("M-m"       , toggleSmartSpacing >> sendMessage (Toggle NBFULL)                             ) -- Toggle Maximize
-    , ("M-f"       , withFocused toggleFloat                                                       ) -- Toggle Floating
-    -- , ("M-d"       , windows W.                                                                 ) -- Toggle Minimize
-    , ("M1-<Tab>"  , windows W.focusDown                                                           ) -- Move focus to next Window
-    , ("M1-S-<Tab>", windows W.focusUp                                                             ) -- Move focus to prev Window
-    , ("M-/"       , switchLayer                                                                   ) -- Switch navigation layer (Tiled vs Floating screens)
-    , ("M-h"       , windowGo L False                                                              ) -- Move focus to left Window
-    , ("M-j"       , windowGo D False                                                              ) -- Move focus to below Window
-    , ("M-k"       , windowGo U False                                                              ) -- Move focus to above Window
-    , ("M-l"       , windowGo R False                                                              ) -- Move focus to right Window
-    -- , ("M-m"       , windows W.focusMaster                                                      ) -- Move focus to Master Window
-    , ("M-S-h"     , windowSwap L False                                                            ) -- Swap focused Window with left Window
-    , ("M-S-j"     , windowSwap D False                                                            ) -- Swap focused Window with below Window
-    , ("M-S-k"     , windowSwap U False                                                            ) -- Swap focused Window with above Window
-    , ("M-S-l"     , windowSwap R False                                                            ) -- Swap focused Window with right Window
-    , ("M-C-h"     , sendMessage Shrink                                                            ) -- Grow focused Window left
-    , ("M-C-l"     , sendMessage Expand                                                            ) -- Grow focused Window right
-    , ("M-C-j"     , sendMessage Shrink                                                            ) -- Grow focused Window down
-    , ("M-C-k"     , sendMessage Expand                                                            ) -- Grow focused Window up
+    , ("M-q"       , kill                                                    ) -- Close focused Window
+    , ("M-<F11>"   , toggleFullScreen                                        ) -- Toggles Fullscreen
+    , ("M-S-f"     , toggleFullScreen                                        ) -- Toggles Fullscreen
+    , ("M-m"       , toggleMaximize                                          ) -- Toggle Maximize
+    , ("M-f"       , toggleFloating                                          ) -- Toggle Floating
+    -- , ("M-d"       , windows W.                                           ) -- Toggle Minimize
+    , ("M1-<Tab>"  , windows W.focusDown                                     ) -- Move focus to next Window
+    , ("M1-S-<Tab>", windows W.focusUp                                       ) -- Move focus to prev Window
+    , ("M-/"       , switchLayer                                             ) -- Switch navigation layer (Tiled vs Floating screens)
+    , ("M-h"       , windowGo L False                                        ) -- Move focus to left Window
+    , ("M-j"       , windowGo D False                                        ) -- Move focus to below Window
+    , ("M-k"       , windowGo U False                                        ) -- Move focus to above Window
+    , ("M-l"       , windowGo R False                                        ) -- Move focus to right Window
+    -- , ("M-m"       , windows W.focusMaster                                ) -- Move focus to Master Window
+    , ("M-S-h"     , windowSwap L False                                      ) -- Swap focused Window with left Window
+    , ("M-S-j"     , windowSwap D False                                      ) -- Swap focused Window with below Window
+    , ("M-S-k"     , windowSwap U False                                      ) -- Swap focused Window with above Window
+    , ("M-S-l"     , windowSwap R False                                      ) -- Swap focused Window with right Window
+    , ("M-C-h"     , sendMessage Shrink                                      ) -- Grow focused Window left
+    , ("M-C-l"     , sendMessage Expand                                      ) -- Grow focused Window right
+    , ("M-C-j"     , sendMessage Shrink                                      ) -- Grow focused Window down
+    , ("M-C-k"     , sendMessage Expand                                      ) -- Grow focused Window up
 
     -- Monitors
     , ("M-,"  , screenGo L False      ) -- Move focus to left Screen
@@ -321,7 +337,6 @@ myKeysP =
     -- , ("M-S-<Space>" , setLayout $ XMonad.layoutHook conf) -- Switch Layouts
     , ("M-M1-<Space>", sendMessage FirstLayout           ) -- Switch to default Layout
     , ("M-="         , refresh                           ) -- Resize viewed windows to the correct size
-    , ("M-t w b"     , sendMessage (Toggle NOBORDERS) ) -- Toggle Window Borders
 
     -- Workspaces
     , ("M-<Tab>" , toggleWS ) -- Toggle Workspace
@@ -473,7 +488,10 @@ full   = renamed [Replace "full"]
        $ myGap myGapSize
        $ Full
 
-myLayoutHook = avoidStruts $ mkToggle (NBFULL ?? NOBORDERS ?? EOT) myLayouts
+myLayoutHook   = avoidStruts
+               $ mkToggle (NBFULL ?? EOT)
+               $ mkToggle (NOBORDERS ?? EOT)
+               $ myLayouts
   where
     myLayouts = tall 
             ||| mirror
