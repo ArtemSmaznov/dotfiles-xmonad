@@ -219,6 +219,7 @@ myVpn              = "/opt/piavpn/bin/pia-client --quiet"
 myVm               = "virtualbox"
 myLauncher         = "rofi -show drun"
 myPasswordManager  = "rofi-pass"
+myCalculator       = "gnome-calculator"
 
 myNetworkManager   = "nm-connection-editor"
 myBluetoothManager = "blueman-manager"
@@ -247,6 +248,13 @@ myScratchpadWindow  = W.RationalRect left_margin top_margin width height
         height      = 0.8
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
+  
+myScratchpadCalc    = W.RationalRect left_margin top_margin width height
+    where
+        width       = 0.2
+        height      = 0.4
+        left_margin = 0.95 - width
+        top_margin  = 0.05
 
 myScratchpadChat    = W.RationalRect left_margin top_margin width height
     where
@@ -270,22 +278,30 @@ toggleStatusBar  = sendMessage ToggleStruts
 toggleGaps       = toggleScreenSpacingEnabled     >> toggleWindowSpacingEnabled
 
 myScratchPads :: [NamedScratchpad]
-myScratchPads  = [ NS "terminal" spawnTerm findTerm (customFloating $ myScratchpadWindow)
-                 , NS "music" spawnMusic findMusic (customFloating $ myScratchpadWindow)
+myScratchPads  = [ NS "terminal" spawnTerm     findTerm     (customFloating $ myScratchpadWindow)
+                 , NS "music"    spawnMusic    findMusic    (customFloating $ myScratchpadWindow)
+                 , NS "calc"     spawnCalc     findCalc     (customFloating $ myScratchpadCalc)
                  , NS "whatsapp" spawnWhatsApp findWhatsApp (customFloating $ myScratchpadChat)
+                 , NS "discord"  spawnDiscord  findDiscord  (customFloating $ myScratchpadChat)
                  ]
   where
-    spawnTerm  = myTerminal ++ " -t scratchpad"
-    findTerm   = title =? "scratchpad"
-
     -- spawnFiles = myFileManager ++ " --role qwe"
     -- findFiles  = role =? "qwe"
+
+    spawnTerm  = myTerminal ++ " -t scratchpad"
+    findTerm   = title =? "scratchpad"
 
     spawnMusic = myMusicPlayer
     findMusic  = className =? "youtubemusic-nativefier-040164"
 
+    spawnCalc = myCalculator
+    findCalc  = className =? "Gnome-calculator"
+
     spawnWhatsApp = "whatsapp-for-linux"
     findWhatsApp  = className =? "Whatsapp-for-linux"
+    
+    spawnDiscord = "discord"
+    findDiscord  = className =? "discord"
 
 myModMask       = mod4Mask
 
@@ -345,7 +361,9 @@ myKeysP =
     , ("M-s t"   , namedScratchpadAction myScratchPads "terminal" )
     -- , ("M-s e"   , namedScratchpadAction myScratchPads "files" )
     , ("M-s m"   , namedScratchpadAction myScratchPads "music" )
+    , ("M-s c"   , namedScratchpadAction myScratchPads "calc" )
     , ("M-s w"   , namedScratchpadAction myScratchPads "whatsapp" )
+    , ("M-s d"   , namedScratchpadAction myScratchPads "discord" )
 
     -- Media Keys
     , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute" )
@@ -491,6 +509,7 @@ full   = renamed [Replace "full"]
 myLayoutHook   = avoidStruts
                $ mkToggle (NBFULL ?? EOT)
                $ mkToggle (NOBORDERS ?? EOT)
+               $ mkToggle (single MIRROR)
                $ myLayouts
   where
     myLayouts = tall 
