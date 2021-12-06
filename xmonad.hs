@@ -31,6 +31,8 @@ import XMonad.Util.NamedScratchpad
 import XMonad.Util.Run (runProcessWithInput, safeSpawn, spawnPipe)
 import XMonad.Util.SpawnOnce
 
+import Colors.Gruvbox
+
 main :: IO ()
 main = do
     xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
@@ -63,35 +65,35 @@ main = do
                             >> hPutStrLn xmproc1 x -- xmobar on Monitor 2
 
             -- Current workspace
-            -- , ppCurrent          = xmobarColor "#ebdbb2" "#665c54"
-            , ppCurrent          = xmobarColor "#ebdbb2" ""
-                                   . wrap "<box type=Bottom width=2 mb=2 color=#fabd2f> " " </box>"
+            -- , ppCurrent          = xmobarColor foreground bg3
+            , ppCurrent          = xmobarColor foreground ""
+                                   . wrap ("<box type=Bottom width=2 mb=2 color=" ++ color11 ++ "> ") " </box>"
 
             -- Visible but not current workspace
-            , ppVisible          = xmobarColor "#ebdbb2" ""
-                                   . wrap "<box type=Bottom width=2 mb=2 color=#665c54> " " </box>"
+            , ppVisible          = xmobarColor foreground ""
+                                   . wrap ("<box type=Bottom width=2 mb=2 color=" ++ bg4 ++ "> ") " </box>"
                                    . clickable
             -- Hidden workspaces
-            , ppHidden           = xmobarColor "#ebdbb2" ""
+            , ppHidden           = xmobarColor foreground ""
                                    . wrap " " " "
                                    . clickable
 
             -- Hidden workspaces (no windows)
-            , ppHiddenNoWindows  = xmobarColor "#504945" ""
+            , ppHiddenNoWindows  = xmobarColor bg2 ""
                                    . wrap " " " "
                                    . clickable
 
             -- Urgent workspace
-            , ppUrgent           = xmobarColor "#FF5252" ""
+            , ppUrgent           = xmobarColor color09 ""
                                    . wrap " " " "
                                    . clickable
 
             -- Title of active window
-            , ppTitle            = xmobarColor "#ebdbb2" ""
+            , ppTitle            = xmobarColor foreground ""
                                    . shorten 60
 
             -- Separator between widgets
-            , ppSep              = "<fc=#7c6f64> | </fc>"
+            , ppSep              = "<fc=" ++ bg4 ++ "> | </fc>"
 
             -- order of things in xmobar
             , ppOrder            = \(ws:l:t:_) -> [l,ws,t]
@@ -100,7 +102,7 @@ main = do
     } `additionalKeysP` myKeysP `additionalKeys` myKeys
 
 myStartupHook = do
-    spawnOnce "$HOME/.config/autostart-scripts/testing.sh"
+    spawnOnce "$HOME/.config/autostart-scripts/autostart.sh"
 
 myEventHook = docksEventHook
 
@@ -187,7 +189,7 @@ myManageHook = composeAll
     , title     =? "signal"                         --> doShift ( myWorkspaces !! 7 )
       
     -- Workspace 9 - Sandbox
-    , className =? "virt-manager"                   --> doShift ( myWorkspaces !! 8 )
+    , className =? "Virt-manager"                   --> doShift ( myWorkspaces !! 8 )
     , className =? "VirtualBox Manager"             --> doShift ( myWorkspaces !! 8 )
     , className =? "VirtualBox Machine"             --> doShift ( myWorkspaces !! 8 )
     , className =? "Cypress"                        --> doShift ( myWorkspaces !! 8 )
@@ -214,7 +216,7 @@ myImageEditor      = "gimp"
 myVectorEditor     = "inkscape"
 myVideoEditor      = "kdenlive"
 myPhotoLibrary     = "digikam"
-myTorrentClient    = "transmission-qt"
+myTorrentClient    = "transmission-gtk"
 myVpn              = "/opt/piavpn/bin/pia-client --quiet"
 myVm               = "virtualbox"
 myLauncher         = "rofi -show drun"
@@ -228,12 +230,12 @@ myPowerManager     = "xfce4-power-manager-settings"
 
 myBarSize = 24
 myBorderWidth = 4
-  
+                
 myGap i = spacingWithEdge i
 myGapSize = 7
 
-myNormalBorderColor  = "#928374"
-myFocusedBorderColor = "#fb4934"
+myNormalBorderColor  = color08
+myFocusedBorderColor = color09
 
 myFloatingWindow    = W.RationalRect left_margin top_margin width height
     where
@@ -278,30 +280,30 @@ toggleStatusBar  = sendMessage ToggleStruts
 toggleGaps       = toggleScreenSpacingEnabled     >> toggleWindowSpacingEnabled
 
 myScratchPads :: [NamedScratchpad]
-myScratchPads  = [ NS "terminal" spawnTerm     findTerm     (customFloating $ myScratchpadWindow)
-                 , NS "music"    spawnMusic    findMusic    (customFloating $ myScratchpadWindow)
-                 , NS "calc"     spawnCalc     findCalc     (customFloating $ myScratchpadCalc)
-                 , NS "whatsapp" spawnWhatsApp findWhatsApp (customFloating $ myScratchpadChat)
-                 , NS "discord"  spawnDiscord  findDiscord  (customFloating $ myScratchpadChat)
+myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloating $ myScratchpadWindow)
+                 , NS "music"       spawnMusic       findMusic       (customFloating $ myScratchpadWindow)
+                 , NS "virtmanager" spawnVirtManager findVirtManager (customFloating $ myScratchpadWindow)
+                 , NS "torrent"     spawnTorrent     findTorrent     (customFloating $ myScratchpadWindow)
+                 , NS "calc"        spawnCalc        findCalc        (customFloating $ myScratchpadCalc)
+                 , NS "whatsapp"    spawnWhatsApp    findWhatsApp    (customFloating $ myScratchpadChat)
+                 , NS "discord"     spawnDiscord     findDiscord     (customFloating $ myScratchpadChat)
                  ]
+  
   where
-    -- spawnFiles = myFileManager ++ " --role qwe"
-    -- findFiles  = role =? "qwe"
-
-    spawnTerm  = myTerminal ++ " -t scratchpad"
-    findTerm   = title =? "scratchpad"
-
-    spawnMusic = myMusicPlayer
-    findMusic  = className =? "youtubemusic-nativefier-040164"
-
-    spawnCalc = myCalculator
-    findCalc  = className =? "Gnome-calculator"
-
-    spawnWhatsApp = "whatsapp-for-linux"
-    findWhatsApp  = className =? "Whatsapp-for-linux"
-    
-    spawnDiscord = "discord"
-    findDiscord  = className =? "discord"
+    spawnTerm        = myTerminal ++ " -t scratchpad"
+    spawnMusic       = myMusicPlayer
+    spawnVirtManager = "virt-manager"
+    spawnTorrent     = myTorrentClient
+    spawnCalc        = myCalculator
+    spawnWhatsApp    = "whatsapp-for-linux"
+    spawnDiscord     = "discord"
+    findTerm         = title     =? "scratchpad"
+    findMusic        = className =? "youtubemusic-nativefier-040164"
+    findVirtManager  = title     =? "Virtual Machine Manager"
+    findTorrent      = className =? "Transmission-gtk"
+    findCalc         = className =? "Gnome-calculator"
+    findWhatsApp     = className =? "Whatsapp-for-linux"
+    findDiscord      = className =? "discord"
 
 myModMask       = mod4Mask
 
@@ -358,12 +360,13 @@ myKeysP =
     , ("M-<Tab>" , toggleWS ) -- Toggle Workspace
         -- Toggle Scratchpads
     , ("M-`"     , namedScratchpadAction myScratchPads "terminal" )
-    , ("M-s t"   , namedScratchpadAction myScratchPads "terminal" )
     -- , ("M-s e"   , namedScratchpadAction myScratchPads "files" )
     , ("M-s m"   , namedScratchpadAction myScratchPads "music" )
     , ("M-s c"   , namedScratchpadAction myScratchPads "calc" )
     , ("M-s w"   , namedScratchpadAction myScratchPads "whatsapp" )
     , ("M-s d"   , namedScratchpadAction myScratchPads "discord" )
+    , ("M-s v"   , namedScratchpadAction myScratchPads "virtmanager" )
+    , ("M-s t"   , namedScratchpadAction myScratchPads "torrent" )
 
     -- Media Keys
     , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute" )

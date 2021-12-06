@@ -29,12 +29,12 @@ Config {
           "time" 10
           
         , Run Date
-          "<box type=Bottom width=2 mb=2 color=#fb4934> %a, %d %b %Y </box>"
+          "<box type=Bottom width=2 mb=2 color=#fb4934>  %a, %d %b %Y  </box>"
           "date" 3600
           
         -- Volume Indicator
         , Run Volume "default" "Master"
-          [ "-t", "<box type=Bottom width=2 mb=2 color=#b8bb26> <status> <volume>% </box>"
+          [ "-t", "<box type=Bottom width=2 mb=2 color=#b8bb26>  <status>  <volume>%  </box>"
                 , "--"
                 -- ON Icon
                 , "-O", "<fn=1>\xf028</fn>"
@@ -46,8 +46,8 @@ Config {
 
         -- Keyboard Layout Indicator
         , Run Kbd
-          [ ("us" , "US")
-          , ("ru" , "RU")
+          [ ("us" , "US ")
+          , ("ru" , "RU ")
           ]
         
         , Run UnsafeStdinReader
