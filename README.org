@@ -566,6 +566,7 @@ myKeysP =
     , ("M-d w"   , spawn "$HOME/.local/bin/dmscripts/dm-wallpaper"  )
     , ("M-d r"   , spawn "$HOME/.local/bin/dmscripts/dm-record"     )
     , ("M-d p"   , spawn "$HOME/.local/bin/dmscripts/dm-power"      )
+    , ("M-d t"   , spawn "$HOME/.local/bin/dmscripts/dm-theme"      )
     , ("M-d s"   , spawn "$HOME/.local/bin/dmscripts/dm-screenshot" )
     , ("M-d b"   , spawn "$HOME/.local/bin/dmscripts/dm-bookman"    )
     , ("M-d n"   , spawn "$HOME/.local/bin/dmscripts/dm-notify"     )
