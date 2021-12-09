@@ -12,7 +12,7 @@ import Data.Monoid
 import qualified Data.Map        as M
 
 import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, xmobarPP, xmobarColor, shorten, PP(..))
-import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, also for xcomposite in obs.
+import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, xcomposite in obs, active window for maim screenshots, etc.
 import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ServerMode
@@ -38,7 +38,7 @@ main = do
     xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
     xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.xmonad/xmobar/mainScreen.hs"
 
-    xmonad $ def
+    xmonad $ ewmh def
         -- simple stuff
         { terminal           = myTerminal
         , focusFollowsMouse  = myFocusFollowsMouse
