@@ -36,7 +36,7 @@ import Colors.Gruvbox
 main :: IO ()
 main = do
     xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
-    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.xmonad/xmobar/secondaryScreen.hs"
+    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.xmonad/xmobar/mainScreen.hs"
 
     xmonad $ def
         -- simple stuff
