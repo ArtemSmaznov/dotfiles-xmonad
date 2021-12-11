@@ -757,7 +757,7 @@ Config {
 
         -- Network
         , Run DynNetwork
-          ["-t", "<box type=Bottom width=2 mb=2 color=#8ec07c>  <fn=3>\xf0ac</fn>  <rx> <fn=3>\xf30c\xf309</fn> <tx> </box>"
+          ["-t", "<box type=Bottom width=2 mb=2 color=#8ec07c>  <fn=3>\xf0ac</fn>  <rx> <fn=3>\xf309\xf30c</fn> <tx> </box>"
                , "-S", "True"
                , "--"
                , "--devices", "eno1,wlan0,enp2s0f0"
