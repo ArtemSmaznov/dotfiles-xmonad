@@ -11,7 +11,7 @@ import Data.Maybe
 import Data.Monoid
 import qualified Data.Map        as M
 
-import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, xmobarPP, xmobarColor, shorten, PP(..))
+import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, pad, xmobarPP, xmobarColor, shorten, PP(..))
 import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, xcomposite in obs, active window for maim screenshots, etc.
 import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers
@@ -65,27 +65,28 @@ main = do
                             >> hPutStrLn xmproc1 x -- xmobar on Monitor 2
 
             -- Current workspace
-            -- , ppCurrent          = xmobarColor foreground bg3
-            , ppCurrent          = xmobarColor foreground ""
-                                   . wrap ("<box type=Bottom width=2 mb=2 color=" ++ color11 ++ "> ") " </box>"
+            , ppCurrent          = xmobarColor foreground bg3
+                                   . wrap ("<box type=Top width=2 color=" ++ color11 ++ ">") "</box>"
+                                   . pad
 
             -- Visible but not current workspace
             , ppVisible          = xmobarColor foreground ""
-                                   . wrap ("<box type=Bottom width=2 mb=2 color=" ++ bg4 ++ "> ") " </box>"
+                                   . wrap ("<box type=Top width=2 color=" ++ color14 ++ ">") "</box>"
+                                   . pad
                                    . clickable
             -- Hidden workspaces
             , ppHidden           = xmobarColor foreground ""
-                                   . wrap " " " "
+                                   . pad
                                    . clickable
 
             -- Hidden workspaces (no windows)
             , ppHiddenNoWindows  = xmobarColor bg2 ""
-                                   . wrap " " " "
+                                   . pad
                                    . clickable
 
             -- Urgent workspace
             , ppUrgent           = xmobarColor color09 ""
-                                   . wrap " " " "
+                                   . pad
                                    . clickable
 
             -- Title of active window
@@ -96,7 +97,7 @@ main = do
             , ppSep              = "<fc=" ++ bg4 ++ "> | </fc>"
 
             -- order of things in xmobar
-            , ppOrder            = \(ws:l:t:_) -> [l,ws,t]
+            , ppOrder            = \(l:ws:t:_) -> [l,ws,t]
             }
 
     } `additionalKeysP` myKeysP `additionalKeys` myKeys
