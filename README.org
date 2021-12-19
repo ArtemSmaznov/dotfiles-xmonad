@@ -84,6 +84,7 @@ import XMonad.Hooks.ServerMode
 ** Layouts
 #+begin_src haskell
 import XMonad.Layout.Grid
+import XMonad.Layout.MultiColumns
 #+end_src
 
 Layout Modifiers
@@ -415,6 +416,7 @@ toggleFloating  = withFocused $ \w -> do
                                       else setFloating w s)
   
 toggleMaximize   = sendMessage (Toggle NBFULL)
+toggleMirror     = sendMessage (Toggle MIRROR)
 toggleFullScreen = sendMessage (Toggle NBFULL)    >> sendMessage ToggleStruts
 toggleZen        = sendMessage (Toggle NOBORDERS) >> sendMessage ToggleStruts >> toggleScreenSpacingEnabled >> toggleWindowSpacingEnabled 
 toggleBorders    = sendMessage (Toggle NOBORDERS)
@@ -504,21 +506,21 @@ myKeysP =
     , ("M-S-l"     , windowSwap R False                                      ) -- Swap focused Window with right Window
     , ("M-C-h"     , sendMessage Shrink                                      ) -- Grow focused Window left
     , ("M-C-l"     , sendMessage Expand                                      ) -- Grow focused Window right
-    , ("M-C-j"     , sendMessage Shrink                                      ) -- Grow focused Window down
-    , ("M-C-k"     , sendMessage Expand                                      ) -- Grow focused Window up
+    , ("M-C-j"     , sendMessage (IncMasterN (-1))                           ) -- Decrease number of Master Windows
+    , ("M-C-k"     , sendMessage (IncMasterN 1)                              ) -- Increase number of Master Windows
 
     -- Monitors
-    , ("M-,"  , screenGo L False      ) -- Move focus to left Screen
-    , ("M-."  , screenGo R False      ) -- Move focus to right Screen
-    , ("M-S-,", windowToScreen L False) -- Move focused Window to the left Screen
-    , ("M-S-.", windowToScreen R False) -- Move focused Window to the right Screen
-    , ("M-C-,", screenSwap L False    ) -- Swap active Screen with the left Screen
-    , ("M-C-.", screenSwap R False    ) -- Swap active Screen with the right Screen
+    , ("M-,"    , screenGo L False       ) -- Move focus to left Screen
+    , ("M-."    , screenGo R False       ) -- Move focus to right Screen
+    , ("M-S-,"  , windowToScreen L False ) -- Move focused Window to the left Screen
+    , ("M-S-."  , windowToScreen R False ) -- Move focused Window to the right Screen
+    , ("M-C-S-h", screenSwap L False     ) -- Swap active Screen with the left Screen
+    , ("M-C-S-l", screenSwap R False     ) -- Swap active Screen with the right Screen
 
     -- Layouts
     , ("M-<Space>"   , sendMessage NextLayout            ) -- Switch Layouts
-    -- , ("M-S-<Space>" , setLayout $ XMonad.layoutHook conf) -- Switch Layouts
-    , ("M-M1-<Space>", sendMessage FirstLayout           ) -- Switch to default Layout
+    , ("M-S-<Space>" , sendMessage FirstLayout           ) -- Switch to default Layout
+    , ("M-S-m"       , toggleMirror                      ) -- Mirror Layout
     , ("M-="         , refresh                           ) -- Resize viewed windows to the correct size
 
     -- Workspaces
@@ -684,20 +686,27 @@ clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
 * Layouts
 Layouts available for selection in the next section
 #+begin_src haskell
-tall   = renamed [Replace "tall"]   -- default tiling algorithm partitions the screen into two panes
-       $ myGap myGapSize
-       $ Tall 
-       1       --- The default number of windows in the master pane
-       (3/100) --- Percent of screen to increment by when resizing panes
-       (1/2)   --- Default proportion of screen occupied by master pane
-mirror = renamed [Replace "mirror"] -- tall layout rotated 90 degrees
-       $ Mirror tall
-grid   = renamed [Replace "grid"]   -- just a grid layout
-       $ myGap myGapSize
-       $ Grid
-full   = renamed [Replace "full"]
-       $ myGap myGapSize
-       $ Full
+tall    = renamed [Replace "tall"]   -- default tiling algorithm partitions the screen into two panes
+        $ myGap myGapSize
+        $ Tall
+          1      --- The default number of windows in the master pane
+          0.03   --- Percent of screen to increment by when resizing panes
+          (0.5)  --- Default proportion of screen occupied by master pane
+mirror  = renamed [Replace "mirror"] -- tall layout rotated 90 degrees
+        $ Mirror tall
+grid    = renamed [Replace "grid"]   -- just a grid layout
+        $ myGap myGapSize
+        $ Grid
+columns = renamed [Replace "columns"]   -- just a grid layout
+        $ myGap myGapSize
+        $ multiCol
+          [1]    --- Windows in each column, starting with master. Set to 0 to catch the rest.
+          1      --- Default value for all following columns.
+          0.03   --- Percent of screen to increment by when resizing panes
+          (-0.5) --- Initial size of master area, or column area if the size is negative.
+full    = renamed [Replace "full"]
+        $ myGap myGapSize
+        $ Full
 #+end_src
 
 You can specify and transform your layouts by modifying these values.
@@ -713,7 +722,7 @@ myLayoutHook   = avoidStruts
                $ myLayouts
   where
     myLayouts = tall 
-            ||| mirror
+            ||| columns
             ||| full
 
 #+end_src
