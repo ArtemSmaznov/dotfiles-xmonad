@@ -284,6 +284,7 @@ toggleGaps       = toggleScreenSpacingEnabled     >> toggleWindowSpacingEnabled
 
 myScratchPads :: [NamedScratchpad]
 myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloating $ myScratchpadWindow)
+                 , NS "htop"        spawnHtop        findHtop        (customFloating $ myScratchpadWindow)
                  , NS "music"       spawnMusic       findMusic       (customFloating $ myScratchpadWindow)
                  , NS "virtmanager" spawnVirtManager findVirtManager (customFloating $ myScratchpadWindow)
                  , NS "torrent"     spawnTorrent     findTorrent     (customFloating $ myScratchpadWindow)
@@ -294,13 +295,16 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
   
   where
     spawnTerm        = myTerminal ++ " -t scratchpad"
+    spawnHtop        = myTerminal ++ " -t htop -e htop"
     spawnMusic       = myMusicPlayer
     spawnVirtManager = "virt-manager"
     spawnTorrent     = myTorrentClient
     spawnCalc        = myCalculator
     spawnWhatsApp    = "whatsapp-for-linux"
     spawnDiscord     = "discord"
+    
     findTerm         = title     =? "scratchpad"
+    findHtop         = title     =? "htop"
     findMusic        = className =? "youtubemusic-nativefier-040164"
     findVirtManager  = title     =? "Virtual Machine Manager"
     findTorrent      = className =? "Transmission-gtk"
@@ -360,16 +364,18 @@ myKeysP =
     , ("M-="         , refresh                           ) -- Resize viewed windows to the correct size
 
     -- Workspaces
-    , ("M-<Tab>" , toggleWS ) -- Toggle Workspace
+    , ("M-<Tab>"       , toggleWS ) -- Toggle Workspace
         -- Toggle Scratchpads
-    , ("M-`"     , namedScratchpadAction myScratchPads "terminal" )
-    -- , ("M-s e"   , namedScratchpadAction myScratchPads "files" )
-    , ("M-s m"   , namedScratchpadAction myScratchPads "music" )
-    , ("M-s c"   , namedScratchpadAction myScratchPads "calc" )
-    , ("M-s w"   , namedScratchpadAction myScratchPads "whatsapp" )
-    , ("M-s d"   , namedScratchpadAction myScratchPads "discord" )
-    , ("M-s v"   , namedScratchpadAction myScratchPads "virtmanager" )
-    , ("M-s t"   , namedScratchpadAction myScratchPads "torrent" )
+    , ("M-`"           , namedScratchpadAction myScratchPads "terminal" )
+    , ("C-M1-<Delete>" , namedScratchpadAction myScratchPads "htop" )
+    , ("M-s h"         , namedScratchpadAction myScratchPads "htop" )
+    -- , ("M-s e"      , namedScratchpadAction myScratchPads "files" )
+    , ("M-s m"         , namedScratchpadAction myScratchPads "music" )
+    , ("M-s c"         , namedScratchpadAction myScratchPads "calc" )
+    , ("M-s w"         , namedScratchpadAction myScratchPads "whatsapp" )
+    , ("M-s d"         , namedScratchpadAction myScratchPads "discord" )
+    , ("M-s v"         , namedScratchpadAction myScratchPads "virtmanager" )
+    , ("M-s t"         , namedScratchpadAction myScratchPads "torrent" )
 
     -- Media Keys
     , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute" )
