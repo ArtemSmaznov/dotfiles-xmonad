@@ -33,7 +33,7 @@
 - [[#layouts-1][Layouts]]
 - [[#xmobar][XMobar]]
   - [[#main-monitor][Main Monitor]]
-  - [[#hold-secondary-monitor][HOLD Secondary Monitor]]
+  - [[#secondary-monitor][Secondary Monitor]]
 - [[#help][Help]]
 
 * Dependencies
@@ -43,10 +43,11 @@
 | [[https://archlinux.org/packages/?name=xmonad][xmonad]]         | Window Manager       |
 | [[https://archlinux.org/packages/?name=xmonad-contrib][xmonad-contrib]] | Additional Libraries |
 | [[https://archlinux.org/packages/?name=xmobar][xmobar]]         | Status Bar           |
+| [[https://archlinux.org/packages/?name=trayer][trayer]]         | System Tray widget   |
 |----------------+----------------------|
 
 #+begin_example shell
-sudo pacman -S xmonad xmonad-contrib xmobar
+sudo pacman -S xmonad xmonad-contrib xmobar trayer
 #+end_example
 
 * Imports
@@ -120,7 +121,7 @@ ppFormat = noIdea "foreground" "background" . commands
 main :: IO ()
 main = do
     xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
-    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.xmonad/xmobar/mainScreen.hs"
+    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.xmonad/xmobar/secondaryScreen.hs"
 
     xmonad $ ewmh def
         -- simple stuff
@@ -197,6 +198,10 @@ By default, do nothing.
 #+begin_src haskell
 myStartupHook = do
     spawnOnce "$HOME/.config/autostart-scripts/autostart.sh"
+
+    -- System Tray
+    spawn "killall trayer"  -- kill current trayer on each restart
+    spawn ("sleep 2 && trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 " ++ colorTrayer ++ " --height " ++ show myBarSize ++ "")
 #+end_src
 
 ** Event handling
@@ -760,7 +765,7 @@ Config {
    , sepChar  = "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
    , iconRoot = ".xmonad/xpm/"
-   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %u_icon% %updates%  </box> %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% "
+   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %u_icon% %updates%  </box> %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% %trayerpad%"
    , commands =
         -- time and date indicators
         [ Run Date
@@ -830,13 +835,15 @@ Config {
           , ("ru" , "RU ")
           ]
         
+        -- Script that dynamically adjusts xmobar padding depending on number of trayer icons.
+        , Run Com ".xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20       
+          
         , Run UnsafeStdinReader
         ]
    }
 #+end_src
 
-** HOLD Secondary Monitor
-Unused
+** Secondary Monitor
 
 #+begin_src haskell :tangle xmobar/secondaryScreen.hs
 Config {
@@ -844,6 +851,7 @@ Config {
      font            = "xft:SF Pro Text Regular:size=9:bold:antialias=true"
    , additionalFonts = [ "xft:Font Awesome 5 Free Solid:pixelsize=16"
                        , "xft:Font Awesome 5 Brands:pixelsize=16"
+                       , "xft:Font Awesome 5 Free Solid:pixelsize=14"
                        , "xft:Mononoki:pixelsize=11:antialias=true:hinting=true"
                        ]
    , bgColor         = "#282828"
@@ -862,29 +870,71 @@ Config {
    , sepChar  = "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
    , iconRoot = ".xmonad/xpm/"
-   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %default:Master% %date% "
+   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %u_icon% %updates%  </box> %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% "
    , commands =
         -- time and date indicators
         [ Run Date
-          " %l:%M %p "
+          " %l:%M %p"
           "time" 10
           
-        , Run Date
-          "<box type=Bottom width=2 mb=2 color=#fb4934>  %a, %d %b %Y  </box>"
-          "date" 3600
-          
-        , Run Volume "default" "Master"
-          [ "-t", "<box type=Bottom width=2 mb=2 color=#b8bb26>  <status> <volume>%  </box>"
-                , "--"
-                -- ON Icon
-                , "-O", "<fn=1>\xf028</fn>"
-                , "-C", "#b8bb26"
-                -- OFF Icon
-                , "-o", "<fn=1>\xf6a9</fn>"
-                , "-c", "#fb4934"
-                ] 10
+        -- Updates
+        , Run Com "echo" ["<box type=Bottom width=2 mb=2 color=#fb4934>  <fn=3>\xf0f3</fn> "] "u_icon" 3600
+        , Run Com ".xmonad/scripts/updates" [] "updates" 3600
 
-        -- keyboard layout indicator
+        -- Network
+        , Run DynNetwork
+          ["-t", "<box type=Bottom width=2 mb=2 color=#8ec07c>  <fn=3>\xf0ac</fn>  <rx> <fn=3>\xf309\xf30c</fn> <tx> </box>"
+               , "-S", "True"
+               , "--"
+               , "--devices", "eno1,wlan0,enp2s0f0"
+               ] 20
+        
+        -- CPU
+        , Run CoreTemp
+          ["-t", "<box type=Bottom width=2 mb=2 color=#d3869b>  <fn=3>\xf2db</fn>  <core0>° "
+               -- High CPU Temp
+               , "-H", "70"
+               , "-h", "#fb4934"
+               -- Low CPU Temp
+               , "-L", "40"
+               , "-l", "#b8bb26"
+               ] 20
+        , Run Cpu 
+          ["-t", "(<total>%)  </box>"
+               -- High CPU Load
+               , "-H", "80"
+               , "-h", "#fb4934"
+               -- Low CPU Load
+               , "-L", "5"
+               , "-l", "#b8bb26"
+               ] 20                    
+        
+        -- RAM
+        , Run Memory 
+          ["-t", "<box type=Bottom width=2 mb=2 color=#83a598>  <fn=3>\xf538</fn>  <used> M (<usedratio>%)  </box>"
+               ] 20
+        
+        -- Volume Indicator
+        , Run Volume "default" "Master"
+          ["-t", "<box type=Bottom width=2 mb=2 color=#b8bb26>  <status>  <volume>%  </box>"
+               , "--"
+               -- ON Icon
+               , "-O", "<fn=3>\xf028</fn>"
+               , "-C", "#b8bb26"
+               -- OFF Icon
+               , "-o", "<fn=3>\xf6a9</fn>"
+               , "-c", "#fb4934"
+               ] 10
+        
+        , Run Uptime 
+          ["-t", "<box type=Bottom width=2 mb=2 color=#fabd2f>  <fn=3>\xf0aa</fn>  <days>d <hours>h  </box>"
+               ] 3600
+                        
+        , Run Date
+          "<box type=Bottom width=2 mb=2 color=#fb4934>  <fn=3>\xf133</fn>  %a, %d %b %Y  </box>"
+          "date" 3600
+
+        -- Keyboard Layout Indicator
         , Run Kbd
           [ ("us" , "US ")
           , ("ru" , "RU ")

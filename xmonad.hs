@@ -37,7 +37,7 @@ import Colors.Gruvbox
 main :: IO ()
 main = do
     xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
-    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.xmonad/xmobar/mainScreen.hs"
+    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.xmonad/xmobar/secondaryScreen.hs"
 
     xmonad $ ewmh def
         -- simple stuff
@@ -105,6 +105,10 @@ main = do
 
 myStartupHook = do
     spawnOnce "$HOME/.config/autostart-scripts/autostart.sh"
+
+    -- System Tray
+    spawn "killall trayer"  -- kill current trayer on each restart
+    spawn ("sleep 2 && trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 " ++ colorTrayer ++ " --height " ++ show myBarSize ++ "")
 
 myEventHook = docksEventHook
 

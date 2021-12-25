@@ -22,7 +22,7 @@ Config {
    , sepChar  = "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
    , iconRoot = ".xmonad/xpm/"
-   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %u_icon% %updates%  </box> %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% "
+   , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %u_icon% %updates%  </box> %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% %trayerpad%"
    , commands =
         -- time and date indicators
         [ Run Date
@@ -92,6 +92,9 @@ Config {
           , ("ru" , "RU ")
           ]
         
+        -- Script that dynamically adjusts xmobar padding depending on number of trayer icons.
+        , Run Com ".xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20       
+          
         , Run UnsafeStdinReader
         ]
    }
