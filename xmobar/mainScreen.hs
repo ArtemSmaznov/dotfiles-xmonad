@@ -21,7 +21,7 @@ Config {
    -- layout
    , sepChar  = "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
-   , iconRoot = ".xmonad/xpm/"
+   , iconRoot = ".config/xmonad/xpm/"
    , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %u_icon% %updates%  </box> %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% %trayerpad%"
    , commands =
         -- time and date indicators
@@ -31,7 +31,7 @@ Config {
           
         -- Updates
         , Run Com "echo" ["<box type=Bottom width=2 mb=2 color=#fb4934>  <fn=3>\xf0f3</fn> "] "u_icon" 3600
-        , Run Com ".xmonad/scripts/updates" [] "updates" 3600
+        , Run Com ".config/xmonad/scripts/updates" [] "updates" 3600
 
         -- Network
         , Run DynNetwork
@@ -93,7 +93,7 @@ Config {
           ]
         
         -- Script that dynamically adjusts xmobar padding depending on number of trayer icons.
-        , Run Com ".xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20       
+        , Run Com ".config/xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20       
           
         , Run UnsafeStdinReader
         ]

@@ -23,14 +23,14 @@
 - [[#apps][Apps]]
 - [[#theme-1][Theme]]
 - [[#windows][Windows]]
+- [[#workspaces][Workspaces]]
 - [[#scratchpads][Scratchpads]]
+- [[#layouts-1][Layouts]]
 - [[#keybindings][Keybindings]]
-  - [[#mod-key][Mod Key]]
+  - [[#mod-keys][Mod Keys]]
   - [[#keybindings-1][Keybindings]]
   - [[#legacy-keybindings][Legacy Keybindings]]
   - [[#mouse-bindings][Mouse Bindings]]
-- [[#workspaces][Workspaces]]
-- [[#layouts-1][Layouts]]
 - [[#xmobar][XMobar]]
   - [[#main-monitor][Main Monitor]]
   - [[#secondary-monitor][Secondary Monitor]]
@@ -120,8 +120,8 @@ ppFormat = noIdea "foreground" "background" . commands
 #+begin_src haskell
 main :: IO ()
 main = do
-    xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
-    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.xmonad/xmobar/secondaryScreen.hs"
+    xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.config/xmonad/xmobar/mainScreen.hs"
+    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.config/xmonad/xmobar/secondaryScreen.hs"
 
     xmonad $ ewmh def
         -- simple stuff
@@ -560,10 +560,19 @@ myKeysP :: [(String, X ())]
 #+end_src
 
 *** System
+Debugging
 #+begin_src haskell
 myKeysP =
-    [ ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
+    [ ("M-C-d", toggleZen ) -- Debugging
+#+end_src
+
+#+begin_src haskell
+    , ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
     , ("M-C-q"     , io (exitWith ExitSuccess)                   ) -- Quit XMonad
+
+    -- Extra modifier keys were already added to Xmonad-contrib. Waiting for the new version to be released
+    -- , ("S-<Alt_L>" , spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
+
     , ("M-t z"     , toggleZen                                   ) -- Toggle Zen Mode
     , ("M-t g"     , toggleGaps                                  ) -- Toggle Gaps
     , ("M-t b"     , toggleBorders                               ) -- Toggle Window Borders
@@ -784,7 +793,7 @@ Config {
    -- layout
    , sepChar  = "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
-   , iconRoot = ".xmonad/xpm/"
+   , iconRoot = ".config/xmonad/xpm/"
    , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %u_icon% %updates%  </box> %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% %trayerpad%"
    , commands =
         -- time and date indicators
@@ -794,7 +803,7 @@ Config {
           
         -- Updates
         , Run Com "echo" ["<box type=Bottom width=2 mb=2 color=#fb4934>  <fn=3>\xf0f3</fn> "] "u_icon" 3600
-        , Run Com ".xmonad/scripts/updates" [] "updates" 3600
+        , Run Com ".config/xmonad/scripts/updates" [] "updates" 3600
 
         -- Network
         , Run DynNetwork
@@ -856,7 +865,7 @@ Config {
           ]
         
         -- Script that dynamically adjusts xmobar padding depending on number of trayer icons.
-        , Run Com ".xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20       
+        , Run Com ".config/xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20       
           
         , Run UnsafeStdinReader
         ]
@@ -889,7 +898,7 @@ Config {
    -- layout
    , sepChar  = "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
-   , iconRoot = ".xmonad/xpm/"
+   , iconRoot = ".config/xmonad/xpm/"
    , template = "%time% <fc=#7c6f64>|</fc> %UnsafeStdinReader% }{ %kbd% %u_icon% %updates%  </box> %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% "
    , commands =
         -- time and date indicators
@@ -899,7 +908,7 @@ Config {
           
         -- Updates
         , Run Com "echo" ["<box type=Bottom width=2 mb=2 color=#fb4934>  <fn=3>\xf0f3</fn> "] "u_icon" 3600
-        , Run Com ".xmonad/scripts/updates" [] "updates" 3600
+        , Run Com ".config/xmonad/scripts/updates" [] "updates" 3600
 
         -- Network
         , Run DynNetwork

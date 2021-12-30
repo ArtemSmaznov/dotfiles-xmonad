@@ -36,8 +36,8 @@ import Colors.Gruvbox
 
 main :: IO ()
 main = do
-    xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.xmonad/xmobar/mainScreen.hs"
-    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.xmonad/xmobar/secondaryScreen.hs"
+    xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.config/xmonad/xmobar/mainScreen.hs"
+    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.config/xmonad/xmobar/secondaryScreen.hs"
 
     xmonad $ ewmh def
         -- simple stuff
@@ -369,8 +369,14 @@ myModMask = mod4Mask
 myKeysP :: [(String, X ())]
 
 myKeysP =
-    [ ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
+    [ ("M-C-d", toggleZen ) -- Debugging
+
+    , ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
     , ("M-C-q"     , io (exitWith ExitSuccess)                   ) -- Quit XMonad
+
+    -- Extra modifier keys were already added to Xmonad-contrib. Waiting for the new version to be released
+    -- , ("S-<Alt_L>" , spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
+
     , ("M-t z"     , toggleZen                                   ) -- Toggle Zen Mode
     , ("M-t g"     , toggleGaps                                  ) -- Toggle Gaps
     , ("M-t b"     , toggleBorders                               ) -- Toggle Window Borders
