@@ -429,6 +429,35 @@ toggleStatusBar  = sendMessage ToggleStruts
 toggleGaps       = toggleScreenSpacingEnabled     >> toggleWindowSpacingEnabled
 #+end_src
 
+* Workspaces
+The default number of workspaces (virtual screens) and their names.
+By default we use numeric strings, but any string may be used as a
+workspace name. The number of workspaces is determined by the length
+of this list.
+
+A tagging example:
+#+begin_example haskell
+workspaces = ["web", "irc", "code" ] ++ map show [4..9]
+#+end_example
+
+#+begin_src haskell
+myWorkspaces  = [ "<fn=2>\xf268</fn>" -- Internet
+                , "<fn=2>\xf1b6</fn>" -- Gaming
+                , "<fn=1>\xf11c</fn>" -- Coding
+                , "<fn=1>\xf07b</fn>" -- Computer
+                , "<fn=1>\xf025</fn>" -- Music
+                , "<fn=1>\xf030</fn>" -- Graphics
+                , "<fn=1>\xf03d</fn>" -- Video
+                , "<fn=1>\xf7cd</fn>" -- Chat
+                , "<fn=2>\xf395</fn>" -- Sandbox
+                ]
+  
+myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
+
+clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
+    where i = fromJust $ M.lookup ws myWorkspaceIndices
+#+end_src
+
 * Scratchpads
 #+begin_src haskell
 myScratchPads :: [NamedScratchpad]
@@ -462,17 +491,60 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     findDiscord      = className =? "discord"
 #+end_src
 
+* Layouts
+Layouts available for selection in the next section
+#+begin_src haskell
+tall    = renamed [Replace "tall"]   -- default tiling algorithm partitions the screen into two panes
+        $ myGap myGapSize
+        $ Tall
+          1      --- The default number of windows in the master pane
+          0.03   --- Percent of screen to increment by when resizing panes
+          (0.5)  --- Default proportion of screen occupied by master pane
+mirror  = renamed [Replace "mirror"] -- tall layout rotated 90 degrees
+        $ Mirror tall
+grid    = renamed [Replace "grid"]   -- just a grid layout
+        $ myGap myGapSize
+        $ Grid
+columns = renamed [Replace "columns"]   -- just a grid layout
+        $ myGap myGapSize
+        $ multiCol
+          [1]    --- Windows in each column, starting with master. Set to 0 to catch the rest.
+          1      --- Default value for all following columns.
+          0.03   --- Percent of screen to increment by when resizing panes
+          (-0.5) --- Initial size of master area, or column area if the size is negative.
+full    = renamed [Replace "full"]
+        $ myGap myGapSize
+        $ Full
+#+end_src
+
+You can specify and transform your layouts by modifying these values.
+If you change layout bindings be sure to use 'mod-shift-space' after
+restarting (with =mod-ctrl-r=) to reset your layout state to the new
+defaults, as xmonad preserves your old layout settings by default.
+
+#+begin_src haskell
+myLayoutHook   = avoidStruts
+               $ mkToggle (NBFULL ?? EOT)
+               $ mkToggle (NOBORDERS ?? EOT)
+               $ mkToggle (single MIRROR)
+               $ myLayouts
+  where
+    myLayouts = tall 
+            ||| columns
+            ||| full
+
+#+end_src
+
 * Keybindings
-** Mod Key
+** Mod Keys
 =modMask= lets you specify which =modkey= you want to use. The default
 is =mod1Mask= ("left alt").  You may also consider using =mod3Mask=
 ("right alt"), which does not conflict with emacs keybindings. The
 "windows key" is usually =mod4Mask=.
 #+begin_src haskell
-myModMask       = mod4Mask
+myModMask = mod4Mask
 #+end_src
 
-** Keybindings
 |-------+--------|
 | Key   | Symbol |
 |-------+--------|
@@ -482,25 +554,29 @@ myModMask       = mod4Mask
 | Alt   | M1     |
 |-------+--------|
 
+** Keybindings
 #+begin_src haskell
 myKeysP :: [(String, X ())]
+#+end_src
+
+*** System
+#+begin_src haskell
 myKeysP =
-    -- System
     [ ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
     , ("M-C-q"     , io (exitWith ExitSuccess)                   ) -- Quit XMonad
-    -- , ("M-d"       ,                                             ) -- Debug
     , ("M-t z"     , toggleZen                                   ) -- Toggle Zen Mode
     , ("M-t g"     , toggleGaps                                  ) -- Toggle Gaps
     , ("M-t b"     , toggleBorders                               ) -- Toggle Window Borders
     , ("M-t s"     , toggleStatusBar                             ) -- Ignore the statusbar
+#+end_src
 
-    -- Windows
+*** Windows
+#+begin_src haskell
     , ("M-q"       , kill                                                    ) -- Close focused Window
     , ("M-<F11>"   , toggleFullScreen                                        ) -- Toggles Fullscreen
     , ("M-S-f"     , toggleFullScreen                                        ) -- Toggles Fullscreen
     , ("M-m"       , toggleMaximize                                          ) -- Toggle Maximize
     , ("M-f"       , toggleFloating                                          ) -- Toggle Floating
-    -- , ("M-d"       , windows W.                                           ) -- Toggle Minimize
     , ("M1-<Tab>"  , windows W.focusDown                                     ) -- Move focus to next Window
     , ("M1-S-<Tab>", windows W.focusUp                                       ) -- Move focus to prev Window
     , ("M-/"       , switchLayer                                             ) -- Switch navigation layer (Tiled vs Floating screens)
@@ -508,7 +584,6 @@ myKeysP =
     , ("M-j"       , windowGo D False                                        ) -- Move focus to below Window
     , ("M-k"       , windowGo U False                                        ) -- Move focus to above Window
     , ("M-l"       , windowGo R False                                        ) -- Move focus to right Window
-    -- , ("M-m"       , windows W.focusMaster                                ) -- Move focus to Master Window
     , ("M-S-h"     , windowSwap L False                                      ) -- Swap focused Window with left Window
     , ("M-S-j"     , windowSwap D False                                      ) -- Swap focused Window with below Window
     , ("M-S-k"     , windowSwap U False                                      ) -- Swap focused Window with above Window
@@ -517,22 +592,28 @@ myKeysP =
     , ("M-C-l"     , sendMessage Expand                                      ) -- Grow focused Window right
     , ("M-C-j"     , sendMessage (IncMasterN (-1))                           ) -- Decrease number of Master Windows
     , ("M-C-k"     , sendMessage (IncMasterN 1)                              ) -- Increase number of Master Windows
+#+end_src
 
-    -- Monitors
+*** Monitors
+#+begin_src haskell
     , ("M-,"    , screenGo L False       ) -- Move focus to left Screen
     , ("M-."    , screenGo R False       ) -- Move focus to right Screen
     , ("M-S-,"  , windowToScreen L False ) -- Move focused Window to the left Screen
     , ("M-S-."  , windowToScreen R False ) -- Move focused Window to the right Screen
     , ("M-C-S-h", screenSwap L False     ) -- Swap active Screen with the left Screen
     , ("M-C-S-l", screenSwap R False     ) -- Swap active Screen with the right Screen
+#+end_src
 
-    -- Layouts
+*** Layouts
+#+begin_src haskell
     , ("M-<Space>"   , sendMessage NextLayout            ) -- Switch Layouts
     , ("M-S-<Space>" , sendMessage FirstLayout           ) -- Switch to default Layout
     , ("M-S-m"       , toggleMirror                      ) -- Mirror Layout
     , ("M-="         , refresh                           ) -- Resize viewed windows to the correct size
+#+end_src
 
-    -- Workspaces
+*** Workspaces
+#+begin_src haskell
     , ("M-<Tab>"       , toggleWS ) -- Toggle Workspace
         -- Toggle Scratchpads
     , ("M-`"           , namedScratchpadAction myScratchPads "terminal" )
@@ -545,16 +626,20 @@ myKeysP =
     , ("M-s d"         , namedScratchpadAction myScratchPads "discord" )
     , ("M-s v"         , namedScratchpadAction myScratchPads "virtmanager" )
     , ("M-s t"         , namedScratchpadAction myScratchPads "torrent" )
+#+end_src
 
-    -- Media Keys
+*** Media Keys
+#+begin_src haskell
     , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute" )
     , ("<XF86AudioRaiseVolume>", spawn "amixer set Master 3%+ unmute" )
     , ("<XF86AudioMute>"       , spawn "amixer set Master toggle"     )
     -- , ("<XF86AudioPlay>"       , spawn "mocp --play"                  )
     -- , ("<XF86AudioPrev>"       , spawn "mocp --previous"              )
     -- , ("<XF86AudioNext>"       , spawn "mocp --next"                  )
+#+end_src
 
-    -- Launching Apps
+*** Launching Apps
+#+begin_src haskell
     , ("C-M1-t"    , spawn (myTerminal)        ) -- Launch Terminal
     , ("M-<Return>", spawn (myTerminal)        ) -- Launch Terminal
     , ("M-c"       , spawn (myIde)             ) -- Launch IDE
@@ -575,8 +660,10 @@ myKeysP =
     , ("C-M1-o g"  , spawn (myImageEditor)     ) -- Launch Image Editor
     , ("C-M1-o r"  , spawn (myVectorEditor)    ) -- Launch Vector Editor
     , ("C-M1-o v"  , spawn (myVideoEditor)     ) -- Launch Video Editor
+#+end_src
 
-    -- dm-scripts
+*** dm-scripts
+#+begin_src haskell
     , ("M-d M-d" , spawn "$HOME/.local/bin/dmscripts/dm-master"     )
     , ("M-d w"   , spawn "$HOME/.local/bin/dmscripts/dm-wallpaper"  )
     , ("M-d r"   , spawn "$HOME/.local/bin/dmscripts/dm-record"     )
@@ -586,8 +673,10 @@ myKeysP =
     , ("M-d b"   , spawn "$HOME/.local/bin/dmscripts/dm-bookman"    )
     , ("M-d n"   , spawn "$HOME/.local/bin/dmscripts/dm-notify"     )
     , ("M-d \\"  , spawn "$HOME/.local/bin/dmscripts/dm-notify"     )
+#+end_src
 
-    -- Power Control
+*** Power Control
+#+begin_src haskell
     , ("M1-<F4>", spawn "$HOME/.local/bin/dmscripts/dm-power"         ) -- Logout Menu
     , ("M-z z"  , spawn "$HOME/.local/bin/dmscripts/dm-power"         ) -- Logout Menu
     , ("M-z l"  , spawn "$HOME/.local/bin/dmscripts/dm-power lock"    ) -- Lock Screen
@@ -595,14 +684,18 @@ myKeysP =
     , ("M-z p"  , spawn "$HOME/.local/bin/dmscripts/dm-power poweroff") -- Shutdown System
     , ("M-z r"  , spawn "$HOME/.local/bin/dmscripts/dm-power reboot"  ) -- Reboot System
     , ("M-z w"  , spawn "$HOME/.local/bin/dmscripts/dm-power windows" ) -- Reboot to Windows
+#+end_src
 
-    -- Screenshot
-    , ("M-<Print>"  , spawn "$HOME/.local/bin/dmscripts/dm-screenshot full"   ) -- Full Desktop Screenshot
+*** Screenshot
+#+begin_src haskell
     , ("<Print>"    , spawn "$HOME/.local/bin/dmscripts/dm-screenshot screen" ) -- Fullscreen Screenshot
     , ("M-S-<Print>", spawn "$HOME/.local/bin/dmscripts/dm-screenshot area"   ) -- Selection Area Screenshot
     , ("M1-<Print>" , spawn "$HOME/.local/bin/dmscripts/dm-screenshot window" ) -- Active Window Screenshot
+    , ("M-<Print>"  , spawn "$HOME/.local/bin/dmscripts/dm-screenshot full"   ) -- Full Desktop Screenshot
+#+end_src
 
-    -- Notifications
+*** Notifications
+#+begin_src haskell
     , ("M-\\ \\"  , spawn "$HOME/.local/bin/dmscripts/dm-notify recents" ) -- Show recent Notifications
     , ("M-\\ r"   , spawn "$HOME/.local/bin/dmscripts/dm-notify recents" ) -- Show recent Notifications
     , ("M-\\ S-c" , spawn "$HOME/.local/bin/dmscripts/dm-notify clear"   ) -- Clear all Notifications
@@ -663,79 +756,6 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
     ]
-#+end_src
-
-* Workspaces
-The default number of workspaces (virtual screens) and their names.
-By default we use numeric strings, but any string may be used as a
-workspace name. The number of workspaces is determined by the length
-of this list.
-
-A tagging example:
-#+begin_example haskell
-workspaces = ["web", "irc", "code" ] ++ map show [4..9]
-#+end_example
-
-#+begin_src haskell
-myWorkspaces  = [ "<fn=2>\xf268</fn>" -- Internet
-                , "<fn=2>\xf1b6</fn>" -- Gaming
-                , "<fn=1>\xf11c</fn>" -- Coding
-                , "<fn=1>\xf07b</fn>" -- Computer
-                , "<fn=1>\xf025</fn>" -- Music
-                , "<fn=1>\xf030</fn>" -- Graphics
-                , "<fn=1>\xf03d</fn>" -- Video
-                , "<fn=1>\xf7cd</fn>" -- Chat
-                , "<fn=2>\xf395</fn>" -- Sandbox
-                ]
-  
-myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
-
-clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
-    where i = fromJust $ M.lookup ws myWorkspaceIndices
-#+end_src
-
-* Layouts
-Layouts available for selection in the next section
-#+begin_src haskell
-tall    = renamed [Replace "tall"]   -- default tiling algorithm partitions the screen into two panes
-        $ myGap myGapSize
-        $ Tall
-          1      --- The default number of windows in the master pane
-          0.03   --- Percent of screen to increment by when resizing panes
-          (0.5)  --- Default proportion of screen occupied by master pane
-mirror  = renamed [Replace "mirror"] -- tall layout rotated 90 degrees
-        $ Mirror tall
-grid    = renamed [Replace "grid"]   -- just a grid layout
-        $ myGap myGapSize
-        $ Grid
-columns = renamed [Replace "columns"]   -- just a grid layout
-        $ myGap myGapSize
-        $ multiCol
-          [1]    --- Windows in each column, starting with master. Set to 0 to catch the rest.
-          1      --- Default value for all following columns.
-          0.03   --- Percent of screen to increment by when resizing panes
-          (-0.5) --- Initial size of master area, or column area if the size is negative.
-full    = renamed [Replace "full"]
-        $ myGap myGapSize
-        $ Full
-#+end_src
-
-You can specify and transform your layouts by modifying these values.
-If you change layout bindings be sure to use 'mod-shift-space' after
-restarting (with =mod-ctrl-r=) to reset your layout state to the new
-defaults, as xmonad preserves your old layout settings by default.
-
-#+begin_src haskell
-myLayoutHook   = avoidStruts
-               $ mkToggle (NBFULL ?? EOT)
-               $ mkToggle (NOBORDERS ?? EOT)
-               $ mkToggle (single MIRROR)
-               $ myLayouts
-  where
-    myLayouts = tall 
-            ||| columns
-            ||| full
-
 #+end_src
 
 * XMobar

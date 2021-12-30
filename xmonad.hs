@@ -286,6 +286,22 @@ toggleBorders    = sendMessage (Toggle NOBORDERS)
 toggleStatusBar  = sendMessage ToggleStruts
 toggleGaps       = toggleScreenSpacingEnabled     >> toggleWindowSpacingEnabled
 
+myWorkspaces  = [ "<fn=2>\xf268</fn>" -- Internet
+                , "<fn=2>\xf1b6</fn>" -- Gaming
+                , "<fn=1>\xf11c</fn>" -- Coding
+                , "<fn=1>\xf07b</fn>" -- Computer
+                , "<fn=1>\xf025</fn>" -- Music
+                , "<fn=1>\xf030</fn>" -- Graphics
+                , "<fn=1>\xf03d</fn>" -- Video
+                , "<fn=1>\xf7cd</fn>" -- Chat
+                , "<fn=2>\xf395</fn>" -- Sandbox
+                ]
+  
+myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
+
+clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
+    where i = fromJust $ M.lookup ws myWorkspaceIndices
+
 myScratchPads :: [NamedScratchpad]
 myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloating $ myScratchpadWindow)
                  , NS "htop"        spawnHtop        findHtop        (customFloating $ myScratchpadWindow)
@@ -316,26 +332,55 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     findWhatsApp     = className =? "Whatsapp-for-linux"
     findDiscord      = className =? "discord"
 
-myModMask       = mod4Mask
+tall    = renamed [Replace "tall"]   -- default tiling algorithm partitions the screen into two panes
+        $ myGap myGapSize
+        $ Tall
+          1      --- The default number of windows in the master pane
+          0.03   --- Percent of screen to increment by when resizing panes
+          (0.5)  --- Default proportion of screen occupied by master pane
+mirror  = renamed [Replace "mirror"] -- tall layout rotated 90 degrees
+        $ Mirror tall
+grid    = renamed [Replace "grid"]   -- just a grid layout
+        $ myGap myGapSize
+        $ Grid
+columns = renamed [Replace "columns"]   -- just a grid layout
+        $ myGap myGapSize
+        $ multiCol
+          [1]    --- Windows in each column, starting with master. Set to 0 to catch the rest.
+          1      --- Default value for all following columns.
+          0.03   --- Percent of screen to increment by when resizing panes
+          (-0.5) --- Initial size of master area, or column area if the size is negative.
+full    = renamed [Replace "full"]
+        $ myGap myGapSize
+        $ Full
+
+myLayoutHook   = avoidStruts
+               $ mkToggle (NBFULL ?? EOT)
+               $ mkToggle (NOBORDERS ?? EOT)
+               $ mkToggle (single MIRROR)
+               $ myLayouts
+  where
+    myLayouts = tall 
+            ||| columns
+            ||| full
+
+myModMask = mod4Mask
 
 myKeysP :: [(String, X ())]
+
 myKeysP =
-    -- System
     [ ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
     , ("M-C-q"     , io (exitWith ExitSuccess)                   ) -- Quit XMonad
-    -- , ("M-d"       ,                                             ) -- Debug
     , ("M-t z"     , toggleZen                                   ) -- Toggle Zen Mode
     , ("M-t g"     , toggleGaps                                  ) -- Toggle Gaps
     , ("M-t b"     , toggleBorders                               ) -- Toggle Window Borders
     , ("M-t s"     , toggleStatusBar                             ) -- Ignore the statusbar
 
-    -- Windows
     , ("M-q"       , kill                                                    ) -- Close focused Window
     , ("M-<F11>"   , toggleFullScreen                                        ) -- Toggles Fullscreen
     , ("M-S-f"     , toggleFullScreen                                        ) -- Toggles Fullscreen
     , ("M-m"       , toggleMaximize                                          ) -- Toggle Maximize
     , ("M-f"       , toggleFloating                                          ) -- Toggle Floating
-    -- , ("M-d"       , windows W.                                           ) -- Toggle Minimize
     , ("M1-<Tab>"  , windows W.focusDown                                     ) -- Move focus to next Window
     , ("M1-S-<Tab>", windows W.focusUp                                       ) -- Move focus to prev Window
     , ("M-/"       , switchLayer                                             ) -- Switch navigation layer (Tiled vs Floating screens)
@@ -343,7 +388,6 @@ myKeysP =
     , ("M-j"       , windowGo D False                                        ) -- Move focus to below Window
     , ("M-k"       , windowGo U False                                        ) -- Move focus to above Window
     , ("M-l"       , windowGo R False                                        ) -- Move focus to right Window
-    -- , ("M-m"       , windows W.focusMaster                                ) -- Move focus to Master Window
     , ("M-S-h"     , windowSwap L False                                      ) -- Swap focused Window with left Window
     , ("M-S-j"     , windowSwap D False                                      ) -- Swap focused Window with below Window
     , ("M-S-k"     , windowSwap U False                                      ) -- Swap focused Window with above Window
@@ -353,7 +397,6 @@ myKeysP =
     , ("M-C-j"     , sendMessage (IncMasterN (-1))                           ) -- Decrease number of Master Windows
     , ("M-C-k"     , sendMessage (IncMasterN 1)                              ) -- Increase number of Master Windows
 
-    -- Monitors
     , ("M-,"    , screenGo L False       ) -- Move focus to left Screen
     , ("M-."    , screenGo R False       ) -- Move focus to right Screen
     , ("M-S-,"  , windowToScreen L False ) -- Move focused Window to the left Screen
@@ -361,13 +404,11 @@ myKeysP =
     , ("M-C-S-h", screenSwap L False     ) -- Swap active Screen with the left Screen
     , ("M-C-S-l", screenSwap R False     ) -- Swap active Screen with the right Screen
 
-    -- Layouts
     , ("M-<Space>"   , sendMessage NextLayout            ) -- Switch Layouts
     , ("M-S-<Space>" , sendMessage FirstLayout           ) -- Switch to default Layout
     , ("M-S-m"       , toggleMirror                      ) -- Mirror Layout
     , ("M-="         , refresh                           ) -- Resize viewed windows to the correct size
 
-    -- Workspaces
     , ("M-<Tab>"       , toggleWS ) -- Toggle Workspace
         -- Toggle Scratchpads
     , ("M-`"           , namedScratchpadAction myScratchPads "terminal" )
@@ -381,7 +422,6 @@ myKeysP =
     , ("M-s v"         , namedScratchpadAction myScratchPads "virtmanager" )
     , ("M-s t"         , namedScratchpadAction myScratchPads "torrent" )
 
-    -- Media Keys
     , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute" )
     , ("<XF86AudioRaiseVolume>", spawn "amixer set Master 3%+ unmute" )
     , ("<XF86AudioMute>"       , spawn "amixer set Master toggle"     )
@@ -389,7 +429,6 @@ myKeysP =
     -- , ("<XF86AudioPrev>"       , spawn "mocp --previous"              )
     -- , ("<XF86AudioNext>"       , spawn "mocp --next"                  )
 
-    -- Launching Apps
     , ("C-M1-t"    , spawn (myTerminal)        ) -- Launch Terminal
     , ("M-<Return>", spawn (myTerminal)        ) -- Launch Terminal
     , ("M-c"       , spawn (myIde)             ) -- Launch IDE
@@ -411,7 +450,6 @@ myKeysP =
     , ("C-M1-o r"  , spawn (myVectorEditor)    ) -- Launch Vector Editor
     , ("C-M1-o v"  , spawn (myVideoEditor)     ) -- Launch Video Editor
 
-    -- dm-scripts
     , ("M-d M-d" , spawn "$HOME/.local/bin/dmscripts/dm-master"     )
     , ("M-d w"   , spawn "$HOME/.local/bin/dmscripts/dm-wallpaper"  )
     , ("M-d r"   , spawn "$HOME/.local/bin/dmscripts/dm-record"     )
@@ -422,7 +460,6 @@ myKeysP =
     , ("M-d n"   , spawn "$HOME/.local/bin/dmscripts/dm-notify"     )
     , ("M-d \\"  , spawn "$HOME/.local/bin/dmscripts/dm-notify"     )
 
-    -- Power Control
     , ("M1-<F4>", spawn "$HOME/.local/bin/dmscripts/dm-power"         ) -- Logout Menu
     , ("M-z z"  , spawn "$HOME/.local/bin/dmscripts/dm-power"         ) -- Logout Menu
     , ("M-z l"  , spawn "$HOME/.local/bin/dmscripts/dm-power lock"    ) -- Lock Screen
@@ -431,13 +468,11 @@ myKeysP =
     , ("M-z r"  , spawn "$HOME/.local/bin/dmscripts/dm-power reboot"  ) -- Reboot System
     , ("M-z w"  , spawn "$HOME/.local/bin/dmscripts/dm-power windows" ) -- Reboot to Windows
 
-    -- Screenshot
-    , ("M-<Print>"  , spawn "$HOME/.local/bin/dmscripts/dm-screenshot full"   ) -- Full Desktop Screenshot
     , ("<Print>"    , spawn "$HOME/.local/bin/dmscripts/dm-screenshot screen" ) -- Fullscreen Screenshot
     , ("M-S-<Print>", spawn "$HOME/.local/bin/dmscripts/dm-screenshot area"   ) -- Selection Area Screenshot
     , ("M1-<Print>" , spawn "$HOME/.local/bin/dmscripts/dm-screenshot window" ) -- Active Window Screenshot
+    , ("M-<Print>"  , spawn "$HOME/.local/bin/dmscripts/dm-screenshot full"   ) -- Full Desktop Screenshot
 
-    -- Notifications
     , ("M-\\ \\"  , spawn "$HOME/.local/bin/dmscripts/dm-notify recents" ) -- Show recent Notifications
     , ("M-\\ r"   , spawn "$HOME/.local/bin/dmscripts/dm-notify recents" ) -- Show recent Notifications
     , ("M-\\ S-c" , spawn "$HOME/.local/bin/dmscripts/dm-notify clear"   ) -- Clear all Notifications
@@ -491,54 +526,6 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
     ]
-
-myWorkspaces  = [ "<fn=2>\xf268</fn>" -- Internet
-                , "<fn=2>\xf1b6</fn>" -- Gaming
-                , "<fn=1>\xf11c</fn>" -- Coding
-                , "<fn=1>\xf07b</fn>" -- Computer
-                , "<fn=1>\xf025</fn>" -- Music
-                , "<fn=1>\xf030</fn>" -- Graphics
-                , "<fn=1>\xf03d</fn>" -- Video
-                , "<fn=1>\xf7cd</fn>" -- Chat
-                , "<fn=2>\xf395</fn>" -- Sandbox
-                ]
-  
-myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
-
-clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
-    where i = fromJust $ M.lookup ws myWorkspaceIndices
-
-tall    = renamed [Replace "tall"]   -- default tiling algorithm partitions the screen into two panes
-        $ myGap myGapSize
-        $ Tall
-          1      --- The default number of windows in the master pane
-          0.03   --- Percent of screen to increment by when resizing panes
-          (0.5)  --- Default proportion of screen occupied by master pane
-mirror  = renamed [Replace "mirror"] -- tall layout rotated 90 degrees
-        $ Mirror tall
-grid    = renamed [Replace "grid"]   -- just a grid layout
-        $ myGap myGapSize
-        $ Grid
-columns = renamed [Replace "columns"]   -- just a grid layout
-        $ myGap myGapSize
-        $ multiCol
-          [1]    --- Windows in each column, starting with master. Set to 0 to catch the rest.
-          1      --- Default value for all following columns.
-          0.03   --- Percent of screen to increment by when resizing panes
-          (-0.5) --- Initial size of master area, or column area if the size is negative.
-full    = renamed [Replace "full"]
-        $ myGap myGapSize
-        $ Full
-
-myLayoutHook   = avoidStruts
-               $ mkToggle (NBFULL ?? EOT)
-               $ mkToggle (NOBORDERS ?? EOT)
-               $ mkToggle (single MIRROR)
-               $ myLayouts
-  where
-    myLayouts = tall 
-            ||| columns
-            ||| full
 
 help :: String
 help = unlines ["The default modifier key is 'alt'. Default keybindings:",
