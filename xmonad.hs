@@ -18,6 +18,7 @@ import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ServerMode
 
 import XMonad.Layout.Grid
+import XMonad.Layout.ResizableTile
 import XMonad.Layout.MultiColumns
 
 import XMonad.Layout.MultiToggle
@@ -339,10 +340,11 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
 
 tall    = renamed [Replace "tall"]   -- default tiling algorithm partitions the screen into two panes
         $ myGap myGapSize
-        $ Tall
+        $ ResizableTall
           1      --- The default number of windows in the master pane
           0.03   --- Percent of screen to increment by when resizing panes
           (0.5)  --- Default proportion of screen occupied by master pane
+          []
 mirror  = renamed [Replace "mirror"] -- tall layout rotated 90 degrees
         $ Mirror tall
 grid    = renamed [Replace "grid"]   -- just a grid layout
@@ -392,28 +394,39 @@ myKeysP =
     , ("M-S-f"     , toggleFullScreen              ) -- Toggles Fullscreen
     , ("M-m"       , toggleMaximize                ) -- Toggle Maximize
     , ("M-f"       , toggleFloating                ) -- Toggle Floating
+
+    , ("M-C-/"     , switchLayer                   ) -- Switch navigation layer (Tiled vs Floating screens)
     , ("M1-<Tab>"  , windows W.focusDown           ) -- Move focus to next Window
     , ("M1-S-<Tab>", windows W.focusUp             ) -- Move focus to prev Window
-    , ("M-/"       , switchLayer                   ) -- Switch navigation layer (Tiled vs Floating screens)
     , ("M-h"       , windowGo L False              ) -- Move focus to left Window
     , ("M-j"       , windowGo D False              ) -- Move focus to below Window
     , ("M-k"       , windowGo U False              ) -- Move focus to above Window
     , ("M-l"       , windowGo R False              ) -- Move focus to right Window
+
     , ("M-S-h"     , windowSwap L False            ) -- Swap focused Window with left Window
     , ("M-S-j"     , windowSwap D False            ) -- Swap focused Window with below Window
     , ("M-S-k"     , windowSwap U False            ) -- Swap focused Window with above Window
     , ("M-S-l"     , windowSwap R False            ) -- Swap focused Window with right Window
+
     , ("M-C-h"     , sendMessage Shrink            ) -- Grow focused Window left
+    , ("M-C-j"     , sendMessage MirrorShrink      ) -- Grow focused Window down
+    , ("M-C-k"     , sendMessage MirrorExpand      ) -- Grow focused Window up
     , ("M-C-l"     , sendMessage Expand            ) -- Grow focused Window right
-    , ("M-C-j"     , sendMessage (IncMasterN (-1)) ) -- Decrease number of Master Windows
-    , ("M-C-k"     , sendMessage (IncMasterN 1)    ) -- Increase number of Master Windows
+
+    , ("M-M1-j"    , sendMessage (IncMasterN (-1)) ) -- Decrease number of Master Windows
+    , ("M-M1-k"    , sendMessage (IncMasterN 1)    ) -- Increase number of Master Windows
 
     , ("M-,"    , screenGo L False       ) -- Move focus to left Screen
     , ("M-."    , screenGo R False       ) -- Move focus to right Screen
+
     , ("M-S-,"  , windowToScreen L False ) -- Move focused Window to the left Screen
     , ("M-S-."  , windowToScreen R False ) -- Move focused Window to the right Screen
-    , ("M-C-S-h", screenSwap L False     ) -- Swap active Screen with the left Screen
-    , ("M-C-S-l", screenSwap R False     ) -- Swap active Screen with the right Screen
+
+    , ("M-C-<Tab>", screenSwap R True  ) -- Swap active Screen with the next Screen
+    , ("M-C-S-h"    , screenSwap L False ) -- Swap active Screen with the left Screen
+    , ("M-C-S-j"    , screenSwap D False ) -- Swap active Screen with the below Screen
+    , ("M-C-S-k"    , screenSwap U False ) -- Swap active Screen with the above Screen
+    , ("M-C-S-l"    , screenSwap R False ) -- Swap active Screen with the right Screen
 
     , ("M-<Space>"   , sendMessage NextLayout            ) -- Switch Layouts
     , ("M-S-<Space>" , sendMessage FirstLayout           ) -- Switch to default Layout
