@@ -208,31 +208,33 @@ myClickJustFocuses :: Bool
 myClickJustFocuses = False
 
 myTerminal         = "alacritty"
-myTextEditor       = "alacritty -e vim"
 myWebBrowser       = "qutebrowser"
 myIncognitoBrowser = "qutebrowser --target private-window"
 myTorBrowser       = "torbrowser-launcher"
-myFileManager      = "pcmanfm"
-myMusicPlayer      = "youtubemusic-nativefier"
--- myCliMusicPlayer   = myTerminal + " -e tmux attach -t music"
-myVideoPlayer      = "celluloid"
 myGame             = "/usr/bin/steam-runtime %U"
+myFileManager      = "pcmanfm"
+myTextEditor       = myTerminal ++ " -e vim"
 myIde              = "emacsclient -c -a 'emacs'"
-myImageEditor      = "gimp"
-myVectorEditor     = "inkscape"
+myMusicPlayer      = "youtubemusic-nativefier"
+myCliMusicPlayer   = myTerminal ++ " -e tmux attach -t music"
+myVideoPlayer      = "celluloid"
 myVideoEditor      = "kdenlive"
 myPhotoLibrary     = "digikam"
+myImageEditor      = "gimp"
+myVectorEditor     = "inkscape"
 myTorrentClient    = "transmission-gtk"
-myVpn              = "/opt/piavpn/bin/pia-client --quiet"
-myVm               = "virtualbox"
+myCalculator       = "gnome-calculator"
+myVm               = "virt-manager"
+
+myWhatsApp         = "whatsapp-for-linux"
+myDiscord          = "discord"
+
 myLauncher         = "rofi -show drun"
 myPasswordManager  = "rofi-pass"
-myCalculator       = "gnome-calculator"
-
 myNetworkManager   = "nm-connection-editor"
 myBluetoothManager = "blueman-manager"
 myPowerManager     = "xfce4-power-manager-settings"
--- myAudioManager     = terminal + " -e alsamixer"
+myAudioManager     = myTerminal ++ " -e alsamixer"
 
 myBarSize = 24
 myBorderWidth = 4
@@ -317,11 +319,11 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     spawnTerm        = myTerminal ++ " -t scratchpad"
     spawnHtop        = myTerminal ++ " -t htop -e htop"
     spawnMusic       = myMusicPlayer
-    spawnVirtManager = "virt-manager"
+    spawnVirtManager = myVm
     spawnTorrent     = myTorrentClient
     spawnCalc        = myCalculator
-    spawnWhatsApp    = "whatsapp-for-linux"
-    spawnDiscord     = "discord"
+    spawnWhatsApp    = myWhatsApp
+    spawnDiscord     = myDiscord
     
     findTerm         = title     =? "scratchpad"
     findHtop         = title     =? "htop"
@@ -382,26 +384,26 @@ myKeysP =
     , ("M-t b"     , toggleBorders                               ) -- Toggle Window Borders
     , ("M-t s"     , toggleStatusBar                             ) -- Ignore the statusbar
 
-    , ("M-q"       , kill                                                    ) -- Close focused Window
-    , ("M-<F11>"   , toggleFullScreen                                        ) -- Toggles Fullscreen
-    , ("M-S-f"     , toggleFullScreen                                        ) -- Toggles Fullscreen
-    , ("M-m"       , toggleMaximize                                          ) -- Toggle Maximize
-    , ("M-f"       , toggleFloating                                          ) -- Toggle Floating
-    , ("M1-<Tab>"  , windows W.focusDown                                     ) -- Move focus to next Window
-    , ("M1-S-<Tab>", windows W.focusUp                                       ) -- Move focus to prev Window
-    , ("M-/"       , switchLayer                                             ) -- Switch navigation layer (Tiled vs Floating screens)
-    , ("M-h"       , windowGo L False                                        ) -- Move focus to left Window
-    , ("M-j"       , windowGo D False                                        ) -- Move focus to below Window
-    , ("M-k"       , windowGo U False                                        ) -- Move focus to above Window
-    , ("M-l"       , windowGo R False                                        ) -- Move focus to right Window
-    , ("M-S-h"     , windowSwap L False                                      ) -- Swap focused Window with left Window
-    , ("M-S-j"     , windowSwap D False                                      ) -- Swap focused Window with below Window
-    , ("M-S-k"     , windowSwap U False                                      ) -- Swap focused Window with above Window
-    , ("M-S-l"     , windowSwap R False                                      ) -- Swap focused Window with right Window
-    , ("M-C-h"     , sendMessage Shrink                                      ) -- Grow focused Window left
-    , ("M-C-l"     , sendMessage Expand                                      ) -- Grow focused Window right
-    , ("M-C-j"     , sendMessage (IncMasterN (-1))                           ) -- Decrease number of Master Windows
-    , ("M-C-k"     , sendMessage (IncMasterN 1)                              ) -- Increase number of Master Windows
+    , ("M-q"       , kill                          ) -- Close focused Window
+    , ("M-<F11>"   , toggleFullScreen              ) -- Toggles Fullscreen
+    , ("M-S-f"     , toggleFullScreen              ) -- Toggles Fullscreen
+    , ("M-m"       , toggleMaximize                ) -- Toggle Maximize
+    , ("M-f"       , toggleFloating                ) -- Toggle Floating
+    , ("M1-<Tab>"  , windows W.focusDown           ) -- Move focus to next Window
+    , ("M1-S-<Tab>", windows W.focusUp             ) -- Move focus to prev Window
+    , ("M-/"       , switchLayer                   ) -- Switch navigation layer (Tiled vs Floating screens)
+    , ("M-h"       , windowGo L False              ) -- Move focus to left Window
+    , ("M-j"       , windowGo D False              ) -- Move focus to below Window
+    , ("M-k"       , windowGo U False              ) -- Move focus to above Window
+    , ("M-l"       , windowGo R False              ) -- Move focus to right Window
+    , ("M-S-h"     , windowSwap L False            ) -- Swap focused Window with left Window
+    , ("M-S-j"     , windowSwap D False            ) -- Swap focused Window with below Window
+    , ("M-S-k"     , windowSwap U False            ) -- Swap focused Window with above Window
+    , ("M-S-l"     , windowSwap R False            ) -- Swap focused Window with right Window
+    , ("M-C-h"     , sendMessage Shrink            ) -- Grow focused Window left
+    , ("M-C-l"     , sendMessage Expand            ) -- Grow focused Window right
+    , ("M-C-j"     , sendMessage (IncMasterN (-1)) ) -- Decrease number of Master Windows
+    , ("M-C-k"     , sendMessage (IncMasterN 1)    ) -- Increase number of Master Windows
 
     , ("M-,"    , screenGo L False       ) -- Move focus to left Screen
     , ("M-."    , screenGo R False       ) -- Move focus to right Screen
@@ -416,7 +418,7 @@ myKeysP =
     , ("M-="         , refresh                           ) -- Resize viewed windows to the correct size
 
     , ("M-<Tab>"       , toggleWS ) -- Toggle Workspace
-        -- Toggle Scratchpads
+
     , ("M-`"           , namedScratchpadAction myScratchPads "terminal" )
     , ("C-M1-<Delete>" , namedScratchpadAction myScratchPads "htop" )
     , ("M-s h"         , namedScratchpadAction myScratchPads "htop" )
@@ -434,27 +436,6 @@ myKeysP =
     -- , ("<XF86AudioPlay>"       , spawn "mocp --play"                  )
     -- , ("<XF86AudioPrev>"       , spawn "mocp --previous"              )
     -- , ("<XF86AudioNext>"       , spawn "mocp --next"                  )
-
-    , ("C-M1-t"    , spawn (myTerminal)        ) -- Launch Terminal
-    , ("M-<Return>", spawn (myTerminal)        ) -- Launch Terminal
-    , ("M-c"       , spawn (myIde)             ) -- Launch IDE
-    , ("M-e"       , spawn (myFileManager)     ) -- Launch File Manager
-    , ("M-b"       , spawn (myWebBrowser)      ) -- Launch Web Browser
-    , ("M-i"       , spawn (myIncognitoBrowser)) -- Launch Web Browser in Incognito Mode
-    , ("M-p"       , spawn (myPasswordManager) ) -- Autofill Passwords
-    , ("M-r"       , spawn (myLauncher)        ) -- Launch Launcher
-    , ("M-S-r"     , spawn "dmenu_run"         ) -- Launch dmenu
-    -- Primary
-    , ("M-o t"     , spawn (myTorBrowser)      ) -- Launch Tor Browser
-    , ("M-o m"     , spawn (myMusicPlayer)     ) -- Launch Music Player
-    , ("M-o v"     , spawn (myVideoPlayer)     ) -- Launch Video Player
-    , ("M-o s"     , spawn (myGame)            ) -- Launch Steam
-    -- Secondary
-    , ("C-M1-o t"  , spawn (myTextEditor)      ) -- Launch Text Editor
-    , ("C-M1-o p"  , spawn (myPhotoLibrary)    ) -- Launch Photo Library
-    , ("C-M1-o g"  , spawn (myImageEditor)     ) -- Launch Image Editor
-    , ("C-M1-o r"  , spawn (myVectorEditor)    ) -- Launch Vector Editor
-    , ("C-M1-o v"  , spawn (myVideoEditor)     ) -- Launch Video Editor
 
     , ("M-d M-d" , spawn "$HOME/.local/bin/dmscripts/dm-master"     )
     , ("M-d w"   , spawn "$HOME/.local/bin/dmscripts/dm-wallpaper"  )
@@ -484,6 +465,27 @@ myKeysP =
     , ("M-\\ S-c" , spawn "$HOME/.local/bin/dmscripts/dm-notify clear"   ) -- Clear all Notifications
     , ("M-\\ c"   , spawn "$HOME/.local/bin/dmscripts/dm-notify close"   ) -- Clear last Notification
     , ("M-\\ a"   , spawn "$HOME/.local/bin/dmscripts/dm-notify context" ) -- Open last Notification
+
+    , ("C-M1-t"    , spawn (myTerminal)        ) -- Launch Terminal
+    , ("M-<Return>", spawn (myTerminal)        ) -- Launch Terminal
+    , ("M-c"       , spawn (myIde)             ) -- Launch IDE
+    , ("M-e"       , spawn (myFileManager)     ) -- Launch File Manager
+    , ("M-b"       , spawn (myWebBrowser)      ) -- Launch Web Browser
+    , ("M-i"       , spawn (myIncognitoBrowser)) -- Launch Web Browser in Incognito Mode
+    , ("M-p"       , spawn (myPasswordManager) ) -- Autofill Passwords
+    , ("M-r"       , spawn (myLauncher)        ) -- Launch Launcher
+    , ("M-S-r"     , spawn "dmenu_run"         ) -- Launch dmenu
+    -- Primary
+    , ("M-o t"     , spawn (myTorBrowser)      ) -- Launch Tor Browser
+    , ("M-o m"     , spawn (myMusicPlayer)     ) -- Launch Music Player
+    , ("M-o v"     , spawn (myVideoPlayer)     ) -- Launch Video Player
+    , ("M-o s"     , spawn (myGame)            ) -- Launch Steam
+    -- Secondary
+    , ("C-M1-o t"  , spawn (myTextEditor)      ) -- Launch Text Editor
+    , ("C-M1-o p"  , spawn (myPhotoLibrary)    ) -- Launch Photo Library
+    , ("C-M1-o g"  , spawn (myImageEditor)     ) -- Launch Image Editor
+    , ("C-M1-o r"  , spawn (myVectorEditor)    ) -- Launch Vector Editor
+    , ("C-M1-o v"  , spawn (myVideoEditor)     ) -- Launch Video Editor
   ]
 
 myKeys :: [((KeyMask, KeySym), X ())]
