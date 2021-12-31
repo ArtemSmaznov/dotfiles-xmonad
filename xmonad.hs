@@ -38,8 +38,9 @@ main :: IO ()
 main = do
     xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.config/xmonad/xmobar/mainScreen.hs"
     xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.config/xmonad/xmobar/secondaryScreen.hs"
-
-    xmonad $ ewmh def
+    
+    xmonad $ withNavigation2DConfig myNavigation2DConfig 
+           $ ewmh def
         -- simple stuff
         { terminal           = myTerminal
         , focusFollowsMouse  = myFocusFollowsMouse
@@ -287,6 +288,8 @@ toggleZen        = sendMessage (Toggle NOBORDERS) >> sendMessage ToggleStruts >>
 toggleBorders    = sendMessage (Toggle NOBORDERS)
 toggleStatusBar  = sendMessage ToggleStruts
 toggleGaps       = toggleScreenSpacingEnabled     >> toggleWindowSpacingEnabled
+
+myNavigation2DConfig = def { defaultTiledNavigation = sideNavigation }
 
 myWorkspaces  = [ "<fn=2>\xf268</fn>" -- Internet
                 , "<fn=2>\xf1b6</fn>" -- Gaming
