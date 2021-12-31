@@ -203,7 +203,7 @@ myStartupHook = do
 
     -- System Tray
     spawn "killall trayer"  -- kill current trayer on each restart
-    spawn ("sleep 2 && trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 " ++ colorTrayer ++ " --height " ++ show myBarSize ++ "")
+    spawn ("sleep 2 && trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 1 --transparent true --alpha 0 " ++ colorTrayer ++ " --height " ++ show myBarSize ++ "")
 #+end_src
 
 ** Event handling
@@ -864,8 +864,9 @@ Config {
 
 **** Updates
 #+begin_src haskell
-        , Run Com "echo" ["<box type=Bottom width=2 mb=2 color=#fb4934>  <fn=3>\xf0f3</fn> "] "u_icon" 3600
+        , Run Com "echo" ["<box type=Bottom width=2 mb=2 color=#fb4934><action=`alacritty -e sudo pacman -Syu`>  <fn=3>\xf0f3</fn>  "] "_us" 3600
         , Run Com ".config/xmonad/scripts/updates" [] "updates" 3600
+        , Run Com "echo" ["  </action></box>"] "_ue" 3600
 #+end_src
 
 **** Network
@@ -881,7 +882,7 @@ Config {
 **** CPU
 #+begin_src haskell
         , Run CoreTemp
-          ["-t", "<box type=Bottom width=2 mb=2 color=#d3869b>  <fn=3>\xf2db</fn>  <core0>° "
+          ["-t", "<box type=Bottom width=2 mb=2 color=#d3869b><action=`alacritty -e htop`>  <fn=3>\xf2db</fn>  <core0>° "
                -- High CPU Temp
                , "-H", "70"
                , "-h", "#fb4934"
@@ -890,7 +891,7 @@ Config {
                , "-l", "#b8bb26"
                ] 20
         , Run Cpu
-          ["-t", "(<total>%)  </box>"
+          ["-t", "(<total>%)  </action></box>"
                -- High CPU Load
                , "-H", "80"
                , "-h", "#fb4934"
@@ -903,14 +904,14 @@ Config {
 **** RAM
 #+begin_src haskell
         , Run Memory
-          ["-t", "<box type=Bottom width=2 mb=2 color=#83a598>  <fn=3>\xf538</fn>  <used> M (<usedratio>%)  </box>"
+          ["-t", "<box type=Bottom width=2 mb=2 color=#83a598><action=`alacritty -e htop`>  <fn=3>\xf538</fn>  <used> M (<usedratio>%)  </action></box>"
                ] 20
 #+end_src
 
 **** Volume
 #+begin_src haskell
         , Run Volume "default" "Master"
-          ["-t", "<box type=Bottom width=2 mb=2 color=#b8bb26>  <status>  <volume>%  </box>"
+          ["-t", "<box type=Bottom width=2 mb=2 color=#b8bb26><action=`alacritty -e alsamixer`>  <status>  <volume>%</action>  </box>"
                , "--"
                -- ON Icon
                , "-O", "<fn=3>\xf028</fn>"
@@ -931,17 +932,19 @@ Config {
 **** Date
 #+begin_src haskell
         , Run Date
-          "<box type=Bottom width=2 mb=2 color=#fb4934>  <fn=3>\xf133</fn>  %a, %d %b %Y  </box>"
+          "<box type=Bottom width=2 mb=2 color=#fb4934><action=`emacsclient -c -a 'emacs' --eval '(cfw:open-org-calendar)'`>  <fn=3>\xf133</fn>  %a, %d %b %Y  </action></box>"
           "date" 3600
 #+end_src
 
 **** Keyboard
 Keyboard Layout Indicator
 #+begin_src haskell
+        , Run Com "echo" ["<action=`.local/bin/dmscripts/dm-lang`> "] "_ks" 3600
         , Run Kbd
-          [ ("us" , "US ")
-          , ("ru" , "RU ")
+          [ ("us" , "US")
+          , ("ru" , "RU")
           ]
+        , Run Com "echo" [" </action>"] "_ke" 3600
 #+end_src
 
 **** Trayer
@@ -960,14 +963,14 @@ Workspaces, layout, window name received from XMonad
 ** Main Monitor Template
 #+begin_src haskell :noweb yes :tangle xmobar/mainScreen.hs
 <<GLOBAL>>
-  , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %u_icon% %updates%  </box> %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% %trayerpad%"
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %_ks%%kbd%%_ke% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% "
    }
 #+end_src
 
 ** Secondary Monitor Template
 #+begin_src haskell :noweb yes :tangle xmobar/secondaryScreen.hs
 <<GLOBAL>>
-   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %u_icon% %updates%  </box> %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% "
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% %trayerpad%"
    }
 #+end_src
 

@@ -23,8 +23,9 @@ Config {
         , Run Date
           " %l:%M %p"
           "time" 10
-        , Run Com "echo" ["<box type=Bottom width=2 mb=2 color=#fb4934>  <fn=3>\xf0f3</fn> "] "u_icon" 3600
+        , Run Com "echo" ["<box type=Bottom width=2 mb=2 color=#fb4934><action=`alacritty -e sudo pacman -Syu`>  <fn=3>\xf0f3</fn>  "] "_us" 3600
         , Run Com ".config/xmonad/scripts/updates" [] "updates" 3600
+        , Run Com "echo" ["  </action></box>"] "_ue" 3600
         , Run DynNetwork
           ["-t", "<box type=Bottom width=2 mb=2 color=#8ec07c>  <fn=3>\xf0ac</fn>  <rx> <fn=3>\xf309\xf30c</fn> <tx> </box>"
                , "-S", "True"
@@ -32,7 +33,7 @@ Config {
                , "--devices", "eno1,wlan0,enp2s0f0"
                ] 20
         , Run CoreTemp
-          ["-t", "<box type=Bottom width=2 mb=2 color=#d3869b>  <fn=3>\xf2db</fn>  <core0>° "
+          ["-t", "<box type=Bottom width=2 mb=2 color=#d3869b><action=`alacritty -e htop`>  <fn=3>\xf2db</fn>  <core0>° "
                -- High CPU Temp
                , "-H", "70"
                , "-h", "#fb4934"
@@ -41,7 +42,7 @@ Config {
                , "-l", "#b8bb26"
                ] 20
         , Run Cpu
-          ["-t", "(<total>%)  </box>"
+          ["-t", "(<total>%)  </action></box>"
                -- High CPU Load
                , "-H", "80"
                , "-h", "#fb4934"
@@ -50,10 +51,10 @@ Config {
                , "-l", "#b8bb26"
                ] 20
         , Run Memory
-          ["-t", "<box type=Bottom width=2 mb=2 color=#83a598>  <fn=3>\xf538</fn>  <used> M (<usedratio>%)  </box>"
+          ["-t", "<box type=Bottom width=2 mb=2 color=#83a598><action=`alacritty -e htop`>  <fn=3>\xf538</fn>  <used> M (<usedratio>%)  </action></box>"
                ] 20
         , Run Volume "default" "Master"
-          ["-t", "<box type=Bottom width=2 mb=2 color=#b8bb26>  <status>  <volume>%  </box>"
+          ["-t", "<box type=Bottom width=2 mb=2 color=#b8bb26><action=`alacritty -e alsamixer`>  <status>  <volume>%</action>  </box>"
                , "--"
                -- ON Icon
                , "-O", "<fn=3>\xf028</fn>"
@@ -66,14 +67,16 @@ Config {
           ["-t", "<box type=Bottom width=2 mb=2 color=#fabd2f>  <fn=3>\xf0aa</fn>  <days>d <hours>h  </box>"
                ] 3600
         , Run Date
-          "<box type=Bottom width=2 mb=2 color=#fb4934>  <fn=3>\xf133</fn>  %a, %d %b %Y  </box>"
+          "<box type=Bottom width=2 mb=2 color=#fb4934><action=`emacsclient -c -a 'emacs' --eval '(cfw:open-org-calendar)'`>  <fn=3>\xf133</fn>  %a, %d %b %Y  </action></box>"
           "date" 3600
+        , Run Com "echo" ["<action=`.local/bin/dmscripts/dm-lang`> "] "_ks" 3600
         , Run Kbd
-          [ ("us" , "US ")
-          , ("ru" , "RU ")
+          [ ("us" , "US")
+          , ("ru" , "RU")
           ]
+        , Run Com "echo" [" </action>"] "_ke" 3600
         , Run Com ".config/xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20
         , Run UnsafeStdinReader
         ]
-   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %u_icon% %updates%  </box> %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% "
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% %trayerpad%"
    }
