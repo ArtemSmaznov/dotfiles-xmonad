@@ -238,7 +238,7 @@ myManageHook = composeAll
     -- General Rules
     [ className =? "confirm"        --> doFloat
     , className =? "file_progress"  --> doFloat
-    , className =? "dialog"         --> doFloat
+    , className =? "dialog"         --> (customFloating $ myFloatingWindow)
     , className =? "download"       --> doFloat
     , className =? "error"          --> doFloat
     , className =? "Gimp"           --> doFloat
