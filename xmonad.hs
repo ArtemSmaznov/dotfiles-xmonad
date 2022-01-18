@@ -215,6 +215,7 @@ myIncognitoBrowser = "qutebrowser --target private-window"
 myTorBrowser       = "torbrowser-launcher"
 myGame             = "/usr/bin/steam-runtime %U"
 myFileManager      = "pcmanfm"
+myCliFileManager   = "vifmrun"
 myTextEditor       = myTerminal ++ " -e vim"
 myIde              = "emacsclient -c -a 'emacs'"
 myMusicPlayer      = "youtubemusic-nativefier"
@@ -311,6 +312,7 @@ clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
 myScratchPads :: [NamedScratchpad]
 myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloating $ myScratchpadWindow)
                  , NS "htop"        spawnHtop        findHtop        (customFloating $ myScratchpadWindow)
+                 , NS "cliFiles"    spawnCliFiles    findCliFiles    (customFloating $ myScratchpadWindow)
                  , NS "music"       spawnMusic       findMusic       (customFloating $ myScratchpadWindow)
                  , NS "virtmanager" spawnVirtManager findVirtManager (customFloating $ myScratchpadWindow)
                  , NS "torrent"     spawnTorrent     findTorrent     (customFloating $ myScratchpadWindow)
@@ -322,6 +324,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
   where
     spawnTerm        = myTerminal ++ " -t scratchpad"
     spawnHtop        = myTerminal ++ " -t htop -e htop"
+    spawnCliFiles    = myTerminal ++ " -t cliFiles -e " ++ myCliFileManager
     spawnMusic       = myMusicPlayer
     spawnVirtManager = myVm
     spawnTorrent     = myTorrentClient
@@ -331,6 +334,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     
     findTerm         = title     =? "scratchpad"
     findHtop         = title     =? "htop"
+    findCliFiles     = title     =? "cliFiles"
     findMusic        = className =? "youtubemusic-nativefier-040164"
     findVirtManager  = title     =? "Virtual Machine Manager"
     findTorrent      = className =? "Transmission-gtk"
@@ -435,16 +439,16 @@ myKeysP =
 
     , ("M-<Tab>"       , toggleWS ) -- Toggle Workspace
 
-    , ("M-`"           , namedScratchpadAction myScratchPads "terminal" )
-    , ("C-M1-<Delete>" , namedScratchpadAction myScratchPads "htop" )
-    , ("M-s h"         , namedScratchpadAction myScratchPads "htop" )
-    -- , ("M-s e"      , namedScratchpadAction myScratchPads "files" )
-    , ("M-s m"         , namedScratchpadAction myScratchPads "music" )
-    , ("M-s c"         , namedScratchpadAction myScratchPads "calc" )
-    , ("M-s w"         , namedScratchpadAction myScratchPads "whatsapp" )
-    , ("M-s d"         , namedScratchpadAction myScratchPads "discord" )
+    , ("M-`"           , namedScratchpadAction myScratchPads "terminal"    )
+    , ("M-e"           , namedScratchpadAction myScratchPads "cliFiles"    )
+    , ("C-M1-<Delete>" , namedScratchpadAction myScratchPads "htop"        )
+    , ("M-s h"         , namedScratchpadAction myScratchPads "htop"        )
+    , ("M-s m"         , namedScratchpadAction myScratchPads "music"       )
+    , ("M-s c"         , namedScratchpadAction myScratchPads "calc"        )
+    , ("M-s w"         , namedScratchpadAction myScratchPads "whatsapp"    )
+    , ("M-s d"         , namedScratchpadAction myScratchPads "discord"     )
     , ("M-s v"         , namedScratchpadAction myScratchPads "virtmanager" )
-    , ("M-s t"         , namedScratchpadAction myScratchPads "torrent" )
+    , ("M-s t"         , namedScratchpadAction myScratchPads "torrent"     )
 
     , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute" )
     , ("<XF86AudioRaiseVolume>", spawn "amixer set Master 3%+ unmute" )
@@ -485,7 +489,7 @@ myKeysP =
     , ("C-M1-t"    , spawn (myTerminal)        ) -- Launch Terminal
     , ("M-<Return>", spawn (myTerminal)        ) -- Launch Terminal
     , ("M-c"       , spawn (myIde)             ) -- Launch IDE
-    , ("M-e"       , spawn (myFileManager)     ) -- Launch File Manager
+    , ("M-S-e"     , spawn (myFileManager)     ) -- Launch File Manager
     , ("M-b"       , spawn (myWebBrowser)      ) -- Launch Web Browser
     , ("M-i"       , spawn (myIncognitoBrowser)) -- Launch Web Browser in Incognito Mode
     , ("M-p"       , spawn (myPasswordManager) ) -- Autofill Passwords
