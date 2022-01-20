@@ -4,31 +4,31 @@ import System.Exit
 import System.IO (hPutStrLn)
 import qualified XMonad.StackSet as W
 
-import XMonad.Actions.CycleWS
+import XMonad.Actions.CycleWS (toggleWS)
 import XMonad.Actions.Navigation2D
 
-import Data.Maybe
+import Data.Maybe (fromJust)
 import Data.Monoid
 import qualified Data.Map        as M
 
 import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, pad, xmobarPP, xmobarColor, shorten, PP(..))
 import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, xcomposite in obs, active window for maim screenshots, etc.
 import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, ToggleStruts(..))
-import XMonad.Hooks.ManageHelpers
+import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat)
 import XMonad.Hooks.ServerMode
 
 import XMonad.Layout.Grid
 import XMonad.Layout.ResizableTile
 import XMonad.Layout.MultiColumns
 
-import XMonad.Layout.MultiToggle
-import XMonad.Layout.MultiToggle.Instances
-import XMonad.Layout.NoBorders
+import XMonad.Layout.MultiToggle (mkToggle, single, EOT(EOT), (??), Toggle(..))
+import XMonad.Layout.MultiToggle.Instances (StdTransformers (NBFULL, MIRROR, NOBORDERS))
+import XMonad.Layout.NoBorders (lessBorders, Ambiguity (OnlyScreenFloat))
 import XMonad.Layout.Renamed
 import XMonad.Layout.Spacing
 
 import XMonad.Util.Dmenu
-import XMonad.Util.EZConfig
+import XMonad.Util.EZConfig (additionalKeysP, additionalKeys)
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.Run (runProcessWithInput, safeSpawn, spawnPipe)
 import XMonad.Util.SpawnOnce
