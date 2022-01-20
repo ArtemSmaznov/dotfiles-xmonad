@@ -18,6 +18,7 @@ import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat)
 import XMonad.Hooks.ServerMode
 
 import XMonad.Layout.Grid
+import XMonad.Layout.Dwindle
 import XMonad.Layout.ResizableTile
 import XMonad.Layout.MultiColumns
 
@@ -361,6 +362,20 @@ columns = renamed [Replace "columns"]   -- just a grid layout
           1      --- Default value for all following columns.
           0.03   --- Percent of screen to increment by when resizing panes
           (-0.5) --- Initial size of master area, or column area if the size is negative.
+spiral  = renamed [Replace "spiral"]
+        $ myGap myGapSize
+        $ Spiral
+          R      --- First split direction
+          CW     --- First split chirality
+          1      --- Size ratio between rectangle allocated to current window and rectangle allocated to remaining windows
+          1.03   --- Factor by which the size ratio is changed in response to Expand or Shrink messages
+dwindle = renamed [Replace "dwindle"]
+        $ myGap myGapSize
+        $ Dwindle
+          R      --- First split direction
+          CW     --- First split chirality
+          1      --- Size ratio between rectangle allocated to current window and rectangle allocated to remaining windows
+          1.03   --- Factor by which the size ratio is changed in response to Expand or Shrink messages
 full    = renamed [Replace "full"]
         $ myGap myGapSize
         $ Full
@@ -373,6 +388,7 @@ myLayoutHook   = avoidStruts
   where
     myLayouts = tall 
             ||| columns
+            ||| spiral
             ||| full
 
 myModMask = mod4Mask
