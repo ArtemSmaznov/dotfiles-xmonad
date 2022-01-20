@@ -78,5 +78,5 @@ Config {
         , Run Com ".config/xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20
         , Run UnsafeStdinReader
         ]
-   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% %trayerpad%"
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %trayerpad%"
    }

@@ -983,14 +983,14 @@ Workspaces, layout, window name received from XMonad
 ** Main Monitor Template
 #+begin_src haskell :noweb yes :tangle xmobar/mainScreen.hs
 <<GLOBAL>>
-   , template = "%time% %separator% %UnsafeStdinReader% }{ %_ks%%kbd%%_ke% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% "
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %_ks%%kbd%%_ke% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %uptime% "
    }
 #+end_src
 
 ** Secondary Monitor Template
 #+begin_src haskell :noweb yes :tangle xmobar/secondaryScreen.hs
 <<GLOBAL>>
-   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %uptime% %date% %trayerpad%"
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %trayerpad%"
    }
 #+end_src
 
