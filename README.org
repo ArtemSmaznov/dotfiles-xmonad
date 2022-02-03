@@ -12,6 +12,7 @@
   - [[#data][Data]]
   - [[#hooks][Hooks]]
   - [[#layouts][Layouts]]
+  - [[#prompt][Prompt]]
   - [[#util][Util]]
   - [[#theme][Theme]]
 - [[#main][Main]]
@@ -23,8 +24,11 @@
 - [[#apps][Apps]]
 - [[#theme-1][Theme]]
 - [[#windows][Windows]]
+  - [[#floating][Floating]]
+  - [[#scratchpads][Scratchpads]]
+  - [[#helper-functions][Helper Functions]]
 - [[#workspaces][Workspaces]]
-- [[#scratchpads][Scratchpads]]
+- [[#scratchpads-1][Scratchpads]]
 - [[#layouts-1][Layouts]]
 - [[#keybindings][Keybindings]]
   - [[#mod-keys][Mod Keys]]
@@ -32,8 +36,9 @@
   - [[#legacy-keybindings][Legacy Keybindings]]
   - [[#mouse-bindings][Mouse Bindings]]
 - [[#xmobar][XMobar]]
-  - [[#main-monitor][Main Monitor]]
-  - [[#secondary-monitor][Secondary Monitor]]
+  - [[#global][Global]]
+  - [[#main-monitor-template][Main Monitor Template]]
+  - [[#secondary-monitor-template][Secondary Monitor Template]]
 - [[#help][Help]]
 
 * Dependencies
@@ -97,6 +102,12 @@ import XMonad.Layout.MultiToggle.Instances (StdTransformers (NBFULL, MIRROR, NOB
 import XMonad.Layout.NoBorders (lessBorders, Ambiguity (OnlyScreenFloat))
 import XMonad.Layout.Renamed
 import XMonad.Layout.Spacing
+#+end_src
+
+** Prompt
+#+begin_src haskell
+import XMonad.Prompt.Pass
+import XMonad.Prompt.Ssh
 #+end_src
 
 ** Util
@@ -387,6 +398,7 @@ myFocusedBorderColor = color09
 #+end_src
 
 * Windows
+** Floating
 #+begin_src haskell
 myFloatingWindow    = W.RationalRect left_margin top_margin width height
     where
@@ -394,14 +406,21 @@ myFloatingWindow    = W.RationalRect left_margin top_margin width height
         height      = 0.7
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
+#+end_src
 
+** Scratchpads
+*** Generic
+#+begin_src haskell
 myScratchpadWindow  = W.RationalRect left_margin top_margin width height
     where
         width       = 0.8
         height      = 0.8
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
-  
+#+end_src
+
+*** Calculator
+#+begin_src haskell
 myScratchpadCalc    = W.RationalRect left_margin top_margin width height
     where
         width       = 0.2
@@ -409,6 +428,10 @@ myScratchpadCalc    = W.RationalRect left_margin top_margin width height
         left_margin = 0.95 - width
         top_margin  = 0.05
 
+#+end_src
+
+*** Chat
+#+begin_src haskell
 myScratchpadChat    = W.RationalRect left_margin top_margin width height
     where
         width       = 0.5
@@ -417,7 +440,18 @@ myScratchpadChat    = W.RationalRect left_margin top_margin width height
         top_margin  = (1.0 - height)/2
 #+end_src
 
-Helper Functions
+*** Anki
+#+begin_src haskell
+myScratchpadAnki    = W.RationalRect left_margin top_margin width height
+    where
+        width       = 0.4
+        height      = 0.9
+        left_margin = (1.0 - width)/2
+        top_margin  = (1.0 - height)/2
+
+#+end_src
+
+** Helper Functions
 #+begin_src haskell
 setFloating   w = W.float w myFloatingWindow 
 unsetFloating w = W.sink w 
@@ -481,6 +515,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
                  , NS "calc"        spawnCalc        findCalc        (customFloating $ myScratchpadCalc)
                  , NS "whatsapp"    spawnWhatsApp    findWhatsApp    (customFloating $ myScratchpadChat)
                  , NS "discord"     spawnDiscord     findDiscord     (customFloating $ myScratchpadChat)
+                 , NS "anki"        spawnAnki        findAnki        (customFloating $ myScratchpadAnki)
                  ]
   
   where
@@ -493,6 +528,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     spawnCalc        = myCalculator
     spawnWhatsApp    = myWhatsApp
     spawnDiscord     = myDiscord
+    spawnAnki        = "anki"
     
     findTerm         = title     =? "scratchpad"
     findHtop         = title     =? "htop"
@@ -503,6 +539,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     findCalc         = className =? "Gnome-calculator"
     findWhatsApp     = className =? "Whatsapp-for-linux"
     findDiscord      = className =? "discord"
+    findAnki         = className =? "Anki"
 #+end_src
 
 * Layouts
@@ -593,7 +630,7 @@ myKeysP :: [(String, X ())]
 Debugging
 #+begin_src haskell
 myKeysP =
-    [ ("M-C-d", toggleZen ) -- Debugging
+    [ ("M-C-d", sshPrompt def ) -- Debugging
 #+end_src
 
 #+begin_src haskell
@@ -601,7 +638,7 @@ myKeysP =
     , ("M-C-q"     , io (exitWith ExitSuccess)                   ) -- Quit XMonad
 
     -- Extra modifier keys were already added to Xmonad-contrib. Waiting for the new version to be released
-    -- , ("S-<Alt_L>" , spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
+    , ("S-<Alt_R>" , spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
 
     , ("M-t z"     , toggleZen                                   ) -- Toggle Zen Mode
     , ("M-t g"     , toggleGaps                                  ) -- Toggle Gaps
@@ -621,7 +658,7 @@ States
 
 Focus
 #+begin_src haskell
-    , ("M-C-/"     , switchLayer                   ) -- Switch navigation layer (Tiled vs Floating screens)
+    , ("M-/"     , switchLayer                   ) -- Switch navigation layer (Tiled vs Floating screens)
     , ("M1-<Tab>"  , windows W.focusDown           ) -- Move focus to next Window
     , ("M1-S-<Tab>", windows W.focusUp             ) -- Move focus to prev Window
     , ("M-h"       , windowGo L False              ) -- Move focus to left Window
@@ -699,6 +736,7 @@ Swapping
     , ("M-s d"         , namedScratchpadAction myScratchPads "discord"     )
     , ("M-s v"         , namedScratchpadAction myScratchPads "virtmanager" )
     , ("M-s t"         , namedScratchpadAction myScratchPads "torrent"     )
+    , ("M-s a"         , namedScratchpadAction myScratchPads "anki"        )
 #+end_src
 
 *** Media Keys
@@ -963,6 +1001,7 @@ Keyboard Layout Indicator
         , Run Kbd
           [ ("us" , "US")
           , ("ru" , "RU")
+          , ("jp" , "JP")
           ]
         , Run Com "echo" [" </action>"] "_ke" 3600
 #+end_src

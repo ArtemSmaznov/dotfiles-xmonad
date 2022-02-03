@@ -73,6 +73,7 @@ Config {
         , Run Kbd
           [ ("us" , "US")
           , ("ru" , "RU")
+          , ("jp" , "JP")
           ]
         , Run Com "echo" [" </action>"] "_ke" 3600
         , Run Com ".config/xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20

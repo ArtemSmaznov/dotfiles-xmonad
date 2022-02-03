@@ -28,6 +28,9 @@ import XMonad.Layout.NoBorders (lessBorders, Ambiguity (OnlyScreenFloat))
 import XMonad.Layout.Renamed
 import XMonad.Layout.Spacing
 
+import XMonad.Prompt.Pass
+import XMonad.Prompt.Ssh
+
 import XMonad.Util.Dmenu
 import XMonad.Util.EZConfig (additionalKeysP, additionalKeys)
 import XMonad.Util.NamedScratchpad
@@ -262,7 +265,7 @@ myScratchpadWindow  = W.RationalRect left_margin top_margin width height
         height      = 0.8
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
-  
+
 myScratchpadCalc    = W.RationalRect left_margin top_margin width height
     where
         width       = 0.2
@@ -273,6 +276,13 @@ myScratchpadCalc    = W.RationalRect left_margin top_margin width height
 myScratchpadChat    = W.RationalRect left_margin top_margin width height
     where
         width       = 0.5
+        height      = 0.9
+        left_margin = (1.0 - width)/2
+        top_margin  = (1.0 - height)/2
+
+myScratchpadAnki    = W.RationalRect left_margin top_margin width height
+    where
+        width       = 0.4
         height      = 0.9
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
@@ -320,6 +330,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
                  , NS "calc"        spawnCalc        findCalc        (customFloating $ myScratchpadCalc)
                  , NS "whatsapp"    spawnWhatsApp    findWhatsApp    (customFloating $ myScratchpadChat)
                  , NS "discord"     spawnDiscord     findDiscord     (customFloating $ myScratchpadChat)
+                 , NS "anki"        spawnAnki        findAnki        (customFloating $ myScratchpadAnki)
                  ]
   
   where
@@ -332,6 +343,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     spawnCalc        = myCalculator
     spawnWhatsApp    = myWhatsApp
     spawnDiscord     = myDiscord
+    spawnAnki        = "anki"
     
     findTerm         = title     =? "scratchpad"
     findHtop         = title     =? "htop"
@@ -342,6 +354,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     findCalc         = className =? "Gnome-calculator"
     findWhatsApp     = className =? "Whatsapp-for-linux"
     findDiscord      = className =? "discord"
+    findAnki         = className =? "Anki"
 
 tall    = renamed [Replace "tall"]   -- default tiling algorithm partitions the screen into two panes
         $ myGap myGapSize
@@ -396,13 +409,13 @@ myModMask = mod4Mask
 myKeysP :: [(String, X ())]
 
 myKeysP =
-    [ ("M-C-d", toggleZen ) -- Debugging
+    [ ("M-C-d", sshPrompt def ) -- Debugging
 
     , ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
     , ("M-C-q"     , io (exitWith ExitSuccess)                   ) -- Quit XMonad
 
     -- Extra modifier keys were already added to Xmonad-contrib. Waiting for the new version to be released
-    -- , ("S-<Alt_L>" , spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
+    , ("S-<Alt_R>" , spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
 
     , ("M-t z"     , toggleZen                                   ) -- Toggle Zen Mode
     , ("M-t g"     , toggleGaps                                  ) -- Toggle Gaps
@@ -415,7 +428,7 @@ myKeysP =
     , ("M-m"       , toggleMaximize                ) -- Toggle Maximize
     , ("M-f"       , toggleFloating                ) -- Toggle Floating
 
-    , ("M-C-/"     , switchLayer                   ) -- Switch navigation layer (Tiled vs Floating screens)
+    , ("M-/"     , switchLayer                   ) -- Switch navigation layer (Tiled vs Floating screens)
     , ("M1-<Tab>"  , windows W.focusDown           ) -- Move focus to next Window
     , ("M1-S-<Tab>", windows W.focusUp             ) -- Move focus to prev Window
     , ("M-h"       , windowGo L False              ) -- Move focus to left Window
@@ -465,6 +478,7 @@ myKeysP =
     , ("M-s d"         , namedScratchpadAction myScratchPads "discord"     )
     , ("M-s v"         , namedScratchpadAction myScratchPads "virtmanager" )
     , ("M-s t"         , namedScratchpadAction myScratchPads "torrent"     )
+    , ("M-s a"         , namedScratchpadAction myScratchPads "anki"        )
 
     , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute" )
     , ("<XF86AudioRaiseVolume>", spawn "amixer set Master 3%+ unmute" )
