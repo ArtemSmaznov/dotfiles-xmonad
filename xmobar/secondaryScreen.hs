@@ -1,9 +1,9 @@
 Config {
    -- appearance
      font            = "xft:SF Pro Text Regular:size=9:bold:antialias=true"
-   , additionalFonts = [ "xft:Font Awesome 5 Free Solid:pixelsize=16"
-                       , "xft:Font Awesome 5 Brands:pixelsize=16"
-                       , "xft:Font Awesome 5 Free Solid:pixelsize=14"
+   , additionalFonts = [ "xft:Font Awesome 6 Free Solid:pixelsize=16"
+                       , "xft:Font Awesome 6 Brands:pixelsize=16"
+                       , "xft:Font Awesome 6 Free Solid:pixelsize=14"
                        , "xft:Mononoki:pixelsize=11:antialias=true:hinting=true"
                        ]
    , bgColor         = "#282828"

@@ -74,26 +74,22 @@ main = do
             -- Current workspace
             , ppCurrent          = xmobarColor foreground bg3
                                    . wrap ("<box type=Top width=2 color=" ++ color11 ++ ">") "</box>"
-                                   . pad
+                                   . clickable
 
             -- Visible but not current workspace
             , ppVisible          = xmobarColor foreground ""
                                    . wrap ("<box type=Top width=2 color=" ++ color14 ++ ">") "</box>"
-                                   . pad
                                    . clickable
             -- Hidden workspaces
             , ppHidden           = xmobarColor foreground ""
-                                   . pad
                                    . clickable
 
             -- Hidden workspaces (no windows)
             , ppHiddenNoWindows  = xmobarColor bg2 ""
-                                   . pad
                                    . clickable
 
             -- Urgent workspace
             , ppUrgent           = xmobarColor color09 ""
-                                   . pad
                                    . clickable
 
             -- Title of active window
@@ -304,15 +300,15 @@ toggleGaps       = toggleScreenSpacingEnabled     >> toggleWindowSpacingEnabled
 
 myNavigation2DConfig = def { defaultTiledNavigation = sideNavigation }
 
-myWorkspaces  = [ "<fn=2>\xf268</fn>" -- Internet
-                , "<fn=2>\xf1b6</fn>" -- Gaming
-                , "<fn=1>\xf11c</fn>" -- Coding
-                , "<fn=1>\xf07b</fn>" -- Computer
-                , "<fn=1>\xf025</fn>" -- Music
-                , "<fn=1>\xf030</fn>" -- Graphics
-                , "<fn=1>\xf03d</fn>" -- Video
-                , "<fn=1>\xf7cd</fn>" -- Chat
-                , "<fn=2>\xf395</fn>" -- Sandbox
+myWorkspaces  = [ "<fn=2> \xf268 </fn>" -- Internet
+                , "<fn=2> \xf1b6 </fn>" -- Gaming
+                , "<fn=1> \xf11c </fn>" -- Coding
+                , "<fn=1> \xf07b </fn>" -- Computer
+                , "<fn=1> \xf025 </fn>" -- Music
+                , "<fn=1> \xf030 </fn>" -- Graphics
+                , "<fn=1> \xf03d </fn>" -- Video
+                , "<fn=1> \xf7cd </fn>" -- Chat
+                , "<fn=2> \xf395 </fn>" -- Sandbox
                 ]
   
 myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
