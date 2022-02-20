@@ -218,8 +218,7 @@ myFileManager      = "pcmanfm"
 myCliFileManager   = "vifmrun"
 myTextEditor       = myTerminal ++ " -e vim"
 myIde              = "emacsclient -c -a 'emacs'"
-myMusicPlayer      = "youtubemusic-nativefier"
-myCliMusicPlayer   = myTerminal ++ " -e tmux attach -t music"
+myMusicPlayer      = myTerminal ++ " -e ncmpcpp"
 myVideoPlayer      = "celluloid"
 myVideoEditor      = "kdenlive"
 myPhotoLibrary     = "digikam"
@@ -333,7 +332,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     spawnTerm        = myTerminal ++ " -t scratchpad"
     spawnHtop        = myTerminal ++ " -t htop -e htop"
     spawnCliFiles    = myTerminal ++ " -t cliFiles -e " ++ myCliFileManager
-    spawnMusic       = myMusicPlayer
+    spawnMusic       = myTerminal ++ " --class ncmpcpp,music -e ncmpcpp"
     spawnVirtManager = myVm
     spawnTorrent     = myTorrentClient
     spawnCalc        = myCalculator
@@ -344,7 +343,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     findTerm         = title     =? "scratchpad"
     findHtop         = title     =? "htop"
     findCliFiles     = title     =? "cliFiles"
-    findMusic        = className =? "youtubemusic-nativefier-040164"
+    findMusic        = className =? "music"
     findVirtManager  = title     =? "Virtual Machine Manager"
     findTorrent      = className =? "Transmission-gtk"
     findCalc         = className =? "Gnome-calculator"
@@ -479,9 +478,10 @@ myKeysP =
     , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute" )
     , ("<XF86AudioRaiseVolume>", spawn "amixer set Master 3%+ unmute" )
     , ("<XF86AudioMute>"       , spawn "amixer set Master toggle"     )
-    -- , ("<XF86AudioPlay>"       , spawn "mocp --play"                  )
-    -- , ("<XF86AudioPrev>"       , spawn "mocp --previous"              )
-    -- , ("<XF86AudioNext>"       , spawn "mocp --next"                  )
+    , ("<XF86AudioPrev>"       , spawn "mpc prev"                     )
+    , ("<XF86AudioNext>"       , spawn "mpc next"                     )
+    , ("<XF86AudioPlay>"       , spawn "mpc toggle"                   )
+    , ("<XF86AudioStop>"       , spawn "mpc stop"                     )
 
     , ("M-d M-d" , spawn "$HOME/.local/bin/dm-scripts/dm-master"     )
     , ("M-d w"   , spawn "$HOME/.local/bin/dm-scripts/dm-wallpaper"  )
