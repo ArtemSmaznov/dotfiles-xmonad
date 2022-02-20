@@ -411,7 +411,7 @@ myKeysP =
     , ("M-C-q"     , io (exitWith ExitSuccess)                   ) -- Quit XMonad
 
     -- Extra modifier keys were already added to Xmonad-contrib. Waiting for the new version to be released
-    , ("S-<Alt_R>" , spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
+    , ("S-<Alt_R>" , spawn "$HOME/.local/bin/dm-scripts/dm-lang"  ) -- Language Switching
 
     , ("M-t z"     , toggleZen                                   ) -- Toggle Zen Mode
     , ("M-t g"     , toggleGaps                                  ) -- Toggle Gaps
@@ -483,34 +483,34 @@ myKeysP =
     -- , ("<XF86AudioPrev>"       , spawn "mocp --previous"              )
     -- , ("<XF86AudioNext>"       , spawn "mocp --next"                  )
 
-    , ("M-d M-d" , spawn "$HOME/.local/bin/dmscripts/dm-master"     )
-    , ("M-d w"   , spawn "$HOME/.local/bin/dmscripts/dm-wallpaper"  )
-    , ("M-d r"   , spawn "$HOME/.local/bin/dmscripts/dm-record"     )
-    , ("M-d p"   , spawn "$HOME/.local/bin/dmscripts/dm-power"      )
-    , ("M-d t"   , spawn "$HOME/.local/bin/dmscripts/dm-theme"      )
-    , ("M-d s"   , spawn "$HOME/.local/bin/dmscripts/dm-screenshot" )
-    , ("M-d b"   , spawn "$HOME/.local/bin/dmscripts/dm-bookman"    )
-    , ("M-d n"   , spawn "$HOME/.local/bin/dmscripts/dm-notify"     )
-    , ("M-d \\"  , spawn "$HOME/.local/bin/dmscripts/dm-notify"     )
+    , ("M-d M-d" , spawn "$HOME/.local/bin/dm-scripts/dm-master"     )
+    , ("M-d w"   , spawn "$HOME/.local/bin/dm-scripts/dm-wallpaper"  )
+    , ("M-d r"   , spawn "$HOME/.local/bin/dm-scripts/dm-record"     )
+    , ("M-d p"   , spawn "$HOME/.local/bin/dm-scripts/dm-power"      )
+    , ("M-d t"   , spawn "$HOME/.local/bin/dm-scripts/dm-theme"      )
+    , ("M-d s"   , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot" )
+    , ("M-d b"   , spawn "$HOME/.local/bin/dm-scripts/dm-bookman"    )
+    , ("M-d n"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify"     )
+    , ("M-d \\"  , spawn "$HOME/.local/bin/dm-scripts/dm-notify"     )
 
-    , ("M1-<F4>", spawn "$HOME/.local/bin/dmscripts/dm-power"         ) -- Logout Menu
-    , ("M-z z"  , spawn "$HOME/.local/bin/dmscripts/dm-power"         ) -- Logout Menu
-    , ("M-z l"  , spawn "$HOME/.local/bin/dmscripts/dm-power lock"    ) -- Lock Screen
-    , ("M-z s"  , spawn "$HOME/.local/bin/dmscripts/dm-power suspend" ) -- Suspend System
-    , ("M-z p"  , spawn "$HOME/.local/bin/dmscripts/dm-power poweroff") -- Shutdown System
-    , ("M-z r"  , spawn "$HOME/.local/bin/dmscripts/dm-power reboot"  ) -- Reboot System
-    , ("M-z w"  , spawn "$HOME/.local/bin/dmscripts/dm-power windows" ) -- Reboot to Windows
+    , ("M1-<F4>", spawn "$HOME/.local/bin/dm-scripts/dm-power"         ) -- Logout Menu
+    , ("M-z z"  , spawn "$HOME/.local/bin/dm-scripts/dm-power"         ) -- Logout Menu
+    , ("M-z l"  , spawn "$HOME/.local/bin/dm-scripts/dm-power lock"    ) -- Lock Screen
+    , ("M-z s"  , spawn "$HOME/.local/bin/dm-scripts/dm-power suspend" ) -- Suspend System
+    , ("M-z p"  , spawn "$HOME/.local/bin/dm-scripts/dm-power poweroff") -- Shutdown System
+    , ("M-z r"  , spawn "$HOME/.local/bin/dm-scripts/dm-power reboot"  ) -- Reboot System
+    , ("M-z w"  , spawn "$HOME/.local/bin/dm-scripts/dm-power windows" ) -- Reboot to Windows
 
-    , ("<Print>"    , spawn "$HOME/.local/bin/dmscripts/dm-screenshot screen" ) -- Fullscreen Screenshot
-    , ("M-S-<Print>", spawn "$HOME/.local/bin/dmscripts/dm-screenshot area"   ) -- Selection Area Screenshot
-    , ("M1-<Print>" , spawn "$HOME/.local/bin/dmscripts/dm-screenshot window" ) -- Active Window Screenshot
-    , ("M-<Print>"  , spawn "$HOME/.local/bin/dmscripts/dm-screenshot full"   ) -- Full Desktop Screenshot
+    , ("<Print>"    , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot screen" ) -- Fullscreen Screenshot
+    , ("M-S-<Print>", spawn "$HOME/.local/bin/dm-scripts/dm-screenshot area"   ) -- Selection Area Screenshot
+    , ("M1-<Print>" , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot window" ) -- Active Window Screenshot
+    , ("M-<Print>"  , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot full"   ) -- Full Desktop Screenshot
 
-    , ("M-\\ \\"  , spawn "$HOME/.local/bin/dmscripts/dm-notify recents" ) -- Show recent Notifications
-    , ("M-\\ r"   , spawn "$HOME/.local/bin/dmscripts/dm-notify recents" ) -- Show recent Notifications
-    , ("M-\\ S-c" , spawn "$HOME/.local/bin/dmscripts/dm-notify clear"   ) -- Clear all Notifications
-    , ("M-\\ c"   , spawn "$HOME/.local/bin/dmscripts/dm-notify close"   ) -- Clear last Notification
-    , ("M-\\ a"   , spawn "$HOME/.local/bin/dmscripts/dm-notify context" ) -- Open last Notification
+    , ("M-\\ \\"  , spawn "$HOME/.local/bin/dm-scripts/dm-notify recents" ) -- Show recent Notifications
+    , ("M-\\ r"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify recents" ) -- Show recent Notifications
+    , ("M-\\ S-c" , spawn "$HOME/.local/bin/dm-scripts/dm-notify clear"   ) -- Clear all Notifications
+    , ("M-\\ c"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify close"   ) -- Clear last Notification
+    , ("M-\\ a"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify context" ) -- Open last Notification
 
     , ("C-M1-t"    , spawn (myTerminal)        ) -- Launch Terminal
     , ("M-<Return>", spawn (myTerminal)        ) -- Launch Terminal
@@ -536,7 +536,7 @@ myKeysP =
 
 myKeys :: [((KeyMask, KeySym), X ())]
 myKeys =
-    [ ((shiftMask, xK_Alt_L), spawn "$HOME/.local/bin/dmscripts/dm-lang"  ) -- Language Switching
+    [ ((shiftMask, xK_Alt_L), spawn "$HOME/.local/bin/dm-scripts/dm-lang"  ) -- Language Switching
 
     -- Push window back into tiling
     -- , ((mod4Mask,               xK_t     ), withFocused $ windows . W.sink)

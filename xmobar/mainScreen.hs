@@ -24,7 +24,7 @@ Config {
           " %l:%M %p"
           "time" 10
         , Run Com "echo" ["<box type=Bottom width=2 mb=2 color=#fb4934><action=`alacritty -e sudo pacman -Syu`>  <fn=3>\xf0f3</fn>  "] "_us" 3600
-        , Run Com ".config/xmonad/scripts/updates" [] "updates" 3600
+        , Run Com ".local/bin/dm-scripts/helpers/updates" [] "updates" 3600
         , Run Com "echo" ["  </action></box>"] "_ue" 3600
         , Run DynNetwork
           ["-t", "<box type=Bottom width=2 mb=2 color=#8ec07c>  <fn=3>\xf0ac</fn>  <rx> <fn=3>\xf309\xf30c</fn> <tx> </box>"
@@ -69,7 +69,7 @@ Config {
         , Run Date
           "<box type=Bottom width=2 mb=2 color=#fb4934><action=`emacsclient -c -a 'emacs' --eval '(cfw:open-org-calendar)'`>  <fn=3>\xf133</fn>  %a, %d %b %Y  </action></box>"
           "date" 3600
-        , Run Com "echo" ["<action=`.local/bin/dmscripts/dm-lang`> "] "_ks" 3600
+        , Run Com "echo" ["<action=`.local/bin/dm-scripts/dm-lang`> "] "_ks" 3600
         , Run Kbd
           [ ("us" , "US")
           , ("ru" , "RU")
