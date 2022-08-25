@@ -736,13 +736,15 @@ Swapping
 
 *** Media Keys
 #+begin_src haskell
-    , ("<XF86AudioLowerVolume>", spawn "amixer set Master 3%- unmute" )
-    , ("<XF86AudioRaiseVolume>", spawn "amixer set Master 3%+ unmute" )
-    , ("<XF86AudioMute>"       , spawn "amixer set Master toggle"     )
-    , ("<XF86AudioPrev>"       , spawn "mpc prev"                     )
-    , ("<XF86AudioNext>"       , spawn "mpc next"                     )
-    , ("<XF86AudioPlay>"       , spawn "mpc toggle"                   )
-    , ("<XF86AudioStop>"       , spawn "mpc stop"                     )
+    , ("<XF86AudioRaiseVolume>"  , spawn "amixer set Master 2%+ unmute" )
+    , ("<XF86AudioLowerVolume>"  , spawn "amixer set Master 2%- unmute" )
+    , ("<XF86AudioMute>"         , spawn "amixer set Master toggle"     )
+    , ("C-<XF86AudioRaiseVolume>", spawn "mpc volume +2"                )
+    , ("C-<XF86AudioLowerVolume>", spawn "mpc volume -2"                )
+    , ("<XF86AudioPrev>"         , spawn "mpc prev"                     )
+    , ("<XF86AudioNext>"         , spawn "mpc next"                     )
+    , ("<XF86AudioPlay>"         , spawn "mpc toggle"                   )
+    , ("<XF86AudioStop>"         , spawn "mpc stop"                     )
 #+end_src
 
 *** dm-scripts
