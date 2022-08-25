@@ -211,7 +211,7 @@ myStartupHook = do
 
     -- System Tray
     spawn "killall trayer"  -- kill current trayer on each restart
-    spawn ("sleep 2 && trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 1 --transparent true --alpha 0 " ++ colorTrayer ++ " --height " ++ show myBarSize ++ "")
+    spawn ("sleep 2 && trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 " ++ colorTrayer ++ " --height " ++ show myBarSize ++ "")
 #+end_src
 
 ** Event handling
@@ -1008,6 +1008,14 @@ Script that dynamically adjusts xmobar padding depending on number of trayer ico
         , Run Com ".config/xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20
 #+end_src
 
+**** MPD
+#+begin_src haskell
+        , Run MPD 
+          ["-t", "<statei> <track>/<plength>: <artist> - <title> "
+               , "--", "-P", ">>", "-Z", "|", "-S", "><"
+               ] 10
+#+end_src
+
 **** Unsafe Stdin Reader
 Workspaces, layout, window name received from XMonad
 #+begin_src haskell
@@ -1018,14 +1026,14 @@ Workspaces, layout, window name received from XMonad
 ** Main Monitor Template
 #+begin_src haskell :noweb yes :tangle xmobar/mainScreen.hs
 <<GLOBAL>>
-   , template = "%time% %separator% %UnsafeStdinReader% }{ %_ks%%kbd%%_ke% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %uptime% "
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %_ks%%kbd%%_ke% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %uptime% %trayerpad%"
    }
 #+end_src
 
 ** Secondary Monitor Template
 #+begin_src haskell :noweb yes :tangle xmobar/secondaryScreen.hs
 <<GLOBAL>>
-   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %trayerpad%"
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %default:Master% %date% "
    }
 #+end_src
 

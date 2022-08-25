@@ -77,7 +77,11 @@ Config {
           ]
         , Run Com "echo" [" </action>"] "_ke" 3600
         , Run Com ".config/xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20
+        , Run MPD 
+          ["-t", "<statei> <track>/<plength>: <artist> - <title> "
+               , "--", "-P", ">>", "-Z", "|", "-S", "><"
+               ] 10
         , Run UnsafeStdinReader
         ]
-   , template = "%time% %separator% %UnsafeStdinReader% }{ %_ks%%kbd%%_ke% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %uptime% "
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %_ks%%kbd%%_ke% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %uptime% %trayerpad%"
    }
