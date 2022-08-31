@@ -16,6 +16,7 @@ import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, xcomposite in o
 import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat)
 import XMonad.Hooks.ServerMode
+import XMonad.Hooks.StatusBar.PP
 
 import XMonad.Layout.Grid
 import XMonad.Layout.Dwindle
@@ -67,7 +68,7 @@ main = do
         , layoutHook         = lessBorders OnlyScreenFloat
                              $ myLayoutHook
         , startupHook        = myStartupHook
-        , logHook            = dynamicLogWithPP $ namedScratchpadFilterOutWorkspacePP $ xmobarPP
+        , logHook            = dynamicLogWithPP $ filterOutWsPP [scratchpadWorkspaceTag] $ xmobarPP
             { ppOutput = \x -> hPutStrLn xmproc0 x -- xmobar on Monitor 1
                             >> hPutStrLn xmproc1 x -- xmobar on Monitor 2
 
