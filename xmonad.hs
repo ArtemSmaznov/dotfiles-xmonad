@@ -47,6 +47,7 @@ main = do
     
     xmonad $ withNavigation2DConfig myNavigation2DConfig 
            $ docks
+           $ ewmhFullscreen
            $ ewmh def
         -- simple stuff
         { terminal           = myTerminal
@@ -64,7 +65,6 @@ main = do
 
         -- hooks, layouts
         , manageHook         = myManageHook <+> manageDocks
-        , handleEventHook    = fullscreenEventHook -- Enables fullscreen for some apps like browsers
         , layoutHook         = lessBorders OnlyScreenFloat
                              $ myLayoutHook
         , startupHook        = myStartupHook
