@@ -126,6 +126,7 @@ myManageHook = composeAll
     , className =? "notification"   --> doFloat
     , className =? "splash"         --> doFloat
     , className =? "toolbar"        --> doFloat
+    , className =? "mpv"            --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
     , isFullscreen                  --> doFullFloat
@@ -219,7 +220,7 @@ myCliFileManager   = "vifmrun"
 myTextEditor       = myTerminal ++ " -e vim"
 myIde              = "emacsclient -c -a 'emacs'"
 myMusicPlayer      = myTerminal ++ " -e ncmpcpp"
-myVideoPlayer      = "celluloid"
+myVideoPlayer      = "mpv"
 myVideoEditor      = "kdenlive"
 myPhotoLibrary     = "digikam"
 myImageEditor      = "gimp"
@@ -406,16 +407,17 @@ myKeysP :: [(String, X ())]
 myKeysP =
     [ ("M-C-d", sshPrompt def ) -- Debugging
 
-    , ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart") -- Restart XMonad
-    , ("M-C-q"     , io (exitWith ExitSuccess)                   ) -- Quit XMonad
+    , ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart"       ) -- Restart XMonad
+    , ("M-C-q"     , io (exitWith ExitSuccess)                          ) -- Quit XMonad
 
     -- Extra modifier keys were already added to Xmonad-contrib. Waiting for the new version to be released
-    , ("S-<Alt_R>" , spawn "$HOME/.local/bin/dm-scripts/dm-lang"  ) -- Language Switching
+    , ("S-<Alt_R>" , spawn "$HOME/.local/bin/dm-scripts/dm-lang"        ) -- Language Switching
 
-    , ("M-t z"     , toggleZen                                   ) -- Toggle Zen Mode
-    , ("M-t g"     , toggleGaps                                  ) -- Toggle Gaps
-    , ("M-t b"     , toggleBorders                               ) -- Toggle Window Borders
-    , ("M-t s"     , toggleStatusBar                             ) -- Ignore the statusbar
+    , ("M-t z"     , toggleZen                                          ) -- Toggle Zen Mode
+    , ("M-t g"     , toggleGaps                                         ) -- Toggle Gaps
+    , ("M-t b"     , toggleBorders                                      ) -- Toggle Window Borders
+    , ("M-t s"     , toggleStatusBar                                    ) -- Ignore the statusbar
+    , ("M-t k"     , spawn "$HOME/.local/bin/dm-scripts/dm-keys toggle" ) -- Toggle Key Grabber
 
     , ("M-q"       , kill                          ) -- Close focused Window
     , ("M-<F11>"   , toggleFullScreen              ) -- Toggles Fullscreen
@@ -494,6 +496,7 @@ myKeysP =
     , ("M-d b"   , spawn "$HOME/.local/bin/dm-scripts/dm-bookman"    )
     , ("M-d n"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify"     )
     , ("M-d \\"  , spawn "$HOME/.local/bin/dm-scripts/dm-notify"     )
+    , ("M-d k"   , spawn "$HOME/.local/bin/dm-scripts/dm-keys"       )
 
     , ("M1-<F4>", spawn "$HOME/.local/bin/dm-scripts/dm-power"         ) -- Logout Menu
     , ("M-z z"  , spawn "$HOME/.local/bin/dm-scripts/dm-power"         ) -- Logout Menu
