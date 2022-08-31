@@ -13,7 +13,7 @@ import qualified Data.Map        as M
 
 import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, pad, xmobarPP, xmobarColor, shorten, PP(..))
 import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, xcomposite in obs, active window for maim screenshots, etc.
-import XMonad.Hooks.ManageDocks (avoidStruts, docksEventHook, manageDocks, ToggleStruts(..))
+import XMonad.Hooks.ManageDocks (avoidStruts, docks, manageDocks, ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat)
 import XMonad.Hooks.ServerMode
 import XMonad.Hooks.StatusBar.PP
@@ -46,6 +46,7 @@ main = do
     xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.config/xmonad/xmobar/secondaryScreen.hs"
     
     xmonad $ withNavigation2DConfig myNavigation2DConfig 
+           $ docks
            $ ewmh def
         -- simple stuff
         { terminal           = myTerminal
@@ -63,8 +64,7 @@ main = do
 
         -- hooks, layouts
         , manageHook         = myManageHook <+> manageDocks
-        , handleEventHook    = myEventHook 
-                             <+> fullscreenEventHook -- Enables fullscreen for some apps like browsers
+        , handleEventHook    = fullscreenEventHook -- Enables fullscreen for some apps like browsers
         , layoutHook         = lessBorders OnlyScreenFloat
                              $ myLayoutHook
         , startupHook        = myStartupHook
@@ -112,8 +112,6 @@ myStartupHook = do
     -- System Tray
     spawn "killall trayer"  -- kill current trayer on each restart
     spawn ("sleep 2 && trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 " ++ colorTrayer ++ " --height " ++ show myBarSize ++ "")
-
-myEventHook = docksEventHook
 
 myManageHook = composeAll
     -- General Rules
