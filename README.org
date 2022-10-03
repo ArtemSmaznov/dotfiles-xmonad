@@ -18,7 +18,6 @@
 - [[#main][Main]]
 - [[#hooks-1][Hooks]]
   - [[#startup-hook][Startup hook]]
-  - [[#event-handling][Event handling]]
   - [[#rules][Rules]]
 - [[#general-settings][General Settings]]
 - [[#apps][Apps]]
@@ -133,12 +132,16 @@ ppFormat = noIdea "foreground" "background" . commands
 #+end_example
 
 #+begin_src haskell
+myWSFont = "<fn=1>"
+
 main :: IO ()
 main = do
     xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.config/xmonad/xmobar/mainScreen.hs"
     xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.config/xmonad/xmobar/secondaryScreen.hs"
-    
-    xmonad $ withNavigation2DConfig myNavigation2DConfig 
+    -- xmproc0 <- spawnPipe "polybar --reload main"
+    -- xmproc1 <- spawnPipe "polybar --reload side"
+
+    xmonad $ withNavigation2DConfig myNavigation2DConfig
            $ docks
            $ ewmhFullscreen
            $ ewmh def
@@ -168,22 +171,27 @@ main = do
             -- Current workspace
             , ppCurrent          = xmobarColor foreground bg3
                                    . wrap ("<box type=Top width=2 color=" ++ color11 ++ ">") "</box>"
+                                   . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
 
             -- Visible but not current workspace
             , ppVisible          = xmobarColor foreground ""
                                    . wrap ("<box type=Top width=2 color=" ++ color14 ++ ">") "</box>"
+                                   . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
             -- Hidden workspaces
             , ppHidden           = xmobarColor foreground ""
+                                   . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
 
             -- Hidden workspaces (no windows)
             , ppHiddenNoWindows  = xmobarColor bg2 ""
+                                   . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
 
             -- Urgent workspace
             , ppUrgent           = xmobarColor color09 ""
+                                   . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
 
             -- Title of active window
@@ -210,6 +218,11 @@ By default, do nothing.
 #+begin_src haskell
 myStartupHook = do
     spawnOnce "$HOME/.config/autostart-scripts/autostart.sh"
+
+    -- -- Manage Workspaces
+    -- screenWorkspace 1 >>= flip whenJust (windows . W.view) -- focus the second screen
+    -- windows $ W.greedyView "<fn=2> \xf395 </fn>"           -- swap second screen to different workspace
+    -- screenWorkspace 0 >>= flip whenJust (windows . W.view) -- focus the first screen again
 
     -- System Tray
     spawn "killall trayer"  -- kill current trayer on each restart
@@ -455,7 +468,8 @@ A tagging example:
 workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 #+end_example
 
-#+begin_src haskell
+Names
+#+begin_src haskell :tangle no
 myWorkspaces  = [ "<fn=2> \xf268 </fn>" -- Internet
                 , "<fn=2> \xf1b6 </fn>" -- Gaming
                 , "<fn=1> \xf11c </fn>" -- Coding
@@ -465,8 +479,26 @@ myWorkspaces  = [ "<fn=2> \xf268 </fn>" -- Internet
                 , "<fn=1> \xf03d </fn>" -- Video
                 , "<fn=1> \xf7cd </fn>" -- Chat
                 , "<fn=2> \xf395 </fn>" -- Sandbox
+                -- , "<fn=1> \xf080 </fn>" -- Monitor
                 ]
-  
+#+end_src
+
+Un-formatted
+#+begin_src haskell
+myWorkspaces  = [ "\xf0ac" -- Internet -- I like f268 better
+                , "\xf11b" -- Gaming -- I like f1b6 better
+                , "\xf11c" -- Coding
+                , "\xf07b" -- Computer
+                , "\xf025" -- Music
+                , "\xf030" -- Graphics
+                , "\xf03d" -- Video
+                , "\xf5fd" -- Sandbox
+                , "\xf080" -- Monitor
+                ]
+#+end_src
+
+Indexing
+#+begin_src haskell
 myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
 
 clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
@@ -863,6 +895,11 @@ Config {
                        , "xft:Font Awesome 6 Brands:pixelsize=16"
                        , "xft:Font Awesome 6 Free Solid:pixelsize=14"
                        , "xft:Mononoki:pixelsize=11:antialias=true:hinting=true"
+                        , "xft:MaterialIcons:size=10"
+                        , "xft:Font Awesome 6 Free:style=Regular"
+                        , "xft:Font Awesome 6 Brands"
+                        , "xft:Font Awesome 6 Free:style=Solid"
+                        , "xft:Source Han Sans JP"
                        ]
    , bgColor         = "#282828"
    , fgColor         = "#ebdbb2"
@@ -898,6 +935,35 @@ Config {
         , Run Date
           " %l:%M %p"
           "time" 10
+#+end_src
+
+**** Workspaces, Layout and Window
+Workspaces, layout, window name received from XMonad
+#+begin_src haskell
+        , Run UnsafeStdinReader
+#+end_src
+
+**** MPD
+#+begin_src haskell
+        , Run MPD
+          ["-t", "<box type=Bottom width=2 mb=2 color=#fabd2f> <statei>  <artist> - <title> </box>"
+               , "--"
+               , "-P", "<fn=3></fn>" -- play icon
+               , "-Z", "<fn=3></fn>" -- pause icon
+               , "-S", "<fn=3></fn>" -- stop icon
+               ] 10
+#+end_src
+
+**** Keyboard
+Keyboard Layout Indicator
+#+begin_src haskell
+        , Run Com "echo" ["<action=`.local/bin/dm-scripts/dm-lang`> "] "_ks" 3600
+        , Run Kbd
+          [ ("us" , "<fc=#fabd2f>US</fc>")
+          , ("ru" , "<fc=#458588>RU</fc>")
+          , ("jp" , "<fc=#fbf1c7>JP</fc>")
+          ]
+        , Run Com "echo" [" </action>"] "_ke" 3600
 #+end_src
 
 **** Updates
@@ -960,13 +1026,6 @@ Config {
                ] 10
 #+end_src
 
-**** Up-time
-#+begin_src haskell
-        , Run Uptime
-          ["-t", "<box type=Bottom width=2 mb=2 color=#fabd2f>  <fn=3>\xf0aa</fn>  <days>d <hours>h  </box>"
-               ] 3600
-#+end_src
-
 **** Date
 #+begin_src haskell
         , Run Date
@@ -974,50 +1033,31 @@ Config {
           "date" 3600
 #+end_src
 
-**** Keyboard
-Keyboard Layout Indicator
+**** Up-time
 #+begin_src haskell
-        , Run Com "echo" ["<action=`.local/bin/dm-scripts/dm-lang`> "] "_ks" 3600
-        , Run Kbd
-          [ ("us" , "US")
-          , ("ru" , "RU")
-          , ("jp" , "JP")
-          ]
-        , Run Com "echo" [" </action>"] "_ke" 3600
+        , Run Uptime
+          ["-t", "<box type=Bottom width=2 mb=2 color=#fabd2f>  <fn=3>\xf0aa</fn>  <days>d <hours>h  </box>"
+               ] 3600
 #+end_src
 
 **** Trayer
 Script that dynamically adjusts xmobar padding depending on number of trayer icons.
 #+begin_src haskell
         , Run Com ".config/xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20
-#+end_src
-
-**** MPD
-#+begin_src haskell
-        , Run MPD 
-          ["-t", "<statei> <track>/<plength>: <artist> - <title> "
-               , "--", "-P", ">>", "-Z", "|", "-S", "><"
-               ] 10
-#+end_src
-
-**** Unsafe Stdin Reader
-Workspaces, layout, window name received from XMonad
-#+begin_src haskell
-        , Run UnsafeStdinReader
-        ]
+]
 #+end_src
 
 ** Main Monitor Template
 #+begin_src haskell :noweb yes :tangle xmobar/mainScreen.hs
 <<GLOBAL>>
-   , template = "%time% %separator% %UnsafeStdinReader% }{ %_ks%%kbd%%_ke% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %uptime% %trayerpad%"
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %mpd% %_ks%%kbd%%_ke% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %trayerpad%"
    }
 #+end_src
 
 ** Secondary Monitor Template
 #+begin_src haskell :noweb yes :tangle xmobar/secondaryScreen.hs
 <<GLOBAL>>
-   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %default:Master% %date% "
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %kbd% %default:Master% %date% %uptime% "
    }
 #+end_src
 

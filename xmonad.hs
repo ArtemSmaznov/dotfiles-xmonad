@@ -41,10 +41,14 @@ import XMonad.Util.SpawnOnce
 
 import Colors.Gruvbox
 
+myWSFont = "<fn=1>"
+
 main :: IO ()
 main = do
     xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.config/xmonad/xmobar/mainScreen.hs"
     xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.config/xmonad/xmobar/secondaryScreen.hs"
+    -- xmproc0 <- spawnPipe "polybar --reload main"
+    -- xmproc1 <- spawnPipe "polybar --reload side"
     
     xmonad $ withNavigation2DConfig myNavigation2DConfig 
            $ docks
@@ -76,22 +80,27 @@ main = do
             -- Current workspace
             , ppCurrent          = xmobarColor foreground bg3
                                    . wrap ("<box type=Top width=2 color=" ++ color11 ++ ">") "</box>"
+                                   . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
 
             -- Visible but not current workspace
             , ppVisible          = xmobarColor foreground ""
                                    . wrap ("<box type=Top width=2 color=" ++ color14 ++ ">") "</box>"
+                                   . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
             -- Hidden workspaces
             , ppHidden           = xmobarColor foreground ""
+                                   . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
 
             -- Hidden workspaces (no windows)
             , ppHiddenNoWindows  = xmobarColor bg2 ""
+                                   . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
 
             -- Urgent workspace
             , ppUrgent           = xmobarColor color09 ""
+                                   . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
 
             -- Title of active window
@@ -294,33 +303,33 @@ toggleGaps       = toggleScreenSpacingEnabled     >> toggleWindowSpacingEnabled
 
 myNavigation2DConfig = def { defaultTiledNavigation = sideNavigation }
 
-myWorkspaces  = [ "<fn=2> \xf268 </fn>" -- Internet
-                , "<fn=2> \xf1b6 </fn>" -- Gaming
-                , "<fn=1> \xf11c </fn>" -- Coding
-                , "<fn=1> \xf07b </fn>" -- Computer
-                , "<fn=1> \xf025 </fn>" -- Music
-                , "<fn=1> \xf030 </fn>" -- Graphics
-                , "<fn=1> \xf03d </fn>" -- Video
-                , "<fn=1> \xf7cd </fn>" -- Chat
-                , "<fn=2> \xf395 </fn>" -- Sandbox
+myWorkspaces  = [ "\xf0ac" -- Internet
+                , "\xf11b" -- Gaming
+                , "\xf11c" -- Coding
+                , "\xf07b" -- Computer
+                , "\xf025" -- Music
+                , "\xf030" -- Graphics
+                , "\xf03d" -- Video
+                , "\xf5fd" -- Sandbox
+                , "\xf080" -- Monitor
                 ]
-  
+
 myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
 
 clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
     where i = fromJust $ M.lookup ws myWorkspaceIndices
 
 myScratchPads :: [NamedScratchpad]
-myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloating $ myScratchpadWindow)
-                 , NS "htop"        spawnHtop        findHtop        (customFloating $ myScratchpadWindow)
-                 , NS "cliFiles"    spawnCliFiles    findCliFiles    (customFloating $ myScratchpadWindow)
-                 , NS "music"       spawnMusic       findMusic       (customFloating $ myScratchpadWindow)
-                 , NS "virtmanager" spawnVirtManager findVirtManager (customFloating $ myScratchpadWindow)
-                 , NS "torrent"     spawnTorrent     findTorrent     (customFloating $ myScratchpadWindow)
+myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloating $ myScratchpadTerm)
+                 , NS "htop"        spawnHtop        findHtop        (customFloating $ myScratchpadTerm)
+                 , NS "cliFiles"    spawnCliFiles    findCliFiles    (customFloating $ myScratchpadTerm)
+                 , NS "music"       spawnMusic       findMusic       (customFloating $ myScratchpadTerm)
+                 , NS "virtmanager" spawnVirtManager findVirtManager doCenterFloat
+                 , NS "torrent"     spawnTorrent     findTorrent     doCenterFloat
                  , NS "calc"        spawnCalc        findCalc        (customFloating $ myScratchpadCalc)
-                 , NS "whatsapp"    spawnWhatsApp    findWhatsApp    (customFloating $ myScratchpadChat)
-                 , NS "discord"     spawnDiscord     findDiscord     (customFloating $ myScratchpadChat)
-                 , NS "anki"        spawnAnki        findAnki        (customFloating $ myScratchpadAnki)
+                 , NS "whatsapp"    spawnWhatsApp    findWhatsApp    doCenterFloat
+                 , NS "discord"     spawnDiscord     findDiscord     doCenterFloat
+                 , NS "anki"        spawnAnki        findAnki        doCenterFloat
                  ]
   
   where

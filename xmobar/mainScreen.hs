@@ -5,6 +5,11 @@ Config {
                        , "xft:Font Awesome 6 Brands:pixelsize=16"
                        , "xft:Font Awesome 6 Free Solid:pixelsize=14"
                        , "xft:Mononoki:pixelsize=11:antialias=true:hinting=true"
+                        , "xft:MaterialIcons:size=10"
+                        , "xft:Font Awesome 6 Free:style=Regular"
+                        , "xft:Font Awesome 6 Brands"
+                        , "xft:Font Awesome 6 Free:style=Solid"
+                        , "xft:Source Han Sans JP"
                        ]
    , bgColor         = "#282828"
    , fgColor         = "#ebdbb2"
@@ -23,6 +28,21 @@ Config {
         , Run Date
           " %l:%M %p"
           "time" 10
+        , Run UnsafeStdinReader
+        , Run MPD
+          ["-t", "<box type=Bottom width=2 mb=2 color=#fabd2f> <statei>  <artist> - <title> </box>"
+               , "--"
+               , "-P", "<fn=3></fn>" -- play icon
+               , "-Z", "<fn=3></fn>" -- pause icon
+               , "-S", "<fn=3></fn>" -- stop icon
+               ] 10
+        , Run Com "echo" ["<action=`.local/bin/dm-scripts/dm-lang`> "] "_ks" 3600
+        , Run Kbd
+          [ ("us" , "<fc=#fabd2f>US</fc>")
+          , ("ru" , "<fc=#458588>RU</fc>")
+          , ("jp" , "<fc=#fbf1c7>JP</fc>")
+          ]
+        , Run Com "echo" [" </action>"] "_ke" 3600
         , Run Com "echo" ["<box type=Bottom width=2 mb=2 color=#fb4934><action=`alacritty -e sudo pacman -Syu`>  <fn=3>\xf0f3</fn>  "] "_us" 3600
         , Run Com ".local/bin/dm-scripts/helpers/updates" [] "updates" 3600
         , Run Com "echo" ["  </action></box>"] "_ue" 3600
@@ -63,25 +83,13 @@ Config {
                , "-o", "<fn=3>\xf6a9</fn>"
                , "-c", "#fb4934"
                ] 10
-        , Run Uptime
-          ["-t", "<box type=Bottom width=2 mb=2 color=#fabd2f>  <fn=3>\xf0aa</fn>  <days>d <hours>h  </box>"
-               ] 3600
         , Run Date
           "<box type=Bottom width=2 mb=2 color=#fb4934><action=`emacsclient -c -a 'emacs' --eval '(cfw:open-org-calendar)'`>  <fn=3>\xf133</fn>  %a, %d %b %Y  </action></box>"
           "date" 3600
-        , Run Com "echo" ["<action=`.local/bin/dm-scripts/dm-lang`> "] "_ks" 3600
-        , Run Kbd
-          [ ("us" , "US")
-          , ("ru" , "RU")
-          , ("jp" , "JP")
-          ]
-        , Run Com "echo" [" </action>"] "_ke" 3600
+        , Run Uptime
+          ["-t", "<box type=Bottom width=2 mb=2 color=#fabd2f>  <fn=3>\xf0aa</fn>  <days>d <hours>h  </box>"
+               ] 3600
         , Run Com ".config/xmonad/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20
-        , Run MPD 
-          ["-t", "<statei> <track>/<plength>: <artist> - <title> "
-               , "--", "-P", ">>", "-Z", "|", "-S", "><"
-               ] 10
-        , Run UnsafeStdinReader
-        ]
-   , template = "%time% %separator% %UnsafeStdinReader% }{ %_ks%%kbd%%_ke% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %uptime% %trayerpad%"
+]
+   , template = "%time% %separator% %UnsafeStdinReader% }{ %mpd% %_ks%%kbd%%_ke% %_us%%updates%%_ue% %dynnetwork% %coretemp%%cpu% %memory% %default:Master% %date% %trayerpad%"
    }
