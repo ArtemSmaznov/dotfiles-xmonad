@@ -5,6 +5,7 @@ import System.IO (hPutStrLn)
 import qualified XMonad.StackSet as W
 
 import XMonad.Actions.CycleWS (toggleWS)
+import XMonad.Actions.FloatKeys
 import XMonad.Actions.Navigation2D
 
 import Data.Maybe (fromJust)
@@ -14,7 +15,7 @@ import qualified Data.Map        as M
 import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, pad, xmobarPP, xmobarColor, shorten, PP(..))
 import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, xcomposite in obs, active window for maim screenshots, etc.
 import XMonad.Hooks.ManageDocks (avoidStruts, docks, manageDocks, ToggleStruts(..))
-import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat)
+import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat, doCenterFloat)
 import XMonad.Hooks.ServerMode
 import XMonad.Hooks.StatusBar.PP
 
@@ -109,23 +110,29 @@ main = do
 myStartupHook = do
     spawnOnce "$HOME/.config/autostart-scripts/autostart.sh"
 
+    -- -- Manage Workspaces
+    -- screenWorkspace 1 >>= flip whenJust (windows . W.view) -- focus the second screen
+    -- windows $ W.greedyView "<fn=2> \xf395 </fn>"           -- swap second screen to different workspace
+    -- screenWorkspace 0 >>= flip whenJust (windows . W.view) -- focus the first screen again
+
     -- System Tray
     spawn "killall trayer"  -- kill current trayer on each restart
     spawn ("sleep 2 && trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 " ++ colorTrayer ++ " --height " ++ show myBarSize ++ "")
 
 myManageHook = composeAll
     -- General Rules
-    [ className =? "confirm"        --> doFloat
-    , className =? "file_progress"  --> doFloat
-    , className =? "dialog"         --> (customFloating $ myFloatingWindow)
-    , className =? "download"       --> doFloat
-    , className =? "error"          --> doFloat
-    , className =? "Gimp"           --> doFloat
-    , className =? "MPlayer"        --> doFloat
-    , className =? "notification"   --> doFloat
-    , className =? "splash"         --> doFloat
-    , className =? "toolbar"        --> doFloat
-    , className =? "mpv"            --> doFloat
+    [ className =? "confirm"        --> doCenterFloat
+    , className =? "file_progress"  --> doCenterFloat
+    , className =? "dialog"         --> doCenterFloat
+    -- , className =? "dialog"         --> (customFloating $ myFloatingWindow)
+    , className =? "download"       --> doCenterFloat
+    , className =? "error"          --> doCenterFloat
+    , className =? "Gimp"           --> doCenterFloat
+    , className =? "MPlayer"        --> doCenterFloat
+    , className =? "notification"   --> doCenterFloat
+    , className =? "splash"         --> doCenterFloat
+    , className =? "toolbar"        --> doCenterFloat
+    , className =? "mpv"            --> doCenterFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
     , isFullscreen                  --> doFullFloat
@@ -171,11 +178,11 @@ myManageHook = composeAll
     , className =? "googledocs"                     --> doShift ( myWorkspaces !! 3 )
     , className =? "keep"                           --> doShift ( myWorkspaces !! 3 )
     , className =? "calendar"                       --> doShift ( myWorkspaces !! 3 )
-    
+
     -- Workspace 5 - Music
     , className =? "Spotify"                        --> doShift ( myWorkspaces !! 4 )
     , className =? "youtubemusic-nativefier-040164" --> doShift ( myWorkspaces !! 4 )
-                    
+
     -- Workspace 6 - Graphics
     , className =? "Gimp"                           --> doShift ( myWorkspaces !! 5 )
     , className =? "Gimp-2.10"                      --> doShift ( myWorkspaces !! 5 )
@@ -183,24 +190,26 @@ myManageHook = composeAll
     , className =? "Inkscape"                       --> doShift ( myWorkspaces !! 5 )
     , className =? "Flowblade"                      --> doShift ( myWorkspaces !! 5 )
     , className =? "digikam"                        --> doShift ( myWorkspaces !! 5 )
-    
+
     -- Workspace 7 - Video
     , className =? "vlc"                            --> doShift ( myWorkspaces !! 6 )
     , className =? "obs"                            --> doShift ( myWorkspaces !! 6 )
     , className =? "kdenlive"                       --> doShift ( myWorkspaces !! 6 )
     , title     =? "Celluloid"                      --> doShift ( myWorkspaces !! 6 )
-    
+
     -- Workspace 8 - Chat
     , title     =? "whatsapp-for-linux"             --> doShift ( myWorkspaces !! 7 )
     , title     =? "Slack"                          --> doShift ( myWorkspaces !! 7 )
     , title     =? "discord"                        --> doShift ( myWorkspaces !! 7 )
     , title     =? "signal"                         --> doShift ( myWorkspaces !! 7 )
-      
+
     -- Workspace 9 - Sandbox
     , className =? "Virt-manager"                   --> doShift ( myWorkspaces !! 8 )
     , className =? "VirtualBox Manager"             --> doShift ( myWorkspaces !! 8 )
     , className =? "VirtualBox Machine"             --> doShift ( myWorkspaces !! 8 )
     , className =? "Cypress"                        --> doShift ( myWorkspaces !! 8 )
+    , title     =? "btop"                           --> doShift ( myWorkspaces !! 8 )
+
     ] <+> namedScratchpadManageHook myScratchPads
 
 myFocusFollowsMouse :: Bool
@@ -213,7 +222,7 @@ myTerminal         = "alacritty"
 myWebBrowser       = "qutebrowser"
 myIncognitoBrowser = "qutebrowser --target private-window"
 myTorBrowser       = "torbrowser-launcher"
-myGame             = "/usr/bin/steam-runtime %U"
+mySteam            = "/usr/bin/steam-runtime %U"
 myFileManager      = "pcmanfm"
 myCliFileManager   = "vifmrun"
 myTextEditor       = myTerminal ++ " -e vim"
@@ -254,7 +263,7 @@ myFloatingWindow    = W.RationalRect left_margin top_margin width height
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
 
-myScratchpadWindow  = W.RationalRect left_margin top_margin width height
+myScratchpadTerm = W.RationalRect left_margin top_margin width height
     where
         width       = 0.8
         height      = 0.8
@@ -267,20 +276,6 @@ myScratchpadCalc    = W.RationalRect left_margin top_margin width height
         height      = 0.4
         left_margin = 0.95 - width
         top_margin  = 0.05
-
-myScratchpadChat    = W.RationalRect left_margin top_margin width height
-    where
-        width       = 0.5
-        height      = 0.9
-        left_margin = (1.0 - width)/2
-        top_margin  = (1.0 - height)/2
-
-myScratchpadAnki    = W.RationalRect left_margin top_margin width height
-    where
-        width       = 0.4
-        height      = 0.9
-        left_margin = (1.0 - width)/2
-        top_margin  = (1.0 - height)/2
 
 setFloating   w = W.float w myFloatingWindow 
 unsetFloating w = W.sink w 
@@ -346,7 +341,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     findMusic        = className =? "music"
     findVirtManager  = title     =? "Virtual Machine Manager"
     findTorrent      = className =? "Transmission-gtk"
-    findCalc         = className =? "Gnome-calculator"
+    findCalc         = className =? "gnome-calculator"
     findWhatsApp     = className =? "Whatsapp-for-linux"
     findDiscord      = className =? "discord"
     findAnki         = className =? "Anki"
@@ -424,7 +419,7 @@ myKeysP =
     , ("M-m"       , toggleMaximize                ) -- Toggle Maximize
     , ("M-f"       , toggleFloating                ) -- Toggle Floating
 
-    , ("M-/"     , switchLayer                   ) -- Switch navigation layer (Tiled vs Floating screens)
+    , ("M-/"       , switchLayer                   ) -- Switch navigation layer (Tiled vs Floating screens)
     , ("M1-<Tab>"  , windows W.focusDown           ) -- Move focus to next Window
     , ("M1-S-<Tab>", windows W.focusUp             ) -- Move focus to prev Window
     , ("M-h"       , windowGo L False              ) -- Move focus to left Window
@@ -441,6 +436,9 @@ myKeysP =
     , ("M-C-j"     , sendMessage MirrorShrink      ) -- Grow focused Window down
     , ("M-C-k"     , sendMessage MirrorExpand      ) -- Grow focused Window up
     , ("M-C-l"     , sendMessage Expand            ) -- Grow focused Window right
+
+    -- , ("M-S-h"     , withFocused (keysMoveWindow (-10,0) )       ) -- Move floating Window right
+    -- , ("M-S-l"     , withFocused (keysMoveWindow (10,0) )       ) -- Move floating Window right
 
     , ("M-M1-j"    , sendMessage (IncMasterN (-1)) ) -- Decrease number of Master Windows
     , ("M-M1-k"    , sendMessage (IncMasterN 1)    ) -- Increase number of Master Windows
@@ -529,7 +527,7 @@ myKeysP =
     , ("M-o t"     , spawn (myTorBrowser)      ) -- Launch Tor Browser
     , ("M-o m"     , spawn (myMusicPlayer)     ) -- Launch Music Player
     , ("M-o v"     , spawn (myVideoPlayer)     ) -- Launch Video Player
-    , ("M-o s"     , spawn (myGame)            ) -- Launch Steam
+    , ("M-o s"     , spawn (mySteam)           ) -- Launch Steam
     -- Secondary
     , ("C-M1-o t"  , spawn (myTextEditor)      ) -- Launch Text Editor
     , ("C-M1-o p"  , spawn (myPhotoLibrary)    ) -- Launch Photo Library
@@ -563,8 +561,8 @@ myLegacyKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
     ++
 
-    -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
-    -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
+    -- mod-{F1,F2,F3}, Switch to physical/Xinerama screens 1, 2, or 3
+    -- mod-shift-{F1,F2,F3}, Move client to screen 1, 2, or 3
     [((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
         | (key, sc) <- zip [xK_F1, xK_F2, xK_F3] [0..]
         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
