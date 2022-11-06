@@ -32,7 +32,8 @@ Config {
         , Run MPD
           ["-t", "<box type=Bottom width=2 mb=2 color=#fabd2f> <statei>  <artist> - <title> </box>"
                , "--"
-               , "-P", "<fn=3></fn>" -- play icon
+               -- , "-P", "<fn=3></fn>" -- play icon
+               , "-P", "<fn=3></fn>" -- play icon
                , "-Z", "<fn=3></fn>" -- pause icon
                , "-S", "<fn=3></fn>" -- stop icon
                ] 10
