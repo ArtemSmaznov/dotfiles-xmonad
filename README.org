@@ -468,22 +468,6 @@ A tagging example:
 workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 #+end_example
 
-Names
-#+begin_src haskell :tangle no
-myWorkspaces  = [ "<fn=2> \xf268 </fn>" -- Internet
-                , "<fn=2> \xf1b6 </fn>" -- Gaming
-                , "<fn=1> \xf11c </fn>" -- Coding
-                , "<fn=1> \xf07b </fn>" -- Computer
-                , "<fn=1> \xf025 </fn>" -- Music
-                , "<fn=1> \xf030 </fn>" -- Graphics
-                , "<fn=1> \xf03d </fn>" -- Video
-                , "<fn=1> \xf7cd </fn>" -- Chat
-                , "<fn=2> \xf395 </fn>" -- Sandbox
-                -- , "<fn=1> \xf080 </fn>" -- Monitor
-                ]
-#+end_src
-
-Un-formatted
 #+begin_src haskell
 myWorkspaces  = [ "\xf0ac" -- Internet -- I like f268 better
                 , "\xf11b" -- Gaming -- I like f1b6 better
@@ -491,7 +475,7 @@ myWorkspaces  = [ "\xf0ac" -- Internet -- I like f268 better
                 , "\xf07b" -- Computer
                 , "\xf025" -- Music
                 , "\xf030" -- Graphics
-                , "\xf03d" -- Video
+                , "\xf7cd" -- Chat
                 , "\xf5fd" -- Sandbox
                 , "\xf080" -- Monitor
                 ]
@@ -535,7 +519,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     findTerm         = title     =? "scratchpad"
     findHtop         = title     =? "htop"
     findCliFiles     = title     =? "cliFiles"
-    findMusic        = className =? "music"
+    findMusic        = className =? "ncmpcpp"
     findVirtManager  = title     =? "Virtual Machine Manager"
     findTorrent      = className =? "Transmission-gtk"
     findCalc         = className =? "gnome-calculator"

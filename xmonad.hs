@@ -49,8 +49,8 @@ main = do
     xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.config/xmonad/xmobar/secondaryScreen.hs"
     -- xmproc0 <- spawnPipe "polybar --reload main"
     -- xmproc1 <- spawnPipe "polybar --reload side"
-    
-    xmonad $ withNavigation2DConfig myNavigation2DConfig 
+
+    xmonad $ withNavigation2DConfig myNavigation2DConfig
            $ docks
            $ ewmhFullscreen
            $ ewmh def
@@ -303,13 +303,13 @@ toggleGaps       = toggleScreenSpacingEnabled     >> toggleWindowSpacingEnabled
 
 myNavigation2DConfig = def { defaultTiledNavigation = sideNavigation }
 
-myWorkspaces  = [ "\xf0ac" -- Internet
-                , "\xf11b" -- Gaming
+myWorkspaces  = [ "\xf0ac" -- Internet -- I like f268 better
+                , "\xf11b" -- Gaming -- I like f1b6 better
                 , "\xf11c" -- Coding
                 , "\xf07b" -- Computer
                 , "\xf025" -- Music
                 , "\xf030" -- Graphics
-                , "\xf03d" -- Video
+                , "\xf7cd" -- Chat
                 , "\xf5fd" -- Sandbox
                 , "\xf080" -- Monitor
                 ]
@@ -347,7 +347,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     findTerm         = title     =? "scratchpad"
     findHtop         = title     =? "htop"
     findCliFiles     = title     =? "cliFiles"
-    findMusic        = className =? "music"
+    findMusic        = className =? "ncmpcpp"
     findVirtManager  = title     =? "Virtual Machine Manager"
     findTorrent      = className =? "Transmission-gtk"
     findCalc         = className =? "gnome-calculator"
