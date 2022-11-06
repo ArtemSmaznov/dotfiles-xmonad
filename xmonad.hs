@@ -517,11 +517,13 @@ myKeysP =
     , ("M1-<Print>" , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot window" ) -- Active Window Screenshot
     , ("M-<Print>"  , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot full"   ) -- Full Desktop Screenshot
 
-    , ("M-\\ \\"  , spawn "$HOME/.local/bin/dm-scripts/dm-notify recents" ) -- Show recent Notifications
-    , ("M-\\ r"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify recents" ) -- Show recent Notifications
-    , ("M-\\ S-c" , spawn "$HOME/.local/bin/dm-scripts/dm-notify clear"   ) -- Clear all Notifications
-    , ("M-\\ c"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify close"   ) -- Clear last Notification
-    , ("M-\\ a"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify context" ) -- Open last Notification
+    , ("M-\\ \\"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify recent"  ) -- Show most recent Notification
+    , ("M-\\ M-\\" , spawn "$HOME/.local/bin/dm-scripts/dm-notify recent"  ) -- Show most recent Notification
+    , ("M-\\ |"    , spawn "$HOME/.local/bin/dm-scripts/dm-notify recents" ) -- Show few recent Notifications
+    , ("M-\\ r"    , spawn "$HOME/.local/bin/dm-scripts/dm-notify recents" ) -- Show few recent Notifications
+    , ("M-\\ S-c"  , spawn "$HOME/.local/bin/dm-scripts/dm-notify clear"   ) -- Clear all Notifications
+    , ("M-\\ c"    , spawn "$HOME/.local/bin/dm-scripts/dm-notify close"   ) -- Clear last Notification
+    , ("M-\\ a"    , spawn "$HOME/.local/bin/dm-scripts/dm-notify context" ) -- Open last Notification
 
     , ("C-M1-t"    , spawn (myTerminal)        ) -- Launch Terminal
     , ("M-<Return>", spawn (myTerminal)        ) -- Launch Terminal
