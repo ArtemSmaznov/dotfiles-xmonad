@@ -119,10 +119,10 @@ main = do
 myStartupHook = do
     spawnOnce "$HOME/.config/autostart-scripts/autostart.sh"
 
-    -- -- Manage Workspaces
-    -- screenWorkspace 1 >>= flip whenJust (windows . W.view) -- focus the second screen
-    -- windows $ W.greedyView "<fn=2> \xf395 </fn>"           -- swap second screen to different workspace
-    -- screenWorkspace 0 >>= flip whenJust (windows . W.view) -- focus the first screen again
+    -- Manage Workspaces
+    screenWorkspace 1 >>= flip whenJust (windows . W.view) -- focus the second screen
+    windows $ W.greedyView "\xf080"                        -- swap second screen to different workspace
+    screenWorkspace 0 >>= flip whenJust (windows . W.view) -- focus the first screen again
 
     -- System Tray
     spawn "killall trayer"  -- kill current trayer on each restart
