@@ -5,11 +5,11 @@ Config {
                        , "xft:Font Awesome 6 Brands:pixelsize=16"
                        , "xft:Font Awesome 6 Free Solid:pixelsize=14"
                        , "xft:Mononoki:pixelsize=11:antialias=true:hinting=true"
-                        , "xft:MaterialIcons:size=10"
-                        , "xft:Font Awesome 6 Free:style=Regular"
-                        , "xft:Font Awesome 6 Brands"
-                        , "xft:Font Awesome 6 Free:style=Solid"
-                        , "xft:Source Han Sans JP"
+                       , "xft:MaterialIcons:size=10"
+                       , "xft:Font Awesome 6 Free:style=Regular"
+                       , "xft:Font Awesome 6 Brands"
+                       , "xft:Font Awesome 6 Free:style=Solid"
+                       , "xft:Source Han Sans JP"
                        ]
    , bgColor         = "#282828"
    , fgColor         = "#ebdbb2"
@@ -41,7 +41,7 @@ Config {
         , Run Kbd
           [ ("us" , "<fc=#fabd2f>US</fc>")
           , ("ru" , "<fc=#458588>RU</fc>")
-          , ("jp" , "<fc=#fbf1c7>JP</fc>")
+          , ("jp" , "<fn=9><fc=#fbf1c7>日本</fc></fn>")
           ]
         , Run Com "echo" [" </action>"] "_ke" 3600
         , Run Com "echo" ["<box type=Bottom width=2 mb=2 color=#fb4934><action=`alacritty -e sudo pacman -Syu`>  <fn=3>\xf0f3</fn>  "] "_us" 3600
