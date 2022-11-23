@@ -126,7 +126,7 @@ ppFormat = noIdea "foreground" "background" . commands
 #+end_example
 
 #+begin_src haskell
-myWSFont = "<fn=1>"
+myWSFont = "<fn=5>"
 
 main :: IO ()
 main = do

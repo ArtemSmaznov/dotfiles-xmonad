@@ -41,7 +41,7 @@ import XMonad.Util.SpawnOnce
 
 import Colors.Gruvbox
 
-myWSFont = "<fn=1>"
+myWSFont = "<fn=5>"
 
 main :: IO ()
 main = do
