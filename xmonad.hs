@@ -136,15 +136,18 @@ myManageHook = composeAll
     -- , className =? "dialog"         --> (customFloating $ myFloatingWindow)
     , className =? "download"       --> doCenterFloat
     , className =? "error"          --> doCenterFloat
-    , className =? "Gimp"           --> doCenterFloat
-    , className =? "MPlayer"        --> doCenterFloat
     , className =? "notification"   --> doCenterFloat
     , className =? "splash"         --> doCenterFloat
     , className =? "toolbar"        --> doCenterFloat
-    , className =? "mpv"            --> doCenterFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
     , isFullscreen                  --> doFullFloat
+
+    -- Floating Apps
+    , className =? "MPlayer"        --> doCenterFloat
+    , className =? "Gimp"           --> doCenterFloat
+    , className =? "mpv"            --> doCenterFloat
+    , title     =? "Steam - News"   --> doCenterFloat
 
     -- Workspace 1 - Internet
     , className =? "firefox"                        --> doShift ( myWorkspaces !! 0 )
@@ -163,8 +166,8 @@ myManageHook = composeAll
     , className =? "Citra"                          --> doShift ( myWorkspaces !! 1 )
     , className =? "SuperTuxKart"                   --> doShift ( myWorkspaces !! 1 )
     , className =? "Steam"                          --> doShift ( myWorkspaces !! 1 )
-    , className =? "battle.net.exe"                 --> doShift ( myWorkspaces !! 1 )
     , title     =? "Steam"                          --> doShift ( myWorkspaces !! 1 )
+    , className =? "battle.net.exe"                 --> doShift ( myWorkspaces !! 1 )
     , title     =? "Battle.net"                     --> doShift ( myWorkspaces !! 1 )
 
     -- Workspace 3 - Coding
@@ -446,7 +449,7 @@ myKeysP =
     , ("M-C-k"     , sendMessage MirrorExpand      ) -- Grow focused Window up
     , ("M-C-l"     , sendMessage Expand            ) -- Grow focused Window right
 
-    -- , ("M-S-h"     , withFocused (keysMoveWindow (-10,0) )       ) -- Move floating Window right
+    -- , ("M-S-h"     , withFocused (keysMoveWindow (-10,0) )       ) -- Move floating Window left
     -- , ("M-S-l"     , withFocused (keysMoveWindow (10,0) )       ) -- Move floating Window right
 
     , ("M-M1-j"    , sendMessage (IncMasterN (-1)) ) -- Decrease number of Master Windows
@@ -458,7 +461,7 @@ myKeysP =
     , ("M-S-,"  , windowToScreen L False ) -- Move focused Window to the left Screen
     , ("M-S-."  , windowToScreen R False ) -- Move focused Window to the right Screen
 
-    , ("M-C-<Tab>", screenSwap R True  ) -- Swap active Screen with the next Screen
+    , ("M-C-<Tab>"  , screenSwap R True  ) -- Swap active Screen with the next Screen
     , ("M-C-S-h"    , screenSwap L False ) -- Swap active Screen with the left Screen
     , ("M-C-S-j"    , screenSwap D False ) -- Swap active Screen with the below Screen
     , ("M-C-S-k"    , screenSwap U False ) -- Swap active Screen with the above Screen
@@ -469,40 +472,40 @@ myKeysP =
     , ("M-S-m"       , toggleMirror                      ) -- Mirror Layout
     , ("M-="         , refresh                           ) -- Resize viewed windows to the correct size
 
-    , ("M-<Tab>"       , toggleWS ) -- Toggle Workspace
+    , ("M-<Tab>", toggleWS ) -- Toggle Workspace
 
-    , ("M-`"           , namedScratchpadAction myScratchPads "terminal"    )
-    , ("M-e"           , namedScratchpadAction myScratchPads "cliFiles"    )
-    , ("C-M1-<Delete>" , namedScratchpadAction myScratchPads "htop"        )
-    , ("M-s h"         , namedScratchpadAction myScratchPads "htop"        )
-    , ("M-s m"         , namedScratchpadAction myScratchPads "music"       )
-    , ("M-s c"         , namedScratchpadAction myScratchPads "calc"        )
-    , ("M-s w"         , namedScratchpadAction myScratchPads "whatsapp"    )
-    , ("M-s d"         , namedScratchpadAction myScratchPads "discord"     )
-    , ("M-s v"         , namedScratchpadAction myScratchPads "virtmanager" )
-    , ("M-s t"         , namedScratchpadAction myScratchPads "torrent"     )
-    , ("M-s a"         , namedScratchpadAction myScratchPads "anki"        )
+    , ("M-`"           , namedScratchpadAction myScratchPads "terminal"    ) -- Terminal Scratchpad
+    , ("M-e"           , namedScratchpadAction myScratchPads "cliFiles"    ) -- File Manager Scratchpad
+    , ("C-M1-<Delete>" , namedScratchpadAction myScratchPads "htop"        ) -- Htop Scratchpad
+    , ("M-s h"         , namedScratchpadAction myScratchPads "htop"        ) -- Htop Scratchpad
+    , ("M-s m"         , namedScratchpadAction myScratchPads "music"       ) -- Music Scratchpad
+    , ("M-s c"         , namedScratchpadAction myScratchPads "calc"        ) -- Calculator Scratchpad
+    , ("M-s w"         , namedScratchpadAction myScratchPads "whatsapp"    ) -- WhatsApp Scratchpad
+    , ("M-s d"         , namedScratchpadAction myScratchPads "discord"     ) -- Discord Scratchpad
+    , ("M-s v"         , namedScratchpadAction myScratchPads "virtmanager" ) -- VirtManager Scratchpad
+    , ("M-s t"         , namedScratchpadAction myScratchPads "torrent"     ) -- Torrent Scratchpad
+    , ("M-s a"         , namedScratchpadAction myScratchPads "anki"        ) -- Anki Scratchpad
 
-    , ("<XF86AudioRaiseVolume>"  , spawn "amixer set Master 2%+ unmute" )
-    , ("<XF86AudioLowerVolume>"  , spawn "amixer set Master 2%- unmute" )
-    , ("<XF86AudioMute>"         , spawn "amixer set Master toggle"     )
-    , ("C-<XF86AudioRaiseVolume>", spawn "mpc volume +2"                )
-    , ("C-<XF86AudioLowerVolume>", spawn "mpc volume -2"                )
-    , ("<XF86AudioPrev>"         , spawn "mpc prev"                     )
-    , ("<XF86AudioNext>"         , spawn "mpc next"                     )
-    , ("<XF86AudioPlay>"         , spawn "mpc toggle"                   )
-    , ("<XF86AudioStop>"         , spawn "mpc stop"                     )
+    , ("<XF86AudioRaiseVolume>"  , spawn "amixer set Master 2%+ unmute" ) -- Increase System Volume
+    , ("<XF86AudioLowerVolume>"  , spawn "amixer set Master 2%- unmute" ) -- Decrease System Volume
+    , ("<XF86AudioMute>"         , spawn "amixer set Master toggle"     ) -- Mute
+    , ("C-<XF86AudioRaiseVolume>", spawn "mpc volume +2"                ) -- Increase Player Volume
+    , ("C-<XF86AudioLowerVolume>", spawn "mpc volume -2"                ) -- Decrease Player Volume
+    , ("<XF86AudioPrev>"         , spawn "mpc prev"                     ) -- Prev Song
+    , ("<XF86AudioNext>"         , spawn "mpc next"                     ) -- Next Song
+    , ("<XF86AudioPlay>"         , spawn "mpc toggle"                   ) -- Play/Pause Music
+    , ("<XF86AudioStop>"         , spawn "mpc stop"                     ) -- Stop Music
 
-    , ("M-d M-d" , spawn "$HOME/.local/bin/dm-scripts/dm-master"     )
-    , ("M-d w"   , spawn "$HOME/.local/bin/dm-scripts/dm-wallpaper"  )
-    , ("M-d r"   , spawn "$HOME/.local/bin/dm-scripts/dm-record"     )
-    , ("M-d p"   , spawn "$HOME/.local/bin/dm-scripts/dm-power"      )
-    , ("M-d t"   , spawn "$HOME/.local/bin/dm-scripts/dm-theme"      )
-    , ("M-d s"   , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot" )
-    , ("M-d b"   , spawn "$HOME/.local/bin/dm-scripts/dm-bookman"    )
-    , ("M-d n"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify"     )
-    , ("M-d \\"  , spawn "$HOME/.local/bin/dm-scripts/dm-notify"     )
-    , ("M-d k"   , spawn "$HOME/.local/bin/dm-scripts/dm-keys"       )
+    , ("M-d M-d" , spawn "$HOME/.local/bin/dm-scripts/dm-master"     ) -- DM Master
+    , ("M-d w"   , spawn "$HOME/.local/bin/dm-scripts/dm-wallpaper"  ) -- DM Wallpaper
+    , ("M-d r"   , spawn "$HOME/.local/bin/dm-scripts/dm-record"     ) -- DM Record
+    , ("M-d p"   , spawn "$HOME/.local/bin/dm-scripts/dm-power"      ) -- DM Power
+    , ("M-d t"   , spawn "$HOME/.local/bin/dm-scripts/dm-theme"      ) -- DM Theme
+    , ("M-d s"   , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot" ) -- DM Screenshot
+    , ("M-d b"   , spawn "$HOME/.local/bin/dm-scripts/dm-bookman"    ) -- DM Bookman
+    , ("M-d n"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify"     ) -- DM Notify
+    , ("M-d \\"  , spawn "$HOME/.local/bin/dm-scripts/dm-notify"     ) -- DM Notify
+    , ("M-d k"   , spawn "$HOME/.local/bin/dm-scripts/dm-keys"       ) -- DM Keys
 
     , ("M1-<F4>", spawn "$HOME/.local/bin/dm-scripts/dm-power"         ) -- Logout Menu
     , ("M-z z"  , spawn "$HOME/.local/bin/dm-scripts/dm-power"         ) -- Logout Menu
@@ -534,11 +537,13 @@ myKeysP =
     , ("M-p"       , spawn (myPasswordManager) ) -- Autofill Passwords
     , ("M-r"       , spawn (myLauncher)        ) -- Launch Launcher
     , ("M-S-r"     , spawn "dmenu_run"         ) -- Launch dmenu
+
     -- Primary
     , ("M-o t"     , spawn (myTorBrowser)      ) -- Launch Tor Browser
     , ("M-o m"     , spawn (myMusicPlayer)     ) -- Launch Music Player
     , ("M-o v"     , spawn (myVideoPlayer)     ) -- Launch Video Player
     , ("M-o s"     , spawn (mySteam)           ) -- Launch Steam
+
     -- Secondary
     , ("C-M1-o t"  , spawn (myTextEditor)      ) -- Launch Text Editor
     , ("C-M1-o p"  , spawn (myPhotoLibrary)    ) -- Launch Photo Library
