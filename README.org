@@ -1,8 +1,9 @@
-#+TITLE: XMonad
-#+AUTHOR: Artem Smaznov
-#+DESCRIPTION: A window manager written in Haskell
-#+STARTUP: overview
-#+PROPERTY: header-args :tangle xmonad.hs
+#+title:       XMonad
+#+author:      Artem Smaznov
+#+description: A window manager written in Haskell
+#+startup:     overview
+#+property:    header-args :tangle xmonad.hs
+#+auto_tangle: t
 
 * Table of Contents :toc:
 - [[#dependencies][Dependencies]]
