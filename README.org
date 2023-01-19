@@ -387,7 +387,7 @@ myAudioManager     = myTerminal ++ " -e alsamixer"
 * Theme
 #+begin_src haskell
 myBarSize = 24
-myBorderWidth = 4
+myBorderWidth = 5
                 
 myGap i = spacingWithEdge i
 myGapSize = 7
@@ -395,8 +395,8 @@ myGapSize = 7
 
 Border colors for unfocused and focused windows, respectively
 #+begin_src haskell
-myNormalBorderColor  = color08
-myFocusedBorderColor = color09
+myNormalBorderColor  = color08 -- gray
+myFocusedBorderColor = color09 -- red
 #+end_src
 
 * Windows

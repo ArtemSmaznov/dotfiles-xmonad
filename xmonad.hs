@@ -260,13 +260,13 @@ myPowerManager     = "xfce4-power-manager-settings"
 myAudioManager     = myTerminal ++ " -e alsamixer"
 
 myBarSize = 24
-myBorderWidth = 4
+myBorderWidth = 5
                 
 myGap i = spacingWithEdge i
 myGapSize = 7
 
-myNormalBorderColor  = color08
-myFocusedBorderColor = color09
+myNormalBorderColor  = color08 -- gray
+myFocusedBorderColor = color09 -- red
 
 myFloatingWindow    = W.RationalRect left_margin top_margin width height
     where
