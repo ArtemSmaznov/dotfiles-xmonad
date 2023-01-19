@@ -509,13 +509,14 @@ myKeysP =
     , ("M-d \\"  , spawn "$HOME/.local/bin/dm-scripts/dm-notify"     ) -- DM Notify
     , ("M-d k"   , spawn "$HOME/.local/bin/dm-scripts/dm-keys"       ) -- DM Keys
 
-    , ("M1-<F4>", spawn "$HOME/.local/bin/dm-scripts/dm-power"         ) -- Logout Menu
-    , ("M-z z"  , spawn "$HOME/.local/bin/dm-scripts/dm-power"         ) -- Logout Menu
-    , ("M-z l"  , spawn "$HOME/.local/bin/dm-scripts/dm-power lock"    ) -- Lock Screen
-    , ("M-z s"  , spawn "$HOME/.local/bin/dm-scripts/dm-power suspend" ) -- Suspend System
-    , ("M-z p"  , spawn "$HOME/.local/bin/dm-scripts/dm-power poweroff") -- Shutdown System
-    , ("M-z r"  , spawn "$HOME/.local/bin/dm-scripts/dm-power reboot"  ) -- Reboot System
-    , ("M-z w"  , spawn "$HOME/.local/bin/dm-scripts/dm-power windows" ) -- Reboot to Windows
+    , ("M1-<F4>" , spawn "$HOME/.local/bin/dm-scripts/dm-power"         ) -- Logout Menu
+    , ("M-z l"   , spawn "$HOME/.local/bin/dm-scripts/dm-power lock"    ) -- Lock Screen
+    , ("M-z s"   , spawn "$HOME/.local/bin/dm-scripts/dm-power suspend" ) -- Suspend System
+    , ("M-z p"   , spawn "$HOME/.local/bin/dm-scripts/dm-power poweroff") -- Shutdown System
+    , ("M-z r"   , spawn "$HOME/.local/bin/dm-scripts/dm-power reboot"  ) -- Reboot System
+    , ("M-z w"   , spawn "$HOME/.local/bin/dm-scripts/dm-power windows" ) -- Reboot to Windows
+    , ("M-z z"   , spawn "$HOME/.local/bin/dm-scripts/dm-power suspend" ) -- Suspend System
+    , ("M-z M-z" , spawn "$HOME/.local/bin/dm-scripts/dm-power suspend" ) -- Suspend System
 
     , ("<Print>"    , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot screen" ) -- Fullscreen Screenshot
     , ("M-S-<Print>", spawn "$HOME/.local/bin/dm-scripts/dm-screenshot area"   ) -- Selection Area Screenshot
