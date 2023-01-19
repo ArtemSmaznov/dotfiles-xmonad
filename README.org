@@ -316,24 +316,26 @@ myManageHook = composeAll
     , className =? "Inkscape"                       --> doShift ( myWorkspaces !! 5 )
     , className =? "Flowblade"                      --> doShift ( myWorkspaces !! 5 )
     , className =? "digikam"                        --> doShift ( myWorkspaces !! 5 )
+    , className =? "obs"                            --> doShift ( myWorkspaces !! 5 )
 
-    -- Workspace 7 - Video
-    , className =? "vlc"                            --> doShift ( myWorkspaces !! 6 )
-    , className =? "obs"                            --> doShift ( myWorkspaces !! 6 )
-    , className =? "kdenlive"                       --> doShift ( myWorkspaces !! 6 )
-    , title     =? "Celluloid"                      --> doShift ( myWorkspaces !! 6 )
+    -- -- Workspace 7 - Video
+    -- , className =? "vlc"                            --> doShift ( myWorkspaces !! 6 )
+    -- , className =? "kdenlive"                       --> doShift ( myWorkspaces !! 6 )
+    -- , title     =? "Celluloid"                      --> doShift ( myWorkspaces !! 6 )
 
-    -- Workspace 8 - Chat
-    , title     =? "whatsapp-for-linux"             --> doShift ( myWorkspaces !! 7 )
-    , title     =? "Slack"                          --> doShift ( myWorkspaces !! 7 )
-    , title     =? "discord"                        --> doShift ( myWorkspaces !! 7 )
-    , title     =? "signal"                         --> doShift ( myWorkspaces !! 7 )
+    -- Workspace 7 - Chat
+    , title     =? "whatsapp-for-linux"             --> doShift ( myWorkspaces !! 6 )
+    , title     =? "Slack"                          --> doShift ( myWorkspaces !! 6 )
+    , title     =? "discord"                        --> doShift ( myWorkspaces !! 6 )
+    , title     =? "signal"                         --> doShift ( myWorkspaces !! 6 )
 
-    -- Workspace 9 - Sandbox
-    , className =? "Virt-manager"                   --> doShift ( myWorkspaces !! 8 )
-    , className =? "VirtualBox Manager"             --> doShift ( myWorkspaces !! 8 )
-    , className =? "VirtualBox Machine"             --> doShift ( myWorkspaces !! 8 )
-    , className =? "Cypress"                        --> doShift ( myWorkspaces !! 8 )
+    -- Workspace 8 - Sandbox
+    , className =? "Virt-manager"                   --> doShift ( myWorkspaces !! 7 )
+    , className =? "VirtualBox Manager"             --> doShift ( myWorkspaces !! 7 )
+    , className =? "VirtualBox Machine"             --> doShift ( myWorkspaces !! 7 )
+    , className =? "Cypress"                        --> doShift ( myWorkspaces !! 7 )
+
+    -- Workspace 9 - Monitor
     , title     =? "btop"                           --> doShift ( myWorkspaces !! 8 )
 
     ] <+> namedScratchpadManageHook myScratchPads
