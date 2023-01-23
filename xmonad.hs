@@ -39,7 +39,7 @@ import XMonad.Util.NamedScratchpad
 import XMonad.Util.Run (runProcessWithInput, safeSpawn, spawnPipe)
 import XMonad.Util.SpawnOnce
 
-import Colors.Gruvbox
+import Themes.Base16
 
 myWSFont = "<fn=5>"
 
@@ -78,14 +78,14 @@ main = do
                             >> hPutStrLn xmproc1 x -- xmobar on Monitor 2
 
             -- Current workspace
-            , ppCurrent          = xmobarColor foreground bg3
-                                   . wrap ("<box type=Top width=2 color=" ++ color11 ++ ">") "</box>"
+            , ppCurrent          = xmobarColor foreground base03
+                                   . wrap ("<box type=Top width=2 color=" ++ base0E ++ ">") "</box>"
                                    . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
 
             -- Visible but not current workspace
             , ppVisible          = xmobarColor foreground ""
-                                   . wrap ("<box type=Top width=2 color=" ++ color14 ++ ">") "</box>"
+                                   . wrap ("<box type=Top width=2 color=" ++ base04 ++ ">") "</box>"
                                    . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
             -- Hidden workspaces
@@ -94,12 +94,12 @@ main = do
                                    . clickable
 
             -- Hidden workspaces (no windows)
-            , ppHiddenNoWindows  = xmobarColor bg2 ""
+            , ppHiddenNoWindows  = xmobarColor base02 ""
                                    . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
 
             -- Urgent workspace
-            , ppUrgent           = xmobarColor color09 ""
+            , ppUrgent           = xmobarColor base08 ""
                                    . wrap (myWSFont ++ " ") " </fn>"
                                    . clickable
 
@@ -108,7 +108,7 @@ main = do
                                    . shorten 60
 
             -- Separator between widgets
-            , ppSep              = "<fc=" ++ bg4 ++ "> | </fc>"
+            , ppSep              = "<fc=" ++ base03 ++ "> | </fc>"
 
             -- order of things in xmobar
             , ppOrder            = \(l:ws:t:_) -> [l,ws,t]
@@ -267,8 +267,8 @@ myBorderWidth = 5
 myGap i = spacingWithEdge i
 myGapSize = 7
 
-myNormalBorderColor  = color08 -- gray
-myFocusedBorderColor = color09 -- red
+myNormalBorderColor  = base03 -- gray
+myFocusedBorderColor = base0E -- accent
 
 myFloatingWindow    = W.RationalRect left_margin top_margin width height
     where
