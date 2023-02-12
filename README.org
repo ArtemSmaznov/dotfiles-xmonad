@@ -38,15 +38,16 @@
 - [[#help][Help]]
 
 * Dependencies
-|----------------+----------------------|
-| Name           | Description          |
-|----------------+----------------------|
-| [[https://archlinux.org/packages/?name=xmonad][xmonad]]         | Window Manager       |
-| [[https://archlinux.org/packages/?name=xmonad-contrib][xmonad-contrib]] | Additional Libraries |
-|----------------+----------------------|
+|----------------+--------------------------------|
+| Name           | Description                    |
+|----------------+--------------------------------|
+| [[https://archlinux.org/packages/?name=xmonad][xmonad]]         | Window Manager                 |
+| [[https://archlinux.org/packages/?name=xmonad-contrib][xmonad-contrib]] | Additional Libraries           |
+| [[https://archlinux.org/packages/?name=trayer][trayer]]         | lightweight GTK2-based systray |
+|----------------+--------------------------------|
 
 #+begin_example shell
-sudo pacman -S xmonad xmonad-contrib
+sudo pacman -S xmonad xmonad-contrib trayer --needed
 #+end_example
 
 * Imports
