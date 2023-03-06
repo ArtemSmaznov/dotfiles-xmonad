@@ -12,11 +12,12 @@ import Data.Maybe (fromJust)
 import Data.Monoid
 import qualified Data.Map        as M
 
-import XMonad.Hooks.DynamicLog (dynamicLogWithPP, wrap, pad, xmobarPP, xmobarColor, shorten, PP(..))
+import XMonad.Hooks.DynamicLog (wrap, pad, xmobarColor, shorten, PP(..))
 import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, xcomposite in obs, active window for maim screenshots, etc.
 import XMonad.Hooks.ManageDocks (avoidStruts, docks, manageDocks, ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat, doCenterFloat)
 import XMonad.Hooks.ServerMode
+import XMonad.Hooks.StatusBar
 import XMonad.Hooks.StatusBar.PP
 
 import XMonad.Layout.Grid
@@ -33,6 +34,7 @@ import XMonad.Layout.Spacing
 import XMonad.Prompt.Pass
 import XMonad.Prompt.Ssh
 
+import XMonad.Util.ClickableWorkspaces (clickablePP)
 import XMonad.Util.Dmenu
 import XMonad.Util.EZConfig (additionalKeysP, additionalKeys)
 import XMonad.Util.NamedScratchpad
@@ -41,19 +43,16 @@ import XMonad.Util.SpawnOnce
 
 import Themes.Base16
 
-myWSFont = "<fn=5>"
-
 main :: IO ()
-main = do
-    xmproc0 <- spawnPipe "xmobar -x 0 $HOME/.config/xmobar/mainScreen.hs"
-    xmproc1 <- spawnPipe "xmobar -x 1 $HOME/.config/xmobar/secondaryScreen.hs"
-    -- xmproc0 <- spawnPipe "polybar --reload main"
-    -- xmproc1 <- spawnPipe "polybar --reload side"
+main = xmonad
+     . withNavigation2DConfig myNavigation2DConfig
+     . docks
+     . ewmhFullscreen
+     . ewmh
+     . withSB (mySB0 <> mySB1)
+     $ myConfig
 
-    xmonad $ withNavigation2DConfig myNavigation2DConfig
-           $ docks
-           $ ewmhFullscreen
-           $ ewmh def
+myConfig = def
         -- simple stuff
         { terminal           = myTerminal
         , focusFollowsMouse  = myFocusFollowsMouse
@@ -73,47 +72,6 @@ main = do
         , layoutHook         = lessBorders OnlyScreenFloat
                              $ myLayoutHook
         , startupHook        = myStartupHook
-        , logHook            = dynamicLogWithPP $ filterOutWsPP [scratchpadWorkspaceTag] $ xmobarPP
-            { ppOutput = \x -> hPutStrLn xmproc0 x -- xmobar on Monitor 1
-                            >> hPutStrLn xmproc1 x -- xmobar on Monitor 2
-
-            -- Current workspace
-            , ppCurrent          = xmobarColor foreground base03
-                                   . wrap ("<box type=Top width=2 color=" ++ base0E ++ ">") "</box>"
-                                   . wrap (myWSFont ++ " ") " </fn>"
-                                   . clickable
-
-            -- Visible but not current workspace
-            , ppVisible          = xmobarColor foreground ""
-                                   . wrap ("<box type=Top width=2 color=" ++ base04 ++ ">") "</box>"
-                                   . wrap (myWSFont ++ " ") " </fn>"
-                                   . clickable
-            -- Hidden workspaces
-            , ppHidden           = xmobarColor foreground ""
-                                   . wrap (myWSFont ++ " ") " </fn>"
-                                   . clickable
-
-            -- Hidden workspaces (no windows)
-            , ppHiddenNoWindows  = xmobarColor base02 ""
-                                   . wrap (myWSFont ++ " ") " </fn>"
-                                   . clickable
-
-            -- Urgent workspace
-            , ppUrgent           = xmobarColor base08 ""
-                                   . wrap (myWSFont ++ " ") " </fn>"
-                                   . clickable
-
-            -- Title of active window
-            , ppTitle            = xmobarColor foreground ""
-                                   . shorten 60
-
-            -- Separator between widgets
-            , ppSep              = "<fc=" ++ base03 ++ "> | </fc>"
-
-            -- order of things in xmobar
-            , ppOrder            = \(l:ws:t:_) -> [l,ws,t]
-            }
-
     } `additionalKeysP` myKeysP `additionalKeys` myKeys
 
 myStartupHook = do
@@ -225,6 +183,44 @@ myManageHook = composeAll
     , title     =? "btop"                           --> doShift ( myWorkspaces !! 8 )
 
     ] <+> namedScratchpadManageHook myScratchPads
+
+mySBConfig = pure (filterOutWsPP [scratchpadWorkspaceTag] myPP)
+
+mySB0 = statusBarProp "xmobar -x 0 ~/.config/xmobar/mainScreen.hs" (mySBConfig)
+mySB1 = statusBarProp "xmobar -x 1 ~/.config/xmobar/secondaryScreen.hs" (mySBConfig)
+
+myWSFont = "<fn=5>"
+
+myPP :: PP
+myPP = def
+    { ppTitleSanitize = xmobarStrip
+                      . shorten 30
+    -- Title of active window
+    -- , ppTitle = xmobarColor foreground ""
+    --           . shorten 60
+    -- Current workspace
+    , ppCurrent = xmobarColor foreground base03
+                . xmobarBorder "Top" base0E 2
+                . wrap (myWSFont ++ " ") " </fn>"
+    -- Visible but not current workspace
+    , ppVisible = xmobarColor foreground ""
+                . xmobarBorder "Top" base04 2
+                . wrap (myWSFont ++ " ") " </fn>"
+    -- Hidden workspaces
+    , ppHidden = xmobarColor foreground ""
+               . wrap (myWSFont ++ " ") " </fn>"
+    -- Hidden workspaces (no windows)
+    , ppHiddenNoWindows = xmobarColor base02 ""
+                        . wrap (myWSFont ++ " ") " </fn>"
+    -- Urgent workspace
+    , ppUrgent = xmobarColor base08 ""
+               . wrap (myWSFont ++ " ") " </fn>"
+    -- Separator between widgets
+    , ppSep = "<fc=" ++ base03 ++ "> | </fc>"
+
+    -- order of things in xmobar
+    , ppOrder = \[l, ws, t, _] -> [l, ws, t]
+    }
 
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse = False
@@ -412,8 +408,9 @@ myModMask = mod4Mask
 
 myKeysP :: [(String, X ())]
 
+myVar = "xmonad"
 myKeysP =
-    [ ("M-C-d", sshPrompt def ) -- Debugging
+    [ ("M-C-d", spawn ("eww update debug=" ++ myVar) ) -- Debugging
 
     , ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart"       ) -- Restart XMonad
     , ("M-C-q"     , io (exitWith ExitSuccess)                          ) -- Quit XMonad
