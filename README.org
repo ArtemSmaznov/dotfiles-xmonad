@@ -306,48 +306,39 @@ myManageHook = composeAll
 ppFormat = noIdea "foreground" "background" . commands
 #+end_example
 
-Xmobar
-#+begin_src haskell
-mySBConfig = pure (filterOutWsPP [scratchpadWorkspaceTag] myPP)
-
-mySB0 = statusBarProp "xmobar -x 0 ~/.config/xmobar/mainScreen.hs" (mySBConfig)
-mySB1 = statusBarProp "xmobar -x 1 ~/.config/xmobar/secondaryScreen.hs" (mySBConfig)
-#+end_src
-
 Pretty Printer
 #+begin_src haskell
 myWSFont = "<fn=5>"
 
 myPP :: PP
 myPP = def
-    { ppTitleSanitize = xmobarStrip
-                      . shorten 30
-    -- Title of active window
-    -- , ppTitle = xmobarColor foreground ""
-    --           . shorten 60
-    -- Current workspace
+    { ppTitleSanitize   = xmobarStrip
+                        . shorten 30
+    -- , ppTitle           = xmobarColor foreground ""
+    --                     . shorten 60                      -- Title of active window
+    , ppSep     = "<fc=" ++ base03 ++ "> | </fc>"         -- Separator between widgets
+    , ppOrder   = \(ws:l:t:_) -> [ws,l,t]                 -- order of things in xmobar
     , ppCurrent = xmobarColor foreground base03
                 . xmobarBorder "Top" base0E 2
-                . wrap (myWSFont ++ " ") " </fn>"
-    -- Visible but not current workspace
+                . wrap (myWSFont ++ " ") " </fn>"         -- Current workspace
+    , ppUrgent  = xmobarColor base08 ""
+                . wrap (myWSFont ++ " ") " </fn>"         -- Urgent workspace
     , ppVisible = xmobarColor foreground ""
                 . xmobarBorder "Top" base04 2
-                . wrap (myWSFont ++ " ") " </fn>"
-    -- Hidden workspaces
-    , ppHidden = xmobarColor foreground ""
-               . wrap (myWSFont ++ " ") " </fn>"
-    -- Hidden workspaces (no windows)
+                . wrap (myWSFont ++ " ") " </fn>"         -- Visible but not current workspace
+    , ppHidden  = xmobarColor foreground ""
+                . wrap (myWSFont ++ " ") " </fn>"         -- Hidden workspaces
     , ppHiddenNoWindows = xmobarColor base02 ""
-                        . wrap (myWSFont ++ " ") " </fn>"
-    -- Urgent workspace
-    , ppUrgent = xmobarColor base08 ""
-               . wrap (myWSFont ++ " ") " </fn>"
-    -- Separator between widgets
-    , ppSep = "<fc=" ++ base03 ++ "> | </fc>"
-
-    -- order of things in xmobar
-    , ppOrder = \[l, ws, t, _] -> [l, ws, t]
+                        . wrap (myWSFont ++ " ") " </fn>" -- Hidden workspaces (no windows)
     }
+#+end_src
+
+Xmobar
+#+begin_src haskell
+mySBConfig = pure (filterOutWsPP [scratchpadWorkspaceTag] myPP)
+
+mySB0 = statusBarProp "xmobar -x 0 ~/.config/xmobar/mainScreen.hs"      (mySBConfig)
+mySB1 = statusBarProp "xmobar -x 1 ~/.config/xmobar/secondaryScreen.hs" (mySBConfig)
 #+end_src
 
 * General Settings
