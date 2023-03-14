@@ -49,42 +49,21 @@ main = xmonad
      . docks
      . ewmhFullscreen
      . ewmh
-     . withSB (mySB0 <> mySB1)
+     -- . withSB (mySB0 <> mySB1)
      $ myConfig
 
-myConfig = def
-        -- simple stuff
-        { terminal           = myTerminal
-        , focusFollowsMouse  = myFocusFollowsMouse
-        , clickJustFocuses   = myClickJustFocuses
-        , borderWidth        = myBorderWidth
-        , modMask            = myModMask
-        , workspaces         = myWorkspaces
-        , normalBorderColor  = myNormalBorderColor
-        , focusedBorderColor = myFocusedBorderColor
-
-        -- key bindings
-        , keys               = myLegacyKeys
-        , mouseBindings      = myMouseBindings
-
-        -- hooks, layouts
-        , manageHook         = myManageHook <+> manageDocks
-        , layoutHook         = lessBorders OnlyScreenFloat
-                             $ myLayoutHook
-        , startupHook        = myStartupHook
-    } `additionalKeysP` myKeysP `additionalKeys` myKeys
-
 myStartupHook = do
-    spawnOnce "$HOME/.config/autostart-scripts/autostart.sh"
+    spawnOnce "$HOME/.local/bin/auto-start.sh"
+    spawn "eww open-many bar0 bar1"
 
-    -- Manage Workspaces
-    screenWorkspace 1 >>= flip whenJust (windows . W.view) -- focus the second screen
-    windows $ W.greedyView "\xf080"                        -- swap second screen to different workspace
-    screenWorkspace 0 >>= flip whenJust (windows . W.view) -- focus the first screen again
+    -- -- Manage Workspaces
+    -- screenWorkspace 1 >>= flip whenJust (windows . W.view) -- focus the second screen
+    -- windows $ W.greedyView "\xf080"                        -- swap second screen to different workspace
+    -- screenWorkspace 0 >>= flip whenJust (windows . W.view) -- focus the first screen again
 
     -- System Tray
     spawn "killall trayer"  -- kill current trayer on each restart
-    spawn ("sleep 2 && trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 " ++ colorTrayer ++ " --height " ++ show myBarSize ++ "")
+    spawn "$HOME/.local/bin/call-trayer.sh"
 
 myManageHook = composeAll
     -- General Rules
@@ -184,34 +163,27 @@ myManageHook = composeAll
 
     ] <+> namedScratchpadManageHook myScratchPads
 
-myWSFont = "<fn=5>"
+myConfig = def
+        -- simple stuff
+        { terminal           = myTerminal
+        , focusFollowsMouse  = myFocusFollowsMouse
+        , clickJustFocuses   = myClickJustFocuses
+        , borderWidth        = myBorderWidth
+        , modMask            = myModMask
+        , workspaces         = myWorkspaces
+        , normalBorderColor  = myNormalBorderColor
+        , focusedBorderColor = myFocusedBorderColor
 
-myPP :: PP
-myPP = def
-    { ppTitleSanitize   = xmobarStrip
-                        . shorten 30
-    -- , ppTitle           = xmobarColor foreground ""
-    --                     . shorten 60                      -- Title of active window
-    , ppSep     = "<fc=" ++ base03 ++ "> | </fc>"         -- Separator between widgets
-    , ppOrder   = \(ws:l:t:_) -> [ws,l,t]                 -- order of things in xmobar
-    , ppCurrent = xmobarColor foreground base03
-                . xmobarBorder "Top" base0E 2
-                . wrap (myWSFont ++ " ") " </fn>"         -- Current workspace
-    , ppUrgent  = xmobarColor base08 ""
-                . wrap (myWSFont ++ " ") " </fn>"         -- Urgent workspace
-    , ppVisible = xmobarColor foreground ""
-                . xmobarBorder "Top" base04 2
-                . wrap (myWSFont ++ " ") " </fn>"         -- Visible but not current workspace
-    , ppHidden  = xmobarColor foreground ""
-                . wrap (myWSFont ++ " ") " </fn>"         -- Hidden workspaces
-    , ppHiddenNoWindows = xmobarColor base02 ""
-                        . wrap (myWSFont ++ " ") " </fn>" -- Hidden workspaces (no windows)
-    }
+        -- key bindings
+        , keys               = myLegacyKeys
+        , mouseBindings      = myMouseBindings
 
-mySBConfig = pure (filterOutWsPP [scratchpadWorkspaceTag] myPP)
-
-mySB0 = statusBarProp "xmobar -x 0 ~/.config/xmobar/mainScreen.hs"      (mySBConfig)
-mySB1 = statusBarProp "xmobar -x 1 ~/.config/xmobar/secondaryScreen.hs" (mySBConfig)
+        -- hooks, layouts
+        , manageHook         = myManageHook <+> manageDocks
+        , layoutHook         = lessBorders OnlyScreenFloat
+                             $ myLayoutHook
+        , startupHook        = myStartupHook
+    } `additionalKeysP` myKeysP `additionalKeys` myKeys
 
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse = False
@@ -341,7 +313,7 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     findCliFiles     = title     =? "cliFiles"
     findMusic        = className =? "ncmpcpp"
     findVirtManager  = title     =? "Virtual Machine Manager"
-    findTorrent      = className =? "Transmission-gtk"
+    findTorrent      = className =? "transmission-gtk"
     findCalc         = className =? "gnome-calculator"
     findWhatsApp     = className =? "Whatsapp-for-linux"
     findDiscord      = className =? "discord"
@@ -399,9 +371,8 @@ myModMask = mod4Mask
 
 myKeysP :: [(String, X ())]
 
-myVar = "xmonad"
 myKeysP =
-    [ ("M-C-d", spawn ("eww update debug=" ++ myVar) ) -- Debugging
+    [ ("M-C-d", spawn ("eww update debug=" ++ "xmonad") ) -- Debugging
 
     , ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart"       ) -- Restart XMonad
     , ("M-C-q"     , io (exitWith ExitSuccess)                          ) -- Quit XMonad
