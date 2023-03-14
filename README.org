@@ -280,7 +280,7 @@ myManageHook = composeAll
 #+begin_src haskell
 myConfig = def
         -- simple stuff
-        { terminal           = myTerminal
+        { terminal           = myTerm
         , focusFollowsMouse  = myFocusFollowsMouse
         , clickJustFocuses   = myClickJustFocuses
         , borderWidth        = myBorderWidth
@@ -357,34 +357,45 @@ myClickJustFocuses = False
                        
 * Apps
 #+begin_src haskell
-myTerminal         = "alacritty"
-myWebBrowser       = "qutebrowser"
-myIncognitoBrowser = "qutebrowser --target private-window"
-myTorBrowser       = "torbrowser-launcher"
-mySteam            = "/usr/bin/steam-runtime %U"
-myFileManager      = "pcmanfm"
-myCliFileManager   = "vifmrun"
-myTextEditor       = myTerminal ++ " -e vim"
-myIde              = "emacsclient -c -a 'emacs'"
-myMusicPlayer      = myTerminal ++ " -e ncmpcpp"
-myVideoPlayer      = "mpv"
-myVideoEditor      = "kdenlive"
-myPhotoLibrary     = "digikam"
-myImageEditor      = "gimp"
-myVectorEditor     = "inkscape"
-myTorrentClient    = "transmission-gtk"
-myCalculator       = "gnome-calculator"
-myVm               = "virt-manager"
+-- cli tools
+myTerm          = "alacritty"
+myCliFiles      = "vifmrun"
+myCliMusic      = "ncmpcpp"
+myCliText       = "vim"
+myCliSysAudio   = "alsamixer"
+myCliSysMonitor = "btop"
+myCliSysTasks   = "htop"
 
-myWhatsApp         = "whatsapp-for-linux"
-myDiscord          = "discord"
+-- core tools
+myWebBrowser    = "qutebrowser"
+myIncBrowser    = "qutebrowser --target private-window"
+myTorBrowser    = "torbrowser-launcher"
+myIde           = "emacsclient -c -a 'emacs'"
+myFiles         = "pcmanfm"
+mySteam         = "/usr/bin/steam-runtime %U"
 
-myLauncher         = "rofi -show drun"
-myPasswordManager  = "rofi-pass"
-myNetworkManager   = "nm-connection-editor"
-myBluetoothManager = "blueman-manager"
-myPowerManager     = "xfce4-power-manager-settings"
-myAudioManager     = myTerminal ++ " -e alsamixer"
+-- extra tools
+myLauncher      = "rofi -show drun"
+myPassManager   = "rofi-pass"
+myVirtManager   = "virt-manager"
+myTorrent       = "transmission-gtk"
+myCalculator    = "gnome-calculator"
+myAnki          = "anki"
+
+-- graphics tools
+myPhotoLibrary  = "digikam"
+myImgEditor     = "gimp"
+myVctEditor     = "inkscape"
+myVidEditor     = "kdenlive"
+
+-- chat apps
+myWhatsApp      = "whatsapp-for-linux"
+myDiscord       = "discord"
+
+-- system tools
+mySysPower      = "xfce4-power-manager-settings"
+mySysNetwork    = "nm-connection-editor"
+mySysBluetooth  = "blueman-manager"
 #+end_src
 
 * Theme
@@ -506,16 +517,16 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
                  ]
   
   where
-    spawnTerm        = myTerminal ++ " -t scratchpad"
-    spawnHtop        = myTerminal ++ " -t htop -e htop"
-    spawnCliFiles    = myTerminal ++ " -t cliFiles -e " ++ myCliFileManager
-    spawnMusic       = myTerminal ++ " --class ncmpcpp,music -e ncmpcpp"
-    spawnVirtManager = myVm
-    spawnTorrent     = myTorrentClient
+    spawnTerm        = myTerm ++ " -t scratchpad"
+    spawnHtop        = myTerm ++ " -t htop -e"               ++ myCliSysTasks
+    spawnCliFiles    = myTerm ++ " -t cliFiles -e"           ++ myCliFiles
+    spawnMusic       = myTerm ++ " --class ncmpcpp,music -e" ++ myCliMusic
+    spawnVirtManager = myVirtManager
+    spawnTorrent     = myTorrent
     spawnCalc        = myCalculator
     spawnWhatsApp    = myWhatsApp
     spawnDiscord     = myDiscord
-    spawnAnki        = "anki"
+    spawnAnki        = myAnki
     
     findTerm         = title     =? "scratchpad"
     findHtop         = title     =? "htop"
@@ -792,28 +803,27 @@ Swapping
 
 *** Launching Apps
 #+begin_src haskell
-    , ("C-M1-t"    , spawn (myTerminal)        ) -- Launch Terminal
-    , ("M-<Return>", spawn (myTerminal)        ) -- Launch Terminal
+    , ("C-M1-t"    , spawn (myTerm)        ) -- Launch Terminal
+    , ("M-<Return>", spawn (myTerm)        ) -- Launch Terminal
     , ("M-c"       , spawn (myIde)             ) -- Launch IDE
-    , ("M-S-e"     , spawn (myFileManager)     ) -- Launch File Manager
+    , ("M-S-e"     , spawn (myFiles)           ) -- Launch File Manager
     , ("M-b"       , spawn (myWebBrowser)      ) -- Launch Web Browser
-    , ("M-i"       , spawn (myIncognitoBrowser)) -- Launch Web Browser in Incognito Mode
-    , ("M-p"       , spawn (myPasswordManager) ) -- Autofill Passwords
+    , ("M-i"       , spawn (myIncBrowser)      ) -- Launch Web Browser in Incognito Mode
+    , ("M-p"       , spawn (myPassManager)     ) -- Autofill Passwords
     , ("M-r"       , spawn (myLauncher)        ) -- Launch Launcher
     , ("M-S-r"     , spawn "dmenu_run"         ) -- Launch dmenu
 
     -- Primary
     , ("M-o t"     , spawn (myTorBrowser)      ) -- Launch Tor Browser
-    , ("M-o m"     , spawn (myMusicPlayer)     ) -- Launch Music Player
-    , ("M-o v"     , spawn (myVideoPlayer)     ) -- Launch Video Player
+    , ("M-o m"     , spawn (myTerm ++ myCliMusic)        ) -- Launch Music Player
     , ("M-o s"     , spawn (mySteam)           ) -- Launch Steam
 
     -- Secondary
-    , ("C-M1-o t"  , spawn (myTextEditor)      ) -- Launch Text Editor
+    , ("C-M1-o t"  , spawn (myTerm ++ myCliText)         ) -- Launch Text Editor
     , ("C-M1-o p"  , spawn (myPhotoLibrary)    ) -- Launch Photo Library
-    , ("C-M1-o g"  , spawn (myImageEditor)     ) -- Launch Image Editor
-    , ("C-M1-o r"  , spawn (myVectorEditor)    ) -- Launch Vector Editor
-    , ("C-M1-o v"  , spawn (myVideoEditor)     ) -- Launch Video Editor
+    , ("C-M1-o g"  , spawn (myImgEditor)       ) -- Launch Image Editor
+    , ("C-M1-o r"  , spawn (myVctEditor)       ) -- Launch Vector Editor
+    , ("C-M1-o v"  , spawn (myVidEditor)       ) -- Launch Video Editor
   ]
 #+end_src
 
