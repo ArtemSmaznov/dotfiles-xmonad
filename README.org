@@ -16,13 +16,13 @@
   - [[#prompt][Prompt]]
   - [[#util][Util]]
   - [[#theme][Theme]]
+- [[#general][General]]
 - [[#main][Main]]
 - [[#hooks-1][Hooks]]
   - [[#startup-hook][Startup hook]]
   - [[#rules][Rules]]
 - [[#config][Config]]
 - [[#bars][Bars]]
-- [[#general-settings][General Settings]]
 - [[#apps][Apps]]
 - [[#theme-1][Theme]]
 - [[#windows][Windows]]
@@ -125,6 +125,24 @@ import XMonad.Util.SpawnOnce
 import Themes.Base16
 #+end_src
 
+* General
+#+begin_src haskell
+myScript = "$HOME/.local/bin/"
+myDMScript = "$HOME/.local/bin/dm-scripts/"
+#+end_src
+
+Whether focus follows the mouse pointer.
+#+begin_src haskell
+myFocusFollowsMouse :: Bool
+myFocusFollowsMouse = False
+#+end_src
+
+Whether clicking on a window to focus also passes the click to the window
+#+begin_src haskell
+myClickJustFocuses :: Bool
+myClickJustFocuses = False
+#+end_src
+
 * Main
 #+begin_src haskell
 main :: IO ()
@@ -146,7 +164,7 @@ per-workspace layout choices.
 By default, do nothing.
 #+begin_src haskell
 myStartupHook = do
-    spawnOnce "$HOME/.local/bin/auto-start.sh"
+    spawnOnce (myScript ++ "auto-start.sh")
     spawn "eww open-many bar0 bar1"
 
     -- -- Manage Workspaces
@@ -156,7 +174,7 @@ myStartupHook = do
 
     -- System Tray
     spawn "killall trayer"  -- kill current trayer on each restart
-    spawn "$HOME/.local/bin/call-trayer.sh"
+    spawn (myScript ++ "call-trayer.sh")
 #+end_src
 
 ** Rules
@@ -342,19 +360,6 @@ mySB0 = statusBarProp "xmobar -x 0 ~/.config/xmobar/mainScreen.hs"      (mySBCon
 mySB1 = statusBarProp "xmobar -x 1 ~/.config/xmobar/secondaryScreen.hs" (mySBConfig)
 #+end_src
 
-* General Settings
-Whether focus follows the mouse pointer.
-#+begin_src haskell
-myFocusFollowsMouse :: Bool
-myFocusFollowsMouse = False
-#+end_src
-
-Whether clicking on a window to focus also passes the click to the window
-#+begin_src haskell
-myClickJustFocuses :: Bool
-myClickJustFocuses = False
-#+end_src
-                       
 * Apps
 #+begin_src haskell
 -- cli tools
@@ -506,11 +511,11 @@ clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
 myScratchPads :: [NamedScratchpad]
 myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloating $ myScratchpadTerm)
                  , NS "htop"        spawnHtop        findHtop        (customFloating $ myScratchpadTerm)
-                 , NS "cliFiles"    spawnCliFiles    findCliFiles    (customFloating $ myScratchpadTerm)
+                 , NS "files"       spawnCliFiles    findCliFiles    (customFloating $ myScratchpadTerm)
                  , NS "music"       spawnMusic       findMusic       (customFloating $ myScratchpadTerm)
+                 , NS "calc"        spawnCalc        findCalc        (customFloating $ myScratchpadCalc)
                  , NS "virtmanager" spawnVirtManager findVirtManager doCenterFloat
                  , NS "torrent"     spawnTorrent     findTorrent     doCenterFloat
-                 , NS "calc"        spawnCalc        findCalc        (customFloating $ myScratchpadCalc)
                  , NS "whatsapp"    spawnWhatsApp    findWhatsApp    doCenterFloat
                  , NS "discord"     spawnDiscord     findDiscord     doCenterFloat
                  , NS "anki"        spawnAnki        findAnki        doCenterFloat
@@ -631,17 +636,17 @@ myKeysP =
 #+end_src
 
 #+begin_src haskell
-    , ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart"       ) -- Restart XMonad
-    , ("M-C-q"     , io (exitWith ExitSuccess)                          ) -- Quit XMonad
+    , ("M-C-r"     , spawn "xmonad --recompile; xmonad --restart" ) -- Restart XMonad
+    , ("M-C-q"     , io (exitWith ExitSuccess)                    ) -- Quit XMonad
 
     -- Extra modifier keys were already added to Xmonad-contrib. Waiting for the new version to be released
-    , ("S-<Alt_R>" , spawn "$HOME/.local/bin/dm-scripts/dm-lang"        ) -- Language Switching
+    , ("S-<Alt_R>" , spawn (myDMScript ++ "dm-lang")              ) -- Language Switching
 
-    , ("M-t z"     , toggleZen                                          ) -- Toggle Zen Mode
-    , ("M-t g"     , toggleGaps                                         ) -- Toggle Gaps
-    , ("M-t b"     , toggleBorders                                      ) -- Toggle Window Borders
-    , ("M-t s"     , toggleStatusBar                                    ) -- Ignore the statusbar
-    , ("M-t k"     , spawn "$HOME/.local/bin/dm-scripts/dm-keys toggle" ) -- Toggle Key Grabber
+    , ("M-t z"     , toggleZen                                    ) -- Toggle Zen Mode
+    , ("M-t g"     , toggleGaps                                   ) -- Toggle Gaps
+    , ("M-t b"     , toggleBorders                                ) -- Toggle Window Borders
+    , ("M-t s"     , toggleStatusBar                              ) -- Ignore the statusbar
+    , ("M-t k"     , spawn (myDMScript ++ "dm-keys toggle")       ) -- Toggle Key Grabber
 #+end_src
 
 *** Windows
@@ -731,99 +736,101 @@ Swapping
 *** Scratchpads
 #+begin_src haskell
     , ("M-`"           , namedScratchpadAction myScratchPads "terminal"    ) -- Terminal Scratchpad
-    , ("M-e"           , namedScratchpadAction myScratchPads "cliFiles"    ) -- File Manager Scratchpad
+    , ("M-e"           , namedScratchpadAction myScratchPads "files"       ) -- File Manager Scratchpad
     , ("C-M1-<Delete>" , namedScratchpadAction myScratchPads "htop"        ) -- Htop Scratchpad
+
+    , ("M-s a"         , namedScratchpadAction myScratchPads "anki"        ) -- Anki Scratchpad
+    , ("M-s c"         , namedScratchpadAction myScratchPads "calc"        ) -- Calculator Scratchpad
+    , ("M-s d"         , namedScratchpadAction myScratchPads "discord"     ) -- Discord Scratchpad
     , ("M-s h"         , namedScratchpadAction myScratchPads "htop"        ) -- Htop Scratchpad
     , ("M-s m"         , namedScratchpadAction myScratchPads "music"       ) -- Music Scratchpad
-    , ("M-s c"         , namedScratchpadAction myScratchPads "calc"        ) -- Calculator Scratchpad
-    , ("M-s w"         , namedScratchpadAction myScratchPads "whatsapp"    ) -- WhatsApp Scratchpad
-    , ("M-s d"         , namedScratchpadAction myScratchPads "discord"     ) -- Discord Scratchpad
-    , ("M-s v"         , namedScratchpadAction myScratchPads "virtmanager" ) -- VirtManager Scratchpad
     , ("M-s t"         , namedScratchpadAction myScratchPads "torrent"     ) -- Torrent Scratchpad
-    , ("M-s a"         , namedScratchpadAction myScratchPads "anki"        ) -- Anki Scratchpad
+    , ("M-s v"         , namedScratchpadAction myScratchPads "virtmanager" ) -- VirtManager Scratchpad
+    , ("M-s w"         , namedScratchpadAction myScratchPads "whatsapp"    ) -- WhatsApp Scratchpad
 #+end_src
 
 *** Media Keys
 #+begin_src haskell
-    , ("<XF86AudioRaiseVolume>"  , spawn "amixer set Master 2%+ unmute" ) -- Increase System Volume
-    , ("<XF86AudioLowerVolume>"  , spawn "amixer set Master 2%- unmute" ) -- Decrease System Volume
-    , ("<XF86AudioMute>"         , spawn "amixer set Master toggle"     ) -- Mute
-    , ("C-<XF86AudioRaiseVolume>", spawn "mpc volume +2"                ) -- Increase Player Volume
-    , ("C-<XF86AudioLowerVolume>", spawn "mpc volume -2"                ) -- Decrease Player Volume
-    , ("<XF86AudioPrev>"         , spawn "mpc prev"                     ) -- Prev Song
-    , ("<XF86AudioNext>"         , spawn "mpc next"                     ) -- Next Song
-    , ("<XF86AudioPlay>"         , spawn "mpc toggle"                   ) -- Play/Pause Music
-    , ("<XF86AudioStop>"         , spawn "mpc stop"                     ) -- Stop Music
+    , ("<XF86AudioRaiseVolume>"  , spawn (myScript ++ "set-volume.sh + 2") ) -- Increase System Volume
+    , ("<XF86AudioLowerVolume>"  , spawn (myScript ++ "set-volume.sh - 2") ) -- Decrease System Volume
+    , ("<XF86AudioMute>"         , spawn (myScript ++ "toggle-mute.sh"   ) ) -- Mute
+    , ("C-<XF86AudioRaiseVolume>", spawn "mpc volume +2"                 ) -- Increase Player Volume
+    , ("C-<XF86AudioLowerVolume>", spawn "mpc volume -2"                 ) -- Decrease Player Volume
+    , ("<XF86AudioPrev>"         , spawn "mpc prev"                      ) -- Prev Song
+    , ("<XF86AudioNext>"         , spawn "mpc next"                      ) -- Next Song
+    , ("<XF86AudioPlay>"         , spawn "mpc toggle"                    ) -- Play/Pause Music
+    , ("<XF86AudioStop>"         , spawn "mpc stop"                      ) -- Stop Music
 #+end_src
 
 *** dm-scripts
+Global
 #+begin_src haskell
-    , ("M-d M-d" , spawn "$HOME/.local/bin/dm-scripts/dm-master"     ) -- DM Master
-    , ("M-d w"   , spawn "$HOME/.local/bin/dm-scripts/dm-wallpaper"  ) -- DM Wallpaper
-    , ("M-d r"   , spawn "$HOME/.local/bin/dm-scripts/dm-record"     ) -- DM Record
-    , ("M-d p"   , spawn "$HOME/.local/bin/dm-scripts/dm-power"      ) -- DM Power
-    , ("M-d t"   , spawn "$HOME/.local/bin/dm-scripts/dm-theme"      ) -- DM Theme
-    , ("M-d s"   , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot" ) -- DM Screenshot
-    , ("M-d b"   , spawn "$HOME/.local/bin/dm-scripts/dm-bookman"    ) -- DM Bookman
-    , ("M-d n"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify"     ) -- DM Notify
-    , ("M-d \\"  , spawn "$HOME/.local/bin/dm-scripts/dm-notify"     ) -- DM Notify
-    , ("M-d k"   , spawn "$HOME/.local/bin/dm-scripts/dm-keys"       ) -- DM Keys
+    , ("M-d M-d" , spawn (myDMScript ++ "dm-master"     )) -- DM Master
+    , ("M-d w"   , spawn (myDMScript ++ "dm-wallpaper"  )) -- DM Wallpaper
+    , ("M-d r"   , spawn (myDMScript ++ "dm-record"     )) -- DM Record
+    , ("M-d p"   , spawn (myDMScript ++ "dm-power"      )) -- DM Power
+    , ("M-d t"   , spawn (myDMScript ++ "dm-theme"      )) -- DM Theme
+    , ("M-d s"   , spawn (myDMScript ++ "dm-screenshot" )) -- DM Screenshot
+    , ("M-d b"   , spawn (myDMScript ++ "dm-bookman"    )) -- DM Bookman
+    , ("M-d n"   , spawn (myDMScript ++ "dm-notify"     )) -- DM Notify
+    , ("M-d \\"  , spawn (myDMScript ++ "dm-notify"     )) -- DM Notify
+    , ("M-d k"   , spawn (myDMScript ++ "dm-keys"       )) -- DM Keys
 #+end_src
 
-*** Power Control
+Power Control
 #+begin_src haskell
-    , ("M1-<F4>" , spawn "$HOME/.local/bin/dm-scripts/dm-power"         ) -- Logout Menu
-    , ("M-z l"   , spawn "$HOME/.local/bin/dm-scripts/dm-power lock"    ) -- Lock Screen
-    , ("M-z s"   , spawn "$HOME/.local/bin/dm-scripts/dm-power suspend" ) -- Suspend System
-    , ("M-z p"   , spawn "$HOME/.local/bin/dm-scripts/dm-power poweroff") -- Shutdown System
-    , ("M-z r"   , spawn "$HOME/.local/bin/dm-scripts/dm-power reboot"  ) -- Reboot System
-    , ("M-z w"   , spawn "$HOME/.local/bin/dm-scripts/dm-power windows" ) -- Reboot to Windows
-    , ("M-z z"   , spawn "$HOME/.local/bin/dm-scripts/dm-power suspend" ) -- Suspend System
-    , ("M-z M-z" , spawn "$HOME/.local/bin/dm-scripts/dm-power suspend" ) -- Suspend System
+    , ("M1-<F4>" , spawn (myDMScript ++ "dm-power"         ) ) -- Logout Menu
+    , ("M-z l"   , spawn (myDMScript ++ "dm-power lock"    ) ) -- Lock Screen
+    , ("M-z s"   , spawn (myDMScript ++ "dm-power suspend" ) ) -- Suspend System
+    , ("M-z p"   , spawn (myDMScript ++ "dm-power poweroff") ) -- Shutdown System
+    , ("M-z r"   , spawn (myDMScript ++ "dm-power reboot"  ) ) -- Reboot System
+    , ("M-z w"   , spawn (myDMScript ++ "dm-power windows" ) ) -- Reboot to Windows
+    , ("M-z z"   , spawn (myDMScript ++ "dm-power suspend" ) ) -- Suspend System
+    , ("M-z M-z" , spawn (myDMScript ++ "dm-power suspend" ) ) -- Suspend System
 #+end_src
 
-*** Screenshot
+Screenshot
 #+begin_src haskell
-    , ("<Print>"    , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot screen" ) -- Fullscreen Screenshot
-    , ("M-S-<Print>", spawn "$HOME/.local/bin/dm-scripts/dm-screenshot area"   ) -- Selection Area Screenshot
-    , ("M1-<Print>" , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot window" ) -- Active Window Screenshot
-    , ("M-<Print>"  , spawn "$HOME/.local/bin/dm-scripts/dm-screenshot full"   ) -- Full Desktop Screenshot
+    , ("<Print>"    , spawn (myDMScript ++ "dm-screenshot screen") ) -- Fullscreen Screenshot
+    , ("M-S-<Print>", spawn (myDMScript ++ "dm-screenshot area"  ) ) -- Selection Area Screenshot
+    , ("M1-<Print>" , spawn (myDMScript ++ "dm-screenshot window") ) -- Active Window Screenshot
+    , ("M-<Print>"  , spawn (myDMScript ++ "dm-screenshot full"  ) ) -- Full Desktop Screenshot
 #+end_src
 
-*** Notifications
+Notifications
 #+begin_src haskell
-    , ("M-\\ \\"   , spawn "$HOME/.local/bin/dm-scripts/dm-notify recent"  ) -- Show most recent Notification
-    , ("M-\\ M-\\" , spawn "$HOME/.local/bin/dm-scripts/dm-notify recent"  ) -- Show most recent Notification
-    , ("M-\\ |"    , spawn "$HOME/.local/bin/dm-scripts/dm-notify recents" ) -- Show few recent Notifications
-    , ("M-\\ r"    , spawn "$HOME/.local/bin/dm-scripts/dm-notify recents" ) -- Show few recent Notifications
-    , ("M-\\ S-c"  , spawn "$HOME/.local/bin/dm-scripts/dm-notify clear"   ) -- Clear all Notifications
-    , ("M-\\ c"    , spawn "$HOME/.local/bin/dm-scripts/dm-notify close"   ) -- Clear last Notification
-    , ("M-\\ a"    , spawn "$HOME/.local/bin/dm-scripts/dm-notify context" ) -- Open last Notification
+    , ("M-\\ \\"   , spawn (myDMScript ++ "dm-notify recent" ) ) -- Show most recent Notification
+    , ("M-\\ M-\\" , spawn (myDMScript ++ "dm-notify recent" ) ) -- Show most recent Notification
+    , ("M-\\ |"    , spawn (myDMScript ++ "dm-notify recents") ) -- Show few recent Notifications
+    , ("M-\\ r"    , spawn (myDMScript ++ "dm-notify recents") ) -- Show few recent Notifications
+    , ("M-\\ S-c"  , spawn (myDMScript ++ "dm-notify clear"  ) ) -- Clear all Notifications
+    , ("M-\\ c"    , spawn (myDMScript ++ "dm-notify close"  ) ) -- Clear last Notification
+    , ("M-\\ a"    , spawn (myDMScript ++ "dm-notify context") ) -- Open last Notification
 #+end_src
 
 *** Launching Apps
 #+begin_src haskell
-    , ("C-M1-t"    , spawn (myTerm)        ) -- Launch Terminal
-    , ("M-<Return>", spawn (myTerm)        ) -- Launch Terminal
-    , ("M-c"       , spawn (myIde)             ) -- Launch IDE
-    , ("M-S-e"     , spawn (myFiles)           ) -- Launch File Manager
-    , ("M-b"       , spawn (myWebBrowser)      ) -- Launch Web Browser
-    , ("M-i"       , spawn (myIncBrowser)      ) -- Launch Web Browser in Incognito Mode
-    , ("M-p"       , spawn (myPassManager)     ) -- Autofill Passwords
-    , ("M-r"       , spawn (myLauncher)        ) -- Launch Launcher
-    , ("M-S-r"     , spawn "dmenu_run"         ) -- Launch dmenu
+    , ("C-M1-t"    , spawn (myTerm)               ) -- Launch Terminal
+    , ("M-<Return>", spawn (myTerm)               ) -- Launch Terminal
+    , ("M-c"       , spawn (myIde)                ) -- Launch IDE
+    , ("M-S-e"     , spawn (myFiles)              ) -- Launch File Manager
+    , ("M-b"       , spawn (myWebBrowser)         ) -- Launch Web Browser
+    , ("M-i"       , spawn (myIncBrowser)         ) -- Launch Web Browser in Incognito Mode
+    , ("M-p"       , spawn (myPassManager)        ) -- Autofill Passwords
+    , ("M-r"       , spawn (myLauncher)           ) -- Launch Launcher
+    , ("M-S-r"     , spawn "dmenu_run"            ) -- Launch dmenu
 
     -- Primary
-    , ("M-o t"     , spawn (myTorBrowser)      ) -- Launch Tor Browser
-    , ("M-o m"     , spawn (myTerm ++ myCliMusic)        ) -- Launch Music Player
-    , ("M-o s"     , spawn (mySteam)           ) -- Launch Steam
+    , ("M-o t"     , spawn (myTorBrowser)         ) -- Launch Tor Browser
+    , ("M-o m"     , spawn (myTerm ++ myCliMusic) ) -- Launch Music Player
+    , ("M-o s"     , spawn (mySteam)              ) -- Launch Steam
 
     -- Secondary
-    , ("C-M1-o t"  , spawn (myTerm ++ myCliText)         ) -- Launch Text Editor
-    , ("C-M1-o p"  , spawn (myPhotoLibrary)    ) -- Launch Photo Library
-    , ("C-M1-o g"  , spawn (myImgEditor)       ) -- Launch Image Editor
-    , ("C-M1-o r"  , spawn (myVctEditor)       ) -- Launch Vector Editor
-    , ("C-M1-o v"  , spawn (myVidEditor)       ) -- Launch Video Editor
+    , ("C-M1-o t"  , spawn (myTerm ++ myCliText)  ) -- Launch Text Editor
+    , ("C-M1-o p"  , spawn (myPhotoLibrary)       ) -- Launch Photo Library
+    , ("C-M1-o g"  , spawn (myImgEditor)          ) -- Launch Image Editor
+    , ("C-M1-o r"  , spawn (myVctEditor)          ) -- Launch Vector Editor
+    , ("C-M1-o v"  , spawn (myVidEditor)          ) -- Launch Video Editor
   ]
 #+end_src
 
@@ -831,7 +838,7 @@ Swapping
 #+begin_src haskell
 myKeys :: [((KeyMask, KeySym), X ())]
 myKeys =
-    [ ((shiftMask, xK_Alt_L), spawn "$HOME/.local/bin/dm-scripts/dm-lang"  ) -- Language Switching
+    [ ((shiftMask, xK_Alt_L), spawn (myDMScript ++ "dm-lang") ) -- Language Switching
 
     -- Push window back into tiling
     -- , ((mod4Mask,               xK_t     ), withFocused $ windows . W.sink)
