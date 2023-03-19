@@ -12,7 +12,6 @@ import Data.Maybe (fromJust)
 import Data.Monoid
 import qualified Data.Map        as M
 
-import XMonad.Hooks.DynamicLog (wrap, pad, xmobarColor, shorten, PP(..))
 import XMonad.Hooks.EwmhDesktops  -- for some fullscreen events, xcomposite in obs, active window for maim screenshots, etc.
 import XMonad.Hooks.ManageDocks (avoidStruts, docks, manageDocks, ToggleStruts(..))
 import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat, doCenterFloat)
@@ -58,21 +57,19 @@ main = xmonad
      . docks
      . ewmhFullscreen
      . ewmh
-     -- . withSB (mySB0 <> mySB1)
+     . withSB mySB
+     -- . withSB (myMainSB <> mySideSB)
      $ myConfig
 
 myStartupHook = do
     spawnOnce (myScript ++ "auto-start.sh")
-    spawn "eww open-many bar0 bar1"
+    -- spawn "eww open-many bar0 bar1"
+    spawn ("$XDG_CONFIG_HOME/trayer/trayer.sh")
 
     -- -- Manage Workspaces
     -- screenWorkspace 1 >>= flip whenJust (windows . W.view) -- focus the second screen
     -- windows $ W.greedyView "\xf080"                        -- swap second screen to different workspace
     -- screenWorkspace 0 >>= flip whenJust (windows . W.view) -- focus the first screen again
-
-    -- System Tray
-    spawn "killall trayer"  -- kill current trayer on each restart
-    spawn (myScript ++ "call-trayer.sh")
 
 myManageHook = composeAll
     -- General Rules
@@ -193,6 +190,24 @@ myConfig = def
                              $ myLayoutHook
         , startupHook        = myStartupHook
     } `additionalKeysP` myKeysP `additionalKeys` myKeys
+
+myEwwPP :: PP
+myEwwPP =
+  def
+    { ppOrder           = \(ws:l:t:_) -> [ws,l]
+    , ppSep             = "::::"
+    , ppUrgent          = wrap "!" "!" -- urgent workspaces
+    , ppCurrent         = wrap "[" "]" -- main screen
+    , ppVisible         = wrap "<" ">" -- side screen
+    , ppHidden          = wrap "-" "-" -- filled workspaces
+    , ppHiddenNoWindows = wrap "_" "_" -- empty workspaces
+    }
+
+mySBConfig = pure (filterOutWsPP [scratchpadWorkspaceTag] myEwwPP)
+
+mySB      = statusBarProp "$XDG_CONFIG_HOME/eww/open-bars.sh" (mySBConfig)
+-- myMainSB = statusBarProp "eww open bar0" (mySBConfig)
+-- mySideSB = statusBarProp "eww open bar1" (mySBConfig)
 
 -- cli tools
 myTerm          = "alacritty"
