@@ -23,6 +23,8 @@ import XMonad.Layout.Grid
 import XMonad.Layout.Dwindle
 import XMonad.Layout.ResizableTile
 import XMonad.Layout.MultiColumns
+import XMonad.Layout.ThreeColumns
+import XMonad.Layout.ResizableThreeColumns
 
 import XMonad.Layout.MultiToggle (mkToggle, single, EOT(EOT), (??), Toggle(..))
 import XMonad.Layout.MultiToggle.Instances (StdTransformers (NBFULL, MIRROR, NOBORDERS))
@@ -57,13 +59,13 @@ main = xmonad
      . docks
      . ewmhFullscreen
      . ewmh
-     . withSB mySB
-     -- . withSB (myMainSB <> mySideSB)
+     -- . withSB mySB
+     -- . withSB (mySB0 <> mySB1)
+     . withSB mySB0
      $ myConfig
 
 myStartupHook = do
     spawnOnce (myScript ++ "auto-start.sh")
-    -- spawn "eww open-many bar0 bar1"
     spawn ("$XDG_CONFIG_HOME/trayer/trayer.sh")
 
     -- -- Manage Workspaces
@@ -108,7 +110,7 @@ myManageHook = composeAll
     , className =? "Lutris"                         --> doShift ( myWorkspaces !! 1 )
     , className =? "Citra"                          --> doShift ( myWorkspaces !! 1 )
     , className =? "SuperTuxKart"                   --> doShift ( myWorkspaces !! 1 )
-    , className =? "Steam"                          --> doShift ( myWorkspaces !! 1 )
+    , className =? "steam"                          --> doShift ( myWorkspaces !! 1 )
     , title     =? "Steam"                          --> doShift ( myWorkspaces !! 1 )
     , className =? "battle.net.exe"                 --> doShift ( myWorkspaces !! 1 )
     , title     =? "Battle.net"                     --> doShift ( myWorkspaces !! 1 )
@@ -136,11 +138,8 @@ myManageHook = composeAll
 
     -- Workspace 5 - Music
     , className =? "Spotify"                        --> doShift ( myWorkspaces !! 4 )
-    , className =? "youtubemusic-nativefier-040164" --> doShift ( myWorkspaces !! 4 )
 
     -- Workspace 6 - Graphics
-    , className =? "Gimp"                           --> doShift ( myWorkspaces !! 5 )
-    , className =? "Gimp-2.10"                      --> doShift ( myWorkspaces !! 5 )
     , className =? "Gimp"                           --> doShift ( myWorkspaces !! 5 )
     , className =? "Inkscape"                       --> doShift ( myWorkspaces !! 5 )
     , className =? "Flowblade"                      --> doShift ( myWorkspaces !! 5 )
@@ -157,6 +156,7 @@ myManageHook = composeAll
     , title     =? "Slack"                          --> doShift ( myWorkspaces !! 6 )
     , title     =? "discord"                        --> doShift ( myWorkspaces !! 6 )
     , title     =? "signal"                         --> doShift ( myWorkspaces !! 6 )
+    , title     =? "Friends List"                   --> doShift ( myWorkspaces !! 6 )
 
     -- Workspace 8 - Sandbox
     , className =? "Virt-manager"                   --> doShift ( myWorkspaces !! 7 )
@@ -165,7 +165,7 @@ myManageHook = composeAll
     , className =? "Cypress"                        --> doShift ( myWorkspaces !! 7 )
 
     -- Workspace 9 - Monitor
-    , title     =? "btop"                           --> doShift ( myWorkspaces !! 8 )
+    , className =? "btop"                           --> doShift ( myWorkspaces !! 8 )
 
     ] <+> namedScratchpadManageHook myScratchPads
 
@@ -191,23 +191,32 @@ myConfig = def
         , startupHook        = myStartupHook
     } `additionalKeysP` myKeysP `additionalKeys` myKeys
 
-myEwwPP :: PP
-myEwwPP =
-  def
-    { ppOrder           = \(ws:l:t:_) -> [ws,l]
-    , ppSep             = "::::"
-    , ppUrgent          = wrap "!" "!" -- urgent workspaces
-    , ppCurrent         = wrap "[" "]" -- main screen
-    , ppVisible         = wrap "<" ">" -- side screen
-    , ppHidden          = wrap "-" "-" -- filled workspaces
-    , ppHiddenNoWindows = wrap "_" "_" -- empty workspaces
+myWSFont = "<fn=5>"
+
+myPP :: PP
+myPP = def
+    { ppTitleSanitize   = xmobarStrip
+                        . shorten 30
+    , ppSep     = "<fc=" ++ base03 ++ "> | </fc>"         -- Separator between widgets
+    , ppOrder   = \(ws:l:t:_) -> [ws,l,t]                 -- order of things in xmobar
+    , ppCurrent = xmobarColor base07 base03
+                . xmobarBorder "Top" base0E 2
+                . wrap (myWSFont ++ " ") " </fn>"         -- Current workspace
+    , ppUrgent  = xmobarColor base08 ""
+                . wrap (myWSFont ++ " ") " </fn>"         -- Urgent workspace
+    , ppVisible = xmobarColor base07 ""
+                . xmobarBorder "Top" base04 2
+                . wrap (myWSFont ++ " ") " </fn>"         -- Visible but not current workspace
+    , ppHidden  = xmobarColor base07 ""
+                . wrap (myWSFont ++ " ") " </fn>"         -- Hidden workspaces
+    , ppHiddenNoWindows = xmobarColor base02 ""
+                        . wrap (myWSFont ++ " ") " </fn>" -- Hidden workspaces (no windows)
     }
 
-mySBConfig = pure (filterOutWsPP [scratchpadWorkspaceTag] myEwwPP)
+mySBConfig = pure (filterOutWsPP [scratchpadWorkspaceTag] myPP)
 
-mySB      = statusBarProp "$XDG_CONFIG_HOME/eww/open-bars.sh" (mySBConfig)
--- myMainSB = statusBarProp "eww open bar0" (mySBConfig)
--- mySideSB = statusBarProp "eww open bar1" (mySBConfig)
+mySB0 = statusBarProp "xmobar -x 0 ~/.config/xmobar/mainScreen.hs"      (mySBConfig)
+-- mySB1 = statusBarProp "xmobar -x 1 ~/.config/xmobar/secondaryScreen.hs" (mySBConfig)
 
 -- cli tools
 myTerm          = "alacritty"
@@ -258,16 +267,32 @@ myGapSize = 7
 myNormalBorderColor  = base03 -- gray
 myFocusedBorderColor = base0E -- accent
 
+myWorkspaces  = [ "\xf0ac" -- Internet -- I like f268 better
+                , "\xf11b" -- Gaming -- I like f1b6 better
+                , "\xf11c" -- Coding
+                , "\xf07b" -- Computer
+                , "\xf025" -- Music
+                , "\xf030" -- Graphics
+                , "\xf7cd" -- Chat
+                , "\xf5fd" -- Sandbox
+                , "\xf080" -- Monitor
+                ]
+
+myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
+
+clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
+    where i = fromJust $ M.lookup ws myWorkspaceIndices
+
 myFloatingWindow    = W.RationalRect left_margin top_margin width height
     where
-        width       = 0.7
+        width       = 0.5
         height      = 0.7
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
 
 myScratchpadTerm = W.RationalRect left_margin top_margin width height
     where
-        width       = 0.8
+        width       = 0.5
         height      = 0.8
         left_margin = (1.0 - width)/2
         top_margin  = (1.0 - height)/2
@@ -295,22 +320,6 @@ toggleStatusBar  = sendMessage ToggleStruts
 toggleGaps       = toggleScreenSpacingEnabled     >> toggleWindowSpacingEnabled
 
 myNavigation2DConfig = def { defaultTiledNavigation = sideNavigation }
-
-myWorkspaces  = [ "\xf0ac" -- Internet -- I like f268 better
-                , "\xf11b" -- Gaming -- I like f1b6 better
-                , "\xf11c" -- Coding
-                , "\xf07b" -- Computer
-                , "\xf025" -- Music
-                , "\xf030" -- Graphics
-                , "\xf7cd" -- Chat
-                , "\xf5fd" -- Sandbox
-                , "\xf080" -- Monitor
-                ]
-
-myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] -- (,) == \x y -> (x,y)
-
-clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
-    where i = fromJust $ M.lookup ws myWorkspaceIndices
 
 myScratchPads :: [NamedScratchpad]
 myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloating $ myScratchpadTerm)
@@ -362,11 +371,11 @@ grid    = renamed [Replace "grid"]   -- just a grid layout
         $ Grid
 columns = renamed [Replace "columns"]   -- just a grid layout
         $ myGap myGapSize
-        $ multiCol
-          [1]    --- Windows in each column, starting with master. Set to 0 to catch the rest.
+        $ ResizableThreeCol
           1      --- Default value for all following columns.
           0.03   --- Percent of screen to increment by when resizing panes
-          (-0.5) --- Initial size of master area, or column area if the size is negative.
+          (1/3)  --- Initial size of master area, or column area if the size is negative.
+          []
 spiral  = renamed [Replace "spiral"]
         $ myGap myGapSize
         $ Spiral
@@ -391,8 +400,8 @@ myLayoutHook   = avoidStruts
                $ mkToggle (single MIRROR)
                $ myLayouts
   where
-    myLayouts = tall 
-            ||| columns
+    myLayouts = columns
+            ||| tall
             ||| spiral
             ||| full
 
@@ -407,7 +416,7 @@ myKeysP =
     , ("M-C-q"     , io (exitWith ExitSuccess)                    ) -- Quit XMonad
 
     -- Extra modifier keys were already added to Xmonad-contrib. Waiting for the new version to be released
-    , ("S-<Alt_R>" , spawn (myDMScript ++ "dm-lang")              ) -- Language Switching
+    , ("S-<Alt_R>" , spawn (myScript ++ "toggle-lang.sh")              ) -- Language Switching
 
     , ("M-t z"     , toggleZen                                    ) -- Toggle Zen Mode
     , ("M-t g"     , toggleGaps                                   ) -- Toggle Gaps
@@ -416,8 +425,8 @@ myKeysP =
     , ("M-t k"     , spawn (myDMScript ++ "dm-keys toggle")       ) -- Toggle Key Grabber
 
     , ("M-q"       , kill                          ) -- Close focused Window
-    , ("M-<F11>"   , toggleFullScreen              ) -- Toggles Fullscreen
-    , ("M-S-f"     , toggleFullScreen              ) -- Toggles Fullscreen
+    , ("M-<F11>"   , toggleFullScreen              ) -- Toggle Fullscreen
+    , ("M-S-f"     , toggleFullScreen              ) -- Toggle Fullscreen
     , ("M-m"       , toggleMaximize                ) -- Toggle Maximize
     , ("M-f"       , toggleFloating                ) -- Toggle Floating
 
@@ -545,7 +554,7 @@ myKeysP =
 
 myKeys :: [((KeyMask, KeySym), X ())]
 myKeys =
-    [ ((shiftMask, xK_Alt_L), spawn (myDMScript ++ "dm-lang") ) -- Language Switching
+    [ ((shiftMask, xK_Alt_L), spawn (myScript ++ "toggle-lang.sh") ) -- Language Switching
 
     -- Push window back into tiling
     -- , ((mod4Mask,               xK_t     ), withFocused $ windows . W.sink)
