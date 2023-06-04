@@ -137,6 +137,7 @@ myManageHook = composeAll
     , className =? "calendar"                       --> doShift ( myWorkspaces !! 3 )
 
     -- Workspace 5 - Music
+    , className =? "ncmpcpp"                        --> doShift ( myWorkspaces !! 4 )
     , className =? "Spotify"                        --> doShift ( myWorkspaces !! 4 )
 
     -- Workspace 6 - Graphics
@@ -335,10 +336,10 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
                  ]
   
   where
-    spawnTerm        = myTerm ++ " -t scratchpad"
-    spawnHtop        = myTerm ++ " -t htop -e"               ++ myCliSysTasks
-    spawnCliFiles    = myTerm ++ " -t cliFiles -e"           ++ myCliFiles
-    spawnMusic       = myTerm ++ " --class ncmpcpp,music -e" ++ myCliMusic
+    spawnTerm        = myTerm ++ " --class sp-term"
+    spawnHtop        = myTerm ++ " --class sp-htop -e"  ++ myCliSysTasks
+    spawnCliFiles    = myTerm ++ " --class sp-files -e" ++ myCliFiles
+    spawnMusic       = myTerm ++ " --class sp-music -e" ++ myCliMusic
     spawnVirtManager = myVirtManager
     spawnTorrent     = myTorrent
     spawnCalc        = myCalculator
@@ -346,10 +347,10 @@ myScratchPads  = [ NS "terminal"    spawnTerm        findTerm        (customFloa
     spawnDiscord     = myDiscord
     spawnAnki        = myAnki
     
-    findTerm         = title     =? "scratchpad"
-    findHtop         = title     =? "htop"
-    findCliFiles     = title     =? "cliFiles"
-    findMusic        = className =? "ncmpcpp"
+    findTerm         = className =? "sp-term"
+    findHtop         = className =? "sp-htop"
+    findCliFiles     = className =? "sp-files"
+    findMusic        = className =? "sp-music"
     findVirtManager  = title     =? "Virtual Machine Manager"
     findTorrent      = className =? "transmission-gtk"
     findCalc         = className =? "gnome-calculator"
@@ -477,14 +478,14 @@ myKeysP =
     , ("M-e"           , namedScratchpadAction myScratchPads "files"       ) -- File Manager Scratchpad
     , ("C-M1-<Delete>" , namedScratchpadAction myScratchPads "htop"        ) -- Htop Scratchpad
 
-    , ("M-s a"         , namedScratchpadAction myScratchPads "anki"        ) -- Anki Scratchpad
-    , ("M-s c"         , namedScratchpadAction myScratchPads "calc"        ) -- Calculator Scratchpad
-    , ("M-s d"         , namedScratchpadAction myScratchPads "discord"     ) -- Discord Scratchpad
-    , ("M-s h"         , namedScratchpadAction myScratchPads "htop"        ) -- Htop Scratchpad
     , ("M-s m"         , namedScratchpadAction myScratchPads "music"       ) -- Music Scratchpad
     , ("M-s t"         , namedScratchpadAction myScratchPads "torrent"     ) -- Torrent Scratchpad
+    , ("M-s a"         , namedScratchpadAction myScratchPads "anki"        ) -- Anki Scratchpad
     , ("M-s v"         , namedScratchpadAction myScratchPads "virtmanager" ) -- VirtManager Scratchpad
     , ("M-s w"         , namedScratchpadAction myScratchPads "whatsapp"    ) -- WhatsApp Scratchpad
+    , ("M-s d"         , namedScratchpadAction myScratchPads "discord"     ) -- Discord Scratchpad
+    , ("M-s c"         , namedScratchpadAction myScratchPads "calc"        ) -- Calculator Scratchpad
+    , ("M-s h"         , namedScratchpadAction myScratchPads "htop"        ) -- Htop Scratchpad
 
     , ("<XF86AudioRaiseVolume>"  , spawn (myScript ++ "set-volume.sh + 2") ) -- Increase System Volume
     , ("<XF86AudioLowerVolume>"  , spawn (myScript ++ "set-volume.sh - 2") ) -- Decrease System Volume
@@ -541,7 +542,7 @@ myKeysP =
 
     -- Primary
     , ("M-o t"     , spawn (myTorBrowser)         ) -- Launch Tor Browser
-    , ("M-o m"     , spawn (myTerm ++ myCliMusic) ) -- Launch Music Player
+    , ("M-o m"     , spawn (myTerm ++ " --class ncmpcpp -e " ++ myCliMusic) ) -- Launch Music Player
     , ("M-o s"     , spawn (mySteam)              ) -- Launch Steam
 
     -- Secondary
