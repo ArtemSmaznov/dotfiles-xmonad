@@ -1,3 +1,6 @@
+:PROPERTIES:
+:ID:       17ea607c-a8bd-49b7-a7ca-d600c7daf82f
+:END:
 #+title:       XMonad
 #+author:      Artem Smaznov
 #+description: A window manager written in Haskell
@@ -17,6 +20,7 @@
   - [[#util][Util]]
   - [[#theme][Theme]]
 - [[#general][General]]
+- [[#xmobar][XMobar]]
 - [[#main][Main]]
 - [[#hooks-1][Hooks]]
   - [[#startup-hook][Startup hook]]
@@ -24,7 +28,7 @@
 - [[#config][Config]]
 - [[#bars][Bars]]
   - [[#eww][EWW]]
-  - [[#xmobar][Xmobar]]
+  - [[#xmobar-1][Xmobar]]
 - [[#apps][Apps]]
 - [[#theme-1][Theme]]
 - [[#workspaces][Workspaces]]
@@ -40,6 +44,8 @@
   - [[#legacy-keybindings][Legacy Keybindings]]
   - [[#mouse-bindings][Mouse Bindings]]
 - [[#help][Help]]
+- [[#scripts][Scripts]]
+  - [[#dmscripts][DMScripts]]
 
 * Dependencies
 |----------------+--------------------------------|
@@ -146,6 +152,7 @@ myClickJustFocuses :: Bool
 myClickJustFocuses = False
 #+end_src
 
+* [[id:2824ddd7-259a-4263-afd9-2e69928d2108][XMobar]]
 * Main
 #+begin_src haskell
 main :: IO ()
@@ -965,3 +972,6 @@ help = unlines ["The default modifier key is 'alt'. Default keybindings:",
     "mod-button2  Raise the window to the top of the stack",
     "mod-button3  Set the window to floating mode and resize by dragging"]
 #+end_src
+
+* [[id:d4c60fae-8667-4066-902f-692a61572338][Scripts]]
+** [[id:c9d06930-ec33-4afc-b320-3942fa73e592][DMScripts]]
